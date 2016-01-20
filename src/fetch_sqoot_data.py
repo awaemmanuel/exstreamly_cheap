@@ -4,7 +4,9 @@
 '''
 import json
 import os
+import datetime
 import requests as rq
+from collections import OrderedDict
 from helper_modules import utility_functions as uf
 
 PUBLIC_KEY = 'pf3lj0'
@@ -63,27 +65,28 @@ def fetch_sqoot_data(base_url):
     focus_grp = reduce_categories_scope(categories_map, 
                                         mvp_categories)
     n = True
-    while n:
+    start_time = datetime.datetime.now()
+    end_time = start_time + datetime.timedelta(hours=3)
+    
+    while start_time < end_time:
         try:
             # Due to api inconsistencies, to always get the newest ones and page 5
             # Duplicates will be batchly processed in SPARK
             first_100_deals = get_request(base_url, 'deals', 'per_page=100;radius=10000')
             page5_100_deals = get_request(base_url, 'deals', 'page=5;per_page=100;radius=10000')
             
-            # Combine both
-            all_deals = first_100_deals.json()['deals'] + page5_100_deals.json()['deals']
-            print len(all_deals)
-            
+            # Combine both  
             # Flatten JSON, keep online merchant ID in deals file
-            # Save Merchant in Merchant Table
-#            with open()
-            
+            # Save Merchant in Merchant Table 
+            all_deals = first_100_deals.json()['deals'] + page5_100_deals.json()['deals']           
             for _, deal in enumerate(all_deals):
                 # If deal category belongs to mvp, save
                 category = category_in_mvp(focus_grp, deal['deal']['category_slug'])
                 if category:
-                    output = {}
+                    output = OrderedDict()
                     output['id'] = deal['deal']['id']
+                    output['category'] = category
+                    output['sub_category'] = deal['deal']['category_slug']
                     output['title'] = deal['deal']['short_title']
                     output['description'] = deal['deal']['description']
                     output['fine_print'] = deal['deal']['fine_print']
@@ -97,44 +100,29 @@ def fetch_sqoot_data(base_url):
                     output['created_at'] = deal['deal']['created_at']
                     output['updated_at'] = deal['deal']['updated_at']
                     output['merchant_id'] = deal['deal']['merchant']['id']
-                    output['sub_category'] = deal['deal']['category_slug']
-                    output['category'] = category
                     
+                    # Write deal to file
+                    with open(os.path.join(files_location, str(category) + '.json'), 'a') as f:
+                        f.write(json.dumps(output))
+                        f.write('\n')
                     
-#                    # Write deal to file
-#                    with open(os.path.join(files_location, str(category) + '.json'), 'a') as f:
-#                        f.write()
-#                    
                     # Write merchant info file
                     merchant_info = deal['deal']['merchant']
                     if not all(merchant_info.values()):
-                        merchant_info = clean_merchant_info(merchant_info)
-                        
-#                    with open(os.path.join(files_location, 'merchants.json'), 'a') as f:
-#                        f.write(json.dumps({m}))
-                    
-                        
-                    print "==> INSIDE: ", deal['deal']['merchant']
-                    pass
-            n = False      
-#              
+                        merchant_info = clean_merchant_info(merchant_info)        
+                    with open(os.path.join(files_location, 'merchants.json'), 'a') as f:
+                        f.write(json.dumps(merchant_info))
+                        f.write('\n')
+            start_time = datetime.datetime.now()
+            uf.print_out("Time left: {} minute(s)".format((end_time - start_time).seconds / 60))
+            uf.spinning_cursor(5)
         except rq.exceptions.ConnectionError:
             uf.print_out("[ConnectionError] ==> Issue with API server.")
         except rq.exceptions.ConnectTimeout:
             uf.print_out("[ConnectionTimeout] ==> Server connection timing out.")
 
-            
-#print map_categories(base_url).values()  
+# Generate data
 fetch_sqoot_data(base_url)
         
-        
-#    deals = req_deals.json()['deals']
-#    
-#    for deal in deals:
-#        print deal
-#    print len(deals)
-    
-#if __name__ == '__main__':
-    #fetch_sqoot_data()
 
 
