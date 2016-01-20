@@ -86,7 +86,7 @@ def fetch_sqoot_data(base_url):
 #            first_100_deals = get_request(base_url, 'deals', 'per_page=100;radius=10000')
 #            all_deals = all_deals + first_100_deals.json()['deals']  
             
-            uf.print_out('Crawling first 500 pages')
+            uf.print_out('Crawling first 100 pages')
             for num in xrange(1, 101):
                 uf.print_out('.' * num)
                 thread_ = threading.Thread(target=get_request, name='Thread{}'.format(num), args=[base_url, 'deals', 'page={};per_page=100;radius=10000'.format(num), queue])
