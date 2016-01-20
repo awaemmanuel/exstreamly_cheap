@@ -2,40 +2,139 @@
     Module that downloads sqoot data for Insight DE project.
     Author: Emmanuel Awa
 '''
+import json
+import os
 import requests as rq
+from helper_modules import utility_functions as uf
 
 PUBLIC_KEY = 'pf3lj0'
 base_url = 'http://api.sqoot.com/v2'
-def get_request(base_url, endpoint='categories', extra_params='', public_key=PUBLIC_KEY):
+def get_request(base_api_url, endpoint='categories', extra_params='', public_key=PUBLIC_KEY):
     ''' Return url to endpoint '''
-    return rq.get('{}/{}/?api_key={};{}'.format(base_url, endpoint, PUBLIC_KEY, extra_params))
-req_categories = get_request(base_url)
+    return rq.get('{}/{}/?api_key={};{}'.format(base_api_url, endpoint, PUBLIC_KEY, extra_params))
 
-main_to_sub_categories = {}
-for cat in req_categories.json()['categories']:
-    category =  cat['category']
-    parent_slug = category['parent_slug']
-    slug = category['slug']
+def reduce_categories_scope(map_of_categories, focus_list):
+    ''' Focus on a list of categories '''
+    return {k: v for k, v in map_of_categories.iteritems() if k in focus_list}
+
+def category_in_mvp(mvp_focus, category_slug):
+    ''' Find category a subcategory falls under '''
+    for k, v in mvp_focus.iteritems():
+        if category_slug in v:
+            return k
+    return None
+
+def clean_merchant_info(merchant_info_dict):
+    ''' Replace null values in merchant info with empty string '''
+    for k, v in merchant_info_dict.iteritems():
+        if not v:
+            merchant_info_dict[k] = ''
+    return merchant_info_dict
     
-    # Category is a main category
-    if parent_slug is None and slug not in main_to_sub_categories.keys():
-            main_to_sub_categories[slug] = []
-    else: # Category may be a subcategory 
-        if parent_slug not in main_to_sub_categories.keys(): # main category
-            main_to_sub_categories[parent_slug] = []
-        main_to_sub_categories[parent_slug].append(slug)
+def map_categories(base_url):
+    ''' Map Sqoot API main categories to subcategories '''
+    req_categories = get_request(base_url)
+    main_to_sub_categories = {}
+    for cat in req_categories.json()['categories']:
+        category = cat['category']
+        parent_slug = category['parent_slug']
+        slug = category['slug']
 
-print main_to_sub_categories.keys()
+        # Category is a main category
+        if parent_slug is None:
+            if slug not in main_to_sub_categories.keys():
+                main_to_sub_categories[slug] = []
+        else: # Category may be a subcategory 
+            if parent_slug not in main_to_sub_categories.keys(): # main category
+                main_to_sub_categories[parent_slug] = []
+            main_to_sub_categories[parent_slug].append(slug)
+    return main_to_sub_categories
+        
+def fetch_sqoot_data(base_url):
+    ''' Fetch Sqoot Data and save relevant information to file '''
+    files_location = uf.mkdir_if_not_exist() # Folder in /tmp/exstreamly_cheap_files
+    merchants_file = os.path.join(files_location, 'merchants.json')
+    products_file = os.path.join(files_location, 'products.json')
+    events_file = os.path.join(files_location, 'activities_events.json')
+    food_nitelife_file = os.path.join(files_location, 'dining_nitelife.json')
+    categories_map = map_categories(base_url)
+    
+    mvp_categories = [u'product', u'dining-nightlife', u'activities-events']
+    focus_grp = reduce_categories_scope(categories_map, 
+                                        mvp_categories)
+    n = True
+    while n:
+        try:
+            # Due to api inconsistencies, to always get the newest ones and page 5
+            # Duplicates will be batchly processed in SPARK
+            first_100_deals = get_request(base_url, 'deals', 'per_page=100;radius=10000')
+            page5_100_deals = get_request(base_url, 'deals', 'page=5;per_page=100;radius=10000')
+            
+            # Combine both
+            all_deals = first_100_deals.json()['deals'] + page5_100_deals.json()['deals']
+            print len(all_deals)
+            
+            # Flatten JSON, keep online merchant ID in deals file
+            # Save Merchant in Merchant Table
+#            with open()
+            
+            for _, deal in enumerate(all_deals):
+                # If deal category belongs to mvp, save
+                category = category_in_mvp(focus_grp, deal['deal']['category_slug'])
+                if category:
+                    output = {}
+                    output['id'] = deal['deal']['id']
+                    output['title'] = deal['deal']['short_title']
+                    output['description'] = deal['deal']['description']
+                    output['fine_print'] = deal['deal']['fine_print']
+                    output['number_sold'] = deal['deal']['number_sold']
+                    output['url'] = deal['deal']['untracked_url']
+                    output['price'] = deal['deal']['price']
+                    output['discount_percentage'] = deal['deal']['discount_percentage']
+                    output['provider_name'] = deal['deal']['provider_name']
+                    output['online'] = deal['deal']['online']
+                    output['expires_at'] = deal['deal']['expires_at']
+                    output['created_at'] = deal['deal']['created_at']
+                    output['updated_at'] = deal['deal']['updated_at']
+                    output['merchant_id'] = deal['deal']['merchant']['id']
+                    output['sub_category'] = deal['deal']['category_slug']
+                    output['category'] = category
+                    
+                    
+#                    # Write deal to file
+#                    with open(os.path.join(files_location, str(category) + '.json'), 'a') as f:
+#                        f.write()
+#                    
+                    # Write merchant info file
+                    merchant_info = deal['deal']['merchant']
+                    if not all(merchant_info.values()):
+                        merchant_info = clean_merchant_info(merchant_info)
+                        
+#                    with open(os.path.join(files_location, 'merchants.json'), 'a') as f:
+#                        f.write(json.dumps({m}))
+                    
+                        
+                    print "==> INSIDE: ", deal['deal']['merchant']
+                    pass
+            n = False      
+#              
+        except rq.exceptions.ConnectionError:
+            uf.print_out("[ConnectionError] ==> Issue with API server.")
+        except rq.exceptions.ConnectTimeout:
+            uf.print_out("[ConnectionTimeout] ==> Server connection timing out.")
 
-# Get deals according to sub-categories
-num_of_pages = 10000
-req_deals = get_request(base_url, 'deals', 'per_page=100;')
-query_params = req_deals.json()['query']
-deals = req_deals.json()['deals']
-print len(deals)
+            
+#print map_categories(base_url).values()  
+fetch_sqoot_data(base_url)
+        
+        
+#    deals = req_deals.json()['deals']
+#    
+#    for deal in deals:
+#        print deal
+#    print len(deals)
+    
+#if __name__ == '__main__':
+    #fetch_sqoot_data()
 
 
-#{u'product': [u'adult', u'audio', u'automotive', u'beauty_health', u'crafts_hobbies', u'electronics', u'fashion_accessories', u'fitness_product', u'food_alcohol', u'gifts', u'home_goods', u'kitchen', u'luggage', u'mens_fashion', u'mobile', u'movies_music_games', u'office_supplies', u'tools', u'toys', u'women_fashion'], u'special-interest': [u'baby', u'bridal', u'college', u'gay', u'jewish', u'kids', u'kosher', u'pets', u'travel'], u'retail-services': [u'automotive-services', u'food-grocery', u'home-services', u'mens-clothing', u'photography-services', u'treats', u'womens-clothing'], u'health-beauty': [u'chiropractic', u'dental', u'dermatology', u'eye-vision', u'facial', u'hair-removal', u'hair-salon', u'makeup', u'manicure-pedicure', u'massage', u'spa', u'tanning', u'teeth-whitening'], u'dining-nightlife': [u'bars-clubs', u'restaurants'], u'fitness': [u'boot-camp', u'fitness-classes', u'gym', u'martial-arts', u'personal-training', u'pilates', u'yoga'], None: [u'dining-nightlife', u'fitness', u'health-beauty', u'product', u'retail-services', u'special-interest'], u'activities-events': [u'bowling', u'city-tours', u'comedy-clubs', u'concerts', u'dance-classes', u'golf', u'life-skills-classes', u'museums', u'outdoor-adventures', u'skiing', u'skydiving', u'sporting-events', u'theater', u'wine-tasting']}
-#{u'product': [u'adult', u'audio', u'automotive', u'beauty_health', u'crafts_hobbies', u'electronics', u'fashion_accessories', u'fitness_product', u'food_alcohol', u'gifts', u'home_goods', u'kitchen', u'luggage', u'mens_fashion', u'mobile', u'movies_music_games', u'office_supplies', u'tools', u'toys', u'women_fashion'], u'special-interest': [u'baby', u'bridal', u'college', u'gay', u'jewish', u'kids', u'kosher', u'pets', u'travel'], u'retail-services': [u'automotive-services', u'food-grocery', u'home-services', u'mens-clothing', u'photography-services', u'treats', u'womens-clothing'], u'health-beauty': [u'chiropractic', u'dental', u'dermatology', u'eye-vision', u'facial', u'hair-removal', u'hair-salon', u'makeup', u'manicure-pedicure', u'massage', u'spa', u'tanning', u'teeth-whitening'], u'dining-nightlife': [u'bars-clubs', u'restaurants'], u'fitness': [u'boot-camp', u'fitness-classes', u'gym', u'martial-arts', u'personal-training', u'pilates', u'yoga'], None: [u'dining-nightlife', u'fitness', u'health-beauty', u'product', u'retail-services', u'special-interest'], u'activities-events': [u'bowling', u'city-tours', u'comedy-clubs', u'concerts', u'dance-classes', u'golf', u'life-skills-classes', u'museums', u'outdoor-adventures', u'skiing', u'skydiving', u'sporting-events', u'theater', u'wine-tasting']}
-
-#[u'product', u'special-interest', u'retail-services', u'health-beauty', u'dining-nightlife', u'fitness', None, u'activities-events']
