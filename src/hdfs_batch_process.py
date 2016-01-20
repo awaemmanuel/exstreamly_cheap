@@ -10,7 +10,7 @@ sc = SparkContext()
 sqlContext = sqlcon(sc)
 
 df_merchants = sqlContext.read.json('/tmp/exstreamly_cheap_files/merchants.json')
-df_merchants.printSchema()
+df_merchants.show()
 
 df_events = sqlContext.read.json('/tmp/exstreamly_cheap_files/activities-events.json')
 df_events.printSchema()
