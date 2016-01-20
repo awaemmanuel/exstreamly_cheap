@@ -3,18 +3,26 @@
     Author: Emmanuel Awa
 '''
 import json
-import os
+import os, sys
 import datetime
+import threading
+import Queue
 import requests as rq
 from collections import OrderedDict
 from helper_modules import utility_functions as uf
 
 PUBLIC_KEY = 'pf3lj0'
 base_url = 'http://api.sqoot.com/v2'
-def get_request(base_api_url, endpoint='categories', extra_params='', public_key=PUBLIC_KEY):
+def get_request(base_api_url, endpoint='categories', extra_params='', queue=None):
     ''' Return url to endpoint '''
-    return rq.get('{}/{}/?api_key={};{}'.format(base_api_url, endpoint, PUBLIC_KEY, extra_params))
+    req =  rq.get('{}/{}/?api_key={};{}'.format(base_api_url, endpoint, PUBLIC_KEY, extra_params))
+    if not queue:
+        return req
+    queue.put(req.json()['deals'])
+        
 
+#def run_thread(req, queue):
+#    queue.put()
 def reduce_categories_scope(map_of_categories, focus_list):
     ''' Focus on a list of categories '''
     return {k: v for k, v in map_of_categories.iteritems() if k in focus_list}
@@ -32,7 +40,7 @@ def clean_merchant_info(merchant_info_dict):
         if not v:
             merchant_info_dict[k] = ''
     return merchant_info_dict
-    
+  
 def map_categories(base_url):
     ''' Map Sqoot API main categories to subcategories '''
     req_categories = get_request(base_url)
@@ -64,22 +72,32 @@ def fetch_sqoot_data(base_url):
     mvp_categories = [u'product', u'dining-nightlife', u'activities-events']
     focus_grp = reduce_categories_scope(categories_map, 
                                         mvp_categories)
-    n = True
     start_time = datetime.datetime.now()
-    end_time = start_time + datetime.timedelta(hours=3)
-    
+    end_time = start_time + datetime.timedelta(hours=7)
+    all_deals = []
+    queue = Queue.Queue()
     while start_time < end_time:
         try:
             # Due to api inconsistencies, to always get the newest ones and page 5
             # Duplicates will be batchly processed in SPARK
-            first_100_deals = get_request(base_url, 'deals', 'per_page=100;radius=10000')
-            page5_100_deals = get_request(base_url, 'deals', 'page=5;per_page=100;radius=10000')
-            
-            # Combine both  
+              # Combine both  
             # Flatten JSON, keep online merchant ID in deals file
             # Save Merchant in Merchant Table 
-            all_deals = first_100_deals.json()['deals'] + page5_100_deals.json()['deals']           
-            for _, deal in enumerate(all_deals):
+#            first_100_deals = get_request(base_url, 'deals', 'per_page=100;radius=10000')
+#            all_deals = all_deals + first_100_deals.json()['deals']  
+            
+            uf.print_out('Crawling first 100 pages')
+            for num in xrange(1, 101):
+                uf.print_out('.' * num)
+                thread_ = threading.Thread(target=get_request, name='Thread{}'.format(num), args=[base_url, 'deals', 'page={};per_page=100;radius=10000'.format(num), queue])
+                thread_.start()
+                thread_.join()
+                     
+            while not queue.empty():
+                all_deals = all_deals + queue.get()
+                
+            for idx, deal in enumerate(all_deals):
+                uf.print_out('Processing deal: {}'.format(idx))
                 # If deal category belongs to mvp, save
                 category = category_in_mvp(focus_grp, deal['deal']['category_slug'])
                 if category:
@@ -115,7 +133,8 @@ def fetch_sqoot_data(base_url):
                         f.write('\n')
             start_time = datetime.datetime.now()
             uf.print_out("Time left: {} minute(s)".format((end_time - start_time).seconds / 60))
-            uf.spinning_cursor(5)
+            uf.print_out("Waiting 30mins to crawl again")
+            uf.spinning_cursor(1800)
         except rq.exceptions.ConnectionError:
             uf.print_out("[ConnectionError] ==> Issue with API server.")
         except rq.exceptions.ConnectTimeout:
