@@ -14,8 +14,8 @@ OUTPUT_KEY_CONVERTER = "com.parsely.spark.converters.ToCassandraCQLKeyConverter"
 OUTPUT_VALUE_CONVERTER = "com.parsely.spark.converters.ToCassandraCQLValueConverter"
 
 if __name__ == '__main__':
-    cluster = Cluster(['172.31.2.39'])
-    session = cluster.connect('deals')
+#    cluster = Cluster(['172.31.2.39'])
+#    session = cluster.connect('deals')
     categories = ['merchants', 'dining_nightlife', 'activities_events', 'product']
     for category in categories:
         uf.print_out('Cleaning {} Table.'.format(category.capitalize()))
