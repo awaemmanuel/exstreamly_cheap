@@ -26,17 +26,19 @@ if __name__ == '__main__':
         
         
         # Insert dataFrames with all our categories into Cassandra
-        if category == 'merchants':
-            stmt = session.prepare('''
-            INSERT INTO deals.{} (merchant_id, name, address, long_lat, url)
-            VALUES (?,?,?,?,?)
-            '''.strip().format(category))
+        if category is not 'merchants':
+            df_category.select(df_category['title'], df_category['description'], df_category['category'], df_category['sub_category'], df_category['provider_name'], df_category['price'], df_category['number_sold'], df_category['discount_percentage'] * 100, df_category['number_sold'] ).show()
             
-        stmt = session.prepare('''
-            INSERT INTO deals.{} (id, merchant_id, provider, title, category, sub_category, description, fine_print, price, percentage_disc, number_sold, created_at, expires_at, updated_at, url, online)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-        '''.strip().format(category))
-        
+#            stmt = session.prepare('''
+#            INSERT INTO deals.{} (merchant_id, name, address, long_lat, url)
+#            VALUES (?,?,?,?,?)
+#            '''.strip().format(category))
+#            
+#        stmt = session.prepare('''
+#            INSERT INTO deals.{} (id, merchant_id, provider, title, category, sub_category, description, fine_print, price, percentage_disc, number_sold, created_at, expires_at, updated_at, url, online)
+#            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+#        '''.strip().format(category))
+#        
 
         
     
