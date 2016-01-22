@@ -1,0 +1,75 @@
+Cleaning Merchants Table.
+Number of unique merchants serving deals: 1901
+merchants table
+ |-- address: string (nullable = true)
+ |-- country: string (nullable = true)
+ |-- country_code: string (nullable = true)
+ |-- id: long (nullable = true)
+ |-- latitude: double (nullable = true)
+ |-- locality: string (nullable = true)
+ |-- longitude: double (nullable = true)
+ |-- name: string (nullable = true)
+ |-- phone_number: string (nullable = true)
+ |-- postal_code: string (nullable = true)
+ |-- region: string (nullable = true)
+ |-- url: string (nullable = true)
+
+Cleaning Dining-nightlife Table.
+Number of unique dining-nightlife serving deals: 1929
+dining-nightlife table
+ |-- category: string (nullable = true)
+ |-- created_at: string (nullable = true)
+ |-- description: string (nullable = true)
+ |-- discount_percentage: double (nullable = true)
+ |-- expires_at: string (nullable = true)
+ |-- fine_print: string (nullable = true)
+ |-- id: long (nullable = true)
+ |-- merchant_id: long (nullable = true)
+ |-- number_sold: long (nullable = true)
+ |-- online: boolean (nullable = true)
+ |-- price: double (nullable = true)
+ |-- provider_name: string (nullable = true)
+ |-- sub_category: string (nullable = true)
+ |-- title: string (nullable = true)
+ |-- updated_at: string (nullable = true)
+ |-- url: string (nullable = true)
+
+Cleaning Activities-events Table.
+Number of unique activities-events serving deals: 353
+root
+ |-- category: string (nullable = true)
+ |-- created_at: string (nullable = true)
+ |-- description: string (nullable = true)
+ |-- discount_percentage: double (nullable = true)
+ |-- expires_at: string (nullable = true)
+ |-- fine_print: string (nullable = true)
+ |-- id: long (nullable = true)
+ |-- merchant_id: long (nullable = true)
+ |-- number_sold: long (nullable = true)
+ |-- online: boolean (nullable = true)
+ |-- price: double (nullable = true)
+ |-- provider_name: string (nullable = true)
+ |-- sub_category: string (nullable = true)
+ |-- title: string (nullable = true)
+ |-- updated_at: string (nullable = true)
+ |-- url: string (nullable = true)
+
+Cleaning Product Table.
+Number of unique product serving deals: 1710
+root
+ |-- category: string (nullable = true)
+ |-- created_at: string (nullable = true)
+ |-- description: string (nullable = true)
+ |-- discount_percentage: double (nullable = true)
+ |-- expires_at: string (nullable = true)
+ |-- fine_print: string (nullable = true)
+ |-- id: long (nullable = true)
+ |-- merchant_id: long (nullable = true)
+ |-- number_sold: long (nullable = true)
+ |-- online: boolean (nullable = true)
+ |-- price: double (nullable = true)
+ |-- provider_name: string (nullable = true)
+ |-- sub_category: string (nullable = true)
+ |-- title: string (nullable = true)
+ |-- updated_at: string (nullable = true)
+ |-- url: string (nullable = true)
