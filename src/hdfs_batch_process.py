@@ -22,10 +22,6 @@ def count_unique_rows(clean_df):
     ''' Return number of unique deals in a category '''
     return clean_df.count()
 
-#def batch_process_data(data):
-#    ''' Call all helper functions to batch process files '''
-#    file_name = data[0]
-
 if __name__ == '__main__':
     categories = ['merchants', 'dining-nightlife', 'activities-events', 'product']
     for category in categories:
