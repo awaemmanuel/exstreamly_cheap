@@ -8,7 +8,7 @@ import sys
 
 from pyspark import SparkContext
 from cassandra.cluster import Cluster
-from helper_modules import utility_functions as uf
+from src.helper_modules import utility_functions as uf
 
 def create_keyspace_if_not_exists(session, keyspace,
                                   replication_opts=None):
