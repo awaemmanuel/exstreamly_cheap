@@ -61,13 +61,4 @@ def create_schemas(server_ip, keyspace_name, create_tables=[], column_descriptio
     '''
     for table in create_tables:
         create_tables(keyspace_name, table, column_description)
-        
-
-'''
-create table activities_events (id bigint, merchant_id bigint, provider text, title text, category text, sub_category text, description text, fine_print text, price float, percentage_disc float, number_sold int, created_at timestamp, expires_at timestamp, updated_at timestamp, url text, online boolean, PRIMARY KEY (id,updated_at));
-cqlsh:deals> drop table products;
-cqlsh:deals> create table products (id bigint, merchant_id bigint, provider text, title text, category text, sub_category text, description text, fine_print text, price float, percentage_disc float, number_sold int, created_at timestamp, expires_at timestamp, updated_at timestamp, url text, online boolean, PRIMARY KEY (id,updated_at));
-cqlsh:deals> create table dining_nightlife (id bigint, merchant_id bigint, provider text, title text, category text, sub_category text,Welcome  description text, fine_print text, price float, percentage_disc float, number_sold int, created_at timestamp, expires_at timestamp, updated_at timestamp, url text, online boolean, PRIMARY KEY (id,updated_at));
-cqlsh:deals> .schemas
-'''
 
