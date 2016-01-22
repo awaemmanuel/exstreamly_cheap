@@ -15,7 +15,7 @@ OUTPUT_VALUE_CONVERTER = "com.parsely.spark.converters.ToCassandraCQLValueConver
 
 if __name__ == '__main__':
     cluster = Cluster(['172.31.2.39'])
-    session = cluster.connect(deals)
+    session = cluster.connect('deals')
     categories = ['merchants', 'dining_nightlife', 'activities_events', 'product']
     for category in categories:
         uf.print_out('Cleaning {} Table.'.format(category.capitalize()))
@@ -27,7 +27,11 @@ if __name__ == '__main__':
         
         # Insert dataFrames with all our categories into Cassandra
         if category == 'merchants':
-            stmt = session.prepare()
+            stmt = session.prepare('''
+            INSERT INTO deals.{} (merchant_id, name, address, long_lat, url)
+            VALUES (?,?,?,?,?)
+            '''.strip().format(category))
+            
         stmt = session.prepare('''
             INSERT INTO deals.{} (id, merchant_id, provider, title, category, sub_category, description, fine_print, price, percentage_disc, number_sold, created_at, expires_at, updated_at, url, online)
             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
