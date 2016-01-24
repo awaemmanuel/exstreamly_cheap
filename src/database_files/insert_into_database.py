@@ -16,7 +16,7 @@ OUTPUT_VALUE_CONVERTER = "com.parsely.spark.converters.ToCassandraCQLValueConver
 if __name__ == '__main__':
     cluster = Cluster(['172.31.2.39'])
     session = cluster.connect('deals')
-    categories = ['merchants', 'dining_nightlife', 'activities_events', 'product']
+    categories = ['merchants', 'dining_nightlife', 'activities_events', 'products']
     for category in categories:
         uf.print_out('Cleaning {} Table.'.format(category.capitalize()))
         df_category = hbp.create_dataframe('/tmp/exstreamly_cheap_files/{}.json'.format(category))
