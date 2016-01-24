@@ -30,9 +30,9 @@ if __name__ == '__main__':
             stmt = session.prepare('''
             INSERT INTO deals.{} (merchant_id, name, address, long_lat, url)
             VALUES (?,?,?,?,?)
-            '''.strip().format(category))
-            
-        stmt = session.prepare('''
+            '''.strip().format(category))   
+        else: # other categories
+            stmt = session.prepare('''
             INSERT INTO deals.{} (id, merchant_id, provider, title, category, sub_category, description, fine_print, price, percentage_disc, number_sold, created_at, expires_at, updated_at, url, online)
             VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         '''.strip().format(category))
