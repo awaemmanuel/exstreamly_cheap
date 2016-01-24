@@ -26,7 +26,7 @@ if __name__ == '__main__':
         
         
         # Insert dataFrames with all our categories into Cassandra
-        if category is not 'merchants':            
+        if category is 'merchants':            
             stmt = session.prepare('''
             INSERT INTO deals.{} (merchant_id, name, address, long_lat, url)
             VALUES (?,?,?,?,?)
