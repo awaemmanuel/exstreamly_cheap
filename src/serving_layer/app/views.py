@@ -21,3 +21,16 @@ def get_email(email, date):
         jsonresponse = [{"first name": x.fname, "last name": x.lname, "id": x.id, "message": x.message, "time": x.time} for x in response_list]
         return jsonify(emails=jsonresponse)
 
+@app.route('/api/<merchants>')
+def get_all_merchants(merchants, full=False):
+    if not full:
+        stmt = 'SELECT id, name, address, postal_code, country, phone_number from merchants'
+        response = session.execute(stmt)
+        response_list = []
+        for val in response:
+            response_list.append(val)
+        json_response = [{'merchant id': x.id, 'name': x.name, 'address': x.address,\
+                         'postal code': x.postal_code, 'phone': x.phone_number, \
+                          'country': x.country} for x in response_list]
+        return jsonify(merchants=json_response)
+            
