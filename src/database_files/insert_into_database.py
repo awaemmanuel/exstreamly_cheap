@@ -24,18 +24,12 @@ if __name__ == '__main__':
         unique_vals = hbp.count_unique_rows(df_category)
         uf.print_out('Number of unique {} serving deals: {}'.format(category, unique_vals))
         
-        
-        # Insert dataFrames with all our categories into Cassandra
+        #  Insert dataFrames with all our categories into Cassandra
+        df_category.registerTempTable('{}'.format(category))
         if category is 'merchants':            
-            stmt = session.prepare('''
-            INSERT INTO deals.{} (merchant_id, name, address, long_lat, url)
-            VALUES (?,?,?,?,?)
-            '''.strip().format(category))   
+            df_category.select('id', 'name', 'address', 'postal_code', 'country', 'phone_number', 'region', 'longitude', 'latitude',  'url').write.format("org.apache.spark.sql.cassandra").options(table='merchants', keyspace='deals').save(mode='append')
         else: # other categories
-            stmt = session.prepare('''
-            INSERT INTO deals.{} (id, merchant_id, provider, title, category, sub_category, description, fine_print, price, percentage_disc, number_sold, created_at, expires_at, updated_at, url, online)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-        '''.strip().format(category))
+            df_category.write.format('org.apache.spark.sql.cassandra').options(table='{}'.format(category), keyspace='deals').save(mode='append')
         
 
 
