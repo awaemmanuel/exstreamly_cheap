@@ -9,9 +9,10 @@ from pyspark import SparkContext
 sc = SparkContext()
 sqlContext = sqlcon(sc)
 
-def create_dataframe(json_filepath):
+def create_dataframe(json_filepath, is_from_hdfs=True):
     ''' Read in a json file and return a dataframe '''
-    return sqlContext.read.json(json_filepath)
+    rdd = sc.textFile(json_filepath)
+    return sqlContext.read.json(rdd)
 
 def remove_duplicate_deals(df):
     ''' Return new dataframe with distinct records '''
