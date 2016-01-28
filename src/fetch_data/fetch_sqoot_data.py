@@ -140,8 +140,9 @@ def fetch_sqoot_data(base_url):
         except rq.exceptions.ConnectTimeout:
             uf.print_out("[ConnectionTimeout] ==> Server connection timing out.")
 
-# Generate data
-fetch_sqoot_data(base_url)
+if __name__ == '__main__':
+    # Generate data
+    fetch_sqoot_data(base_url)
         
 
 
