@@ -4,7 +4,6 @@
 '''
 import logging
 from config import settings 
-from kafka import KafkaConsumer
 from kafka import SimpleProducer, create_message
 from kafka.client import KafkaClient
 from kafka.consumer import KafkaConsumer
@@ -26,7 +25,26 @@ for message in consumer:
 class Consumer(object):
     ''' A consumer class object '''
     
-    def __init__(self, addr):
+    def __init__(self, addr, topic, client_id_str, server_list=['localhost:9092']):
+        self.topic = topic
+        self.client = KafkaClient(addr)
+        self.consumer = KafkaConsumer(topic, 
+                                      client_id=client_id_str, 
+                                      bootstrap_servers=server_list)
+        
+    def consumer_url(self, partition_list=None):
+        ''' Consumer a kafka message and get url to fetch '''
+        if partition_list:
+            self.consumer.set_topic_partitions(
+                {
+                    self.topic : partition_list
+                })
+        for message in self.consumer:
+            self.get_category_deals(message)
+            
+    def get_category_deals(self, msg):
+        ''' Fetch all deals from url found in msg '''
+        url = 
         
     
 
