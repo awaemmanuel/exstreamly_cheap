@@ -26,8 +26,8 @@ for message in consumer:
 class Consumer(object):
     ''' A consumer class object '''
     
-    def __init__(self, addr, topic, group='urls'):
-        pass
+    def __init__(self, addr):
+        
     
 
 if __name__ == '__main__':
