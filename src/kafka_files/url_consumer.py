@@ -32,6 +32,15 @@ class Consumer(object):
                                       client_id=client_id_str, 
                                       bootstrap_servers=server_list)
         
+    def __init__(self, group, config, config_name):
+        self.client = KafkaClient(hosts=config.get(config_name, 'kafka_hosts'))     # Create a client
+        self.topic = self.client.topics[config.get(config_name, 'topic')]       # create topic if not exists
+        self.consumer = self.topic.get_balanced_consumer(       # Zookeeper dynamically assigns partitions
+            consumer_group=group,
+            auto_commit_enable=True,
+            zookeeper_connect=config.get(config_name, 'zookeeper_hosts'))
+        self.partitions = set()
+            
     def consumer_url(self, partition_list=None):
         ''' Consumer a kafka message and get url to fetch '''
         if partition_list:
@@ -45,7 +54,9 @@ class Consumer(object):
     def get_category_deals(self, msg):
         ''' Fetch all deals from url found in msg '''
         url = 
-        
+    def get_consumed_partitions(self):
+        ''' Track partitions consumed by consumer instance '''
+        return self.partitions
     
 
 if __name__ == '__main__':
