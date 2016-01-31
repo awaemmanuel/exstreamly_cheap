@@ -62,8 +62,9 @@ class Producer(object):
         page_chunks = list(self.yield_chunks(total_pages, self._chunk_size))
         for chunk in page_chunks:
             time_stamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%S%Z")
-            msg = '{}: {}'.format(time_stamp, 
-                                  dict(fetch=url, with_pages=chunk))
+            msg = '{} => {} => {}'.format(time_stamp, 
+                                          url,
+                                          chunk)
             print msg
             self.producer.send_messages(topic, partition_key, msg)
             self.__class__._msg_cnt += 1
