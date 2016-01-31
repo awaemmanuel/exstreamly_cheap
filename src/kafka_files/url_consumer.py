@@ -38,16 +38,16 @@ class Consumer(object):
         self.start_time = datetime.now() # For logging
         while True:
             message = self.consumer.consume() # Read one message (url)
-            print(message.value)
+#            print(message.value)
             self.partitions.add(message.partition.id)
-            #self.get_category_deals(message)
-            print type(self.get_pagenums_msg(message.value))
+            self.get_category_deals(message)
+#            print type(self.get_pagenums_msg(message.value))
             self.msg_cnt += 1
             
     def get_category_deals(self, msg):
         ''' Fetch all deals from url found in msg '''
-        url = msg.value['fetch'] 
-        list_of_pages = msg.value['with_pages']
+        url = self.get_url_msg(msg)
+        list_of_pages = self.get_pagenums_msg(msg)
         num_threads = len(list_of_pages)
         for idx in xrange(num_threads):
             worker = Thread(target=fetch_request_data, 
@@ -60,7 +60,6 @@ class Consumer(object):
         ''' Fetch request data from queued up urls '''
         while True:
             url = self.url_queue.get()
-            # TODO - Fetch deals from site.
             req = rq.get(url)
             print req.json()[field]
             q.task_done()
@@ -83,14 +82,14 @@ class Consumer(object):
     def get_url_msg(msg):
         ''' Retrieve the url from kafka message '''
         return msg.split('=>')[1].strip()
+    
     def get_pagenums_msg(self, msg):
         ''' Retrieve page chunks to fetch data from '''
         pages = msg.split('=>')[2].strip()
-        pages = pages.strip('[|]')
+        pages = pages.strip('[]')
         pages = pages.split(', ')
-        pages = map(lambda x: int(x), pages)
-        return pages
-
+        return map(lambda x: int(x), pages)
+        
 if __name__ == '__main__':
 #    print settings.SQOOT_API_KEY
 #    print settings.SQOOT_BASE_URL
