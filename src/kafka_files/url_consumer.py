@@ -3,12 +3,13 @@
     A module that consumers from kafka topics subscribed to
 '''
 import json
-import os, sys
-import datetime
+import os
+import sys
 import threading
-import Queue
-import requests as rq
 import logging
+import requests as rq
+from Queue import Queue
+from datetime import datetime
 from pykafka import KafkaClient
 from config import settings 
 try:
@@ -37,8 +38,9 @@ class Consumer(object):
         self.start_time = datetime.now() # For logging
         while True:
             message = self.consumer.consume() # Read one message (url)
+            print message.value
             self.partitions.add(message.partition.id)
-            self.get_category_deals(message)
+            #self.get_category_deals(message)
             self.msg_cnt += 1
             
     def get_category_deals(self, msg):
@@ -84,7 +86,7 @@ if __name__ == '__main__':
     config = configparser.SafeConfigParser()
     config.read('../../config/general.conf')
     con = Consumer('test_group', config, 'server_settings')
-    
+    con.consumer_url()
     
 
 
