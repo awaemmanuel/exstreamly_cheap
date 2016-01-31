@@ -40,7 +40,7 @@ class Consumer(object):
             message = self.consumer.consume() # Read one message (url)
             print message.value
             self.partitions.add(message.partition.id)
-            #self.get_category_deals(message)
+            self.get_category_deals(message)
             self.msg_cnt += 1
             
     def get_category_deals(self, msg):
@@ -61,7 +61,7 @@ class Consumer(object):
             url = self.url_queue.get()
             # TODO - Fetch deals from site.
             req = rq.get(url)
-            print req.json()[fields]
+            print req.json()[field]
             q.task_done()
     
     def get_consumed_partitions(self):
