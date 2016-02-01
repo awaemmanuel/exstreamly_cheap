@@ -5,9 +5,9 @@
 import json
 import os
 import sys
-import threading
 import logging
 import requests as rq
+from threading import Thread
 from Queue import Queue
 from datetime import datetime
 from pykafka import KafkaClient
@@ -38,7 +38,7 @@ class Consumer(object):
         self.start_time = datetime.now() # For logging
         while True:
             message = self.consumer.consume() # Read one message (url)
-#            print(message.value)
+            print(message.value)
             self.partitions.add(message.partition.id)
             self.get_category_deals(message)
 #            print type(self.get_pagenums_msg(message.value))
@@ -49,8 +49,9 @@ class Consumer(object):
         url = self.get_url_msg(msg)
         list_of_pages = self.get_pagenums_msg(msg)
         num_threads = len(list_of_pages)
+        print "Inside get_category_deals: {} \n{}".format(num_threads, url)
         for idx in xrange(num_threads):
-            worker = Thread(target=fetch_request_data, 
+            worker = Thread(target=self.fetch_request_data, 
                             name='Thread-{}'.format(idx),
                            args=(self.url_queue,))
             worker.setDaemon(True)
@@ -58,7 +59,9 @@ class Consumer(object):
             
     def fetch_request_data(self, field='deals'):
         ''' Fetch request data from queued up urls '''
+        print "Inside fetch_request_data"
         while True:
+            print "Trying to dequeue.... Is queue empty? {}".format(self.url_queue.empty())
             url = self.url_queue.get()
             req = rq.get(url)
             print req.json()[field]
@@ -79,17 +82,26 @@ class Consumer(object):
     def get_delta_init_consume(self):
         ''' Track latency between init and consumption '''
         return (self.start_time - self.init_time).seconds
-    def get_url_msg(msg):
+    
+    def get_url_msg(self, msg):
         ''' Retrieve the url from kafka message '''
-        return msg.split('=>')[1].strip()
+        return msg.value.split('=>')[1].strip()
+        return self.split_return_by_idx(msg, 1)
     
     def get_pagenums_msg(self, msg):
-        ''' Retrieve page chunks to fetch data from '''
-        pages = msg.split('=>')[2].strip()
-        pages = pages.strip('[]')
+        ''' Retrieve page chunks to fetch data
+            List embedded in kafka msg needs to 
+            reconverted to a list
+        '''
+        pages = self.split_return_by_idx(msg, 2)
+        pages = pages.strip('[]') 
         pages = pages.split(', ')
         return map(lambda x: int(x), pages)
         
+    def split_return_by_idx(self, msg, idx, by_token='=>'):
+        ''' Split msg and return part by idx '''
+        return msg.value.split(by_token)[idx].strip()
+
 if __name__ == '__main__':
 #    print settings.SQOOT_API_KEY
 #    print settings.SQOOT_BASE_URL
