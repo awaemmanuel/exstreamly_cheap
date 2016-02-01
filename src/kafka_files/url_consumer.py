@@ -7,7 +7,7 @@ import os
 import sys
 import logging
 import requests as rq
-from threading import Thread
+from threading import Thread, BoundedSemaphore
 from Queue import Queue
 from datetime import datetime
 from pykafka import KafkaClient
@@ -32,6 +32,7 @@ class Consumer(object):
         self.init_time = datetime.now()
         self.start_time = self.init_time
         self.url_queue = Queue(maxsize=0) # infinitely sized
+        self.semaphore = BoundedSemaphore()
             
     def consumer_url(self):
         ''' Consumer a kafka message and get url to fetch '''
@@ -57,6 +58,7 @@ class Consumer(object):
                                 args=(self.url_queue,))
                 worker.setDaemon(True)
                 worker.start()
+                #worker.join()
         else:
             raise Queue.Full
             
@@ -67,9 +69,11 @@ class Consumer(object):
             #print "Trying to dequeue.... Is queue empty? {}".format(self.url_queue.empty())
             url = self.url_queue.get()
             req = rq.get(url)
+            self.semaphore.acquire()
             with open('deals.json', 'a') as f:
                 f.write(json.dumps(req.json()['deals']))
                 f.write('\n')
+            self.semaphore.release()
             self.url_queue.task_done()
             
     def get_consumed_partitions(self):
