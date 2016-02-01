@@ -67,9 +67,11 @@ class Consumer(object):
             #print "Trying to dequeue.... Is queue empty? {}".format(self.url_queue.empty())
             url = self.url_queue.get()
             req = rq.get(url)
-            print req.json()[field]
-            q.task_done()
-
+            with open('deals.json', 'a') as f:
+                f.write(json.dumps(req.json()['deals']))
+                f.write('\n')
+            self.url_queue.task_done()
+            
     def get_consumed_partitions(self):
         ''' Track partitions consumed by consumer instance '''
         return sorted(self.partitions)
