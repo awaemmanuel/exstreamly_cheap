@@ -12,6 +12,7 @@ from Queue import Queue
 from datetime import datetime
 from pykafka import KafkaClient
 from config import settings 
+from helper_modules import utility_functions as uf
 try:
     import configparser # for Python 3
 except ImportError:
@@ -20,7 +21,7 @@ except ImportError:
 class Consumer(object):
     ''' A consumer class object '''
     
-    def __init__(self, group, config, config_name):
+    def __init__(self, group, config, config_name, output):
         self.client = KafkaClient(hosts=config.get(config_name, 'kafka_hosts'))     # Create a client
         self.topic = self.client.topics[config.get(config_name, 'topic')]       # create topic if not exists
         self.consumer = self.topic.get_balanced_consumer(       # Zookeeper dynamically assigns partitions
@@ -33,6 +34,10 @@ class Consumer(object):
         self.start_time = self.init_time
         self.url_queue = Queue(maxsize=0) # infinitely sized
         self.semaphore = BoundedSemaphore()
+        if not isinstance(output, Producer) # meant to write to file
+            self.output = uf.mkdir_if_not_exist()
+        else:
+            self.output = output # write into producer
             
     def consumer_url(self):
         ''' Consumer a kafka message and get url to fetch '''
@@ -70,9 +75,13 @@ class Consumer(object):
             url = self.url_queue.get()
             req = rq.get(url)
             self.semaphore.acquire()
-            with open('deals.json', 'a') as f:
-                f.write(json.dumps(req.json()['deals']))
-                f.write('\n')
+            if isinstance(self.output, Producer): # write to producer
+                self.output.produce
+            else: # write to file
+                with open('deals.json', 'a') as f:
+                    f.write(json.dumps(req.json()['deals']))
+                    f.write('\n')
+                
             self.semaphore.release()
             self.url_queue.task_done()
             
