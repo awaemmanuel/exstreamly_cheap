@@ -109,7 +109,7 @@ class Consumer(object):
         ''' Queue download ready urls '''
         for page in list_of_pages:
             try:
-                self.url_queue.put('{};page={}'.format(url, page)
+                self.url_queue.put('{};page={}'.format(url, page))
             except Queue.Full:
                 return False
         return True
