@@ -49,24 +49,27 @@ class Consumer(object):
         url = self.get_url_msg(msg)
         list_of_pages = self.get_pagenums_msg(msg)
         num_threads = len(list_of_pages)
-        print "Inside get_category_deals: {} \n{}".format(num_threads, url)
-        for idx in xrange(num_threads):
-            worker = Thread(target=self.fetch_request_data, 
-                            name='Thread-{}'.format(idx),
-                           args=(self.url_queue,))
-            worker.setDaemon(True)
-            worker.start()
+        #print "Inside get_category_deals: {} \n{}".format(num_threads, url)
+        if self.queue_urls(url, list_of_pages):
+            for idx in xrange(num_threads):
+                worker = Thread(target=self.fetch_request_data, 
+                                name='Thread-{}'.format(idx),
+                                args=(self.url_queue,))
+                worker.setDaemon(True)
+                worker.start()
+        else:
+            raise Queue.Full
             
     def fetch_request_data(self, field='deals'):
         ''' Fetch request data from queued up urls '''
-        print "Inside fetch_request_data"
+        #print "Inside fetch_request_data"
         while True:
-            print "Trying to dequeue.... Is queue empty? {}".format(self.url_queue.empty())
+            #print "Trying to dequeue.... Is queue empty? {}".format(self.url_queue.empty())
             url = self.url_queue.get()
             req = rq.get(url)
             print req.json()[field]
             q.task_done()
-    
+
     def get_consumed_partitions(self):
         ''' Track partitions consumed by consumer instance '''
         return sorted(self.partitions)
@@ -101,6 +104,15 @@ class Consumer(object):
     def split_return_by_idx(self, msg, idx, by_token='=>'):
         ''' Split msg and return part by idx '''
         return msg.value.split(by_token)[idx].strip()
+        
+    def queue_urls(self, url, list_of_pages):
+        ''' Queue download ready urls '''
+        for page in list_of_pages:
+            try:
+                self.url_queue.put('{};page={}'.format(url, page)
+            except Queue.Full:
+                return False
+        return True
 
 if __name__ == '__main__':
 #    print settings.SQOOT_API_KEY
