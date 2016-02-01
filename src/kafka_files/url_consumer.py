@@ -21,10 +21,10 @@ except ImportError:
 class Consumer(object):
     ''' A consumer class object '''
     
-    def __init__(self, group, config, config_name, output):
-        self.client = KafkaClient(hosts=config.get(config_name, 'kafka_hosts'))     # Create a client
-        self.topic = self.client.topics[config.get(config_name, 'topic')]       # create topic if not exists
-        self.consumer = self.topic.get_balanced_consumer(       # Zookeeper dynamically assigns partitions
+    def __init__(self, group, topic, output):
+        self.client = KafkaClient(hosts=config.get(config_name, 'kafka_hosts')) # Create a client
+        self.topic = self.client.topics[config.get(config_name, 'topic')] # create topic if not exists
+        self.consumer = self.topic.get_balanced_consumer( # Zookeeper dynamically assigns partitions
             consumer_group=group,
             auto_commit_enable=True,
             zookeeper_connect=config.get(config_name, 'zookeeper_hosts'))
@@ -63,7 +63,6 @@ class Consumer(object):
                                 args=(self.url_queue,))
                 worker.setDaemon(True)
                 worker.start()
-                #worker.join()
         else:
             raise Queue.Full
             
@@ -74,14 +73,16 @@ class Consumer(object):
             #print "Trying to dequeue.... Is queue empty? {}".format(self.url_queue.empty())
             url = self.url_queue.get()
             req = rq.get(url)
-            self.semaphore.acquire()
+            data = req.json()['deals']
+            if not data:
+                pass 
+            self.semaphore.acquire() # Thread safe I/O write
             if isinstance(self.output, Producer): # write to producer
-                self.output.produce
+                self.output.produce(data) # send to final queue for persistence.
             else: # write to file
                 with open('deals.json', 'a') as f:
-                    f.write(json.dumps(req.json()['deals']))
-                    f.write('\n')
-                
+                    f.write(json.dumps(data))
+                    f.write('\n') 
             self.semaphore.release()
             self.url_queue.task_done()
             
