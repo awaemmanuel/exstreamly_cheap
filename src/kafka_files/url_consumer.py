@@ -19,26 +19,30 @@ except ImportError:
     import ConfigParser as configparser # Python 2
 
 class Consumer(object):
-    ''' A consumer class object '''
     
-    def __init__(self, group, topic, output):
-        self.client = KafkaClient(hosts=config.get(config_name, 'kafka_hosts')) # Create a client
-        self.topic = self.client.topics[config.get(config_name, 'topic')] # create topic if not exists
+    
+    def __init__(self, config, consumer_mode, output):
+        ''' Init a consumer based on mode activated in input '''
+        self.config = config
+        self.config_section = consumer_mode
+        config_params = self.get_config_items()
+        self.client = KafkaClient(hosts=config_params['kafka_hosts']) # Create a client
+        self.topic = self.client.topics[config_params['topic']] # create topic if not exists
         self.consumer = self.topic.get_balanced_consumer( # Zookeeper dynamically assigns partitions
-            consumer_group=group,
+            consumer_group=config_params['group'],
             auto_commit_enable=True,
-            zookeeper_connect=config.get(config_name, 'zookeeper_hosts'))
+            zookeeper_connect=config_params['zookeeper_hosts'])
+        if isinstance(output, Producer) 
+            self.output = output # write into producer
+        else:
+            self.output = uf.mkdir_if_not_exist() # write to file
         self.partitions = set()
         self.msg_cnt = 0 # Num consumed by instance.
         self.init_time = datetime.now()
         self.start_time = self.init_time
         self.url_queue = Queue(maxsize=0) # infinitely sized
         self.semaphore = BoundedSemaphore()
-        if not isinstance(output, Producer) # meant to write to file
-            self.output = uf.mkdir_if_not_exist()
-        else:
-            self.output = output # write into producer
-            
+       
     def consumer_url(self):
         ''' Consumer a kafka message and get url to fetch '''
         self.start_time = datetime.now() # For logging
@@ -129,14 +133,34 @@ class Consumer(object):
             except Queue.Full:
                 return False
         return True
+    
+    def get_config_items(self):
+        ''' Retrieve relevant config settings for section
+            applicable to this type of instance for 
+            group, in_topic, out_topic if available
+        '''
+        try:
+            return dict(self.config.items(self.config_section))
+        except NoSectionError:
+            raise NoSectionError('No section: {} exists in the config file'
+                                 .format(self.config_section))
 
 if __name__ == '__main__':
 #    print settings.SQOOT_API_KEY
 #    print settings.SQOOT_BASE_URL
+'''
+    settings.SQOOT_API_KEY
+    settings.SQOOT_BASE_URL
+    settings.CONSUMER_MODE_URL
+    settings.CONSUMER_MODE_DATA
+    settings.PRODUCER_MODE_URL
+    settings.PRODUCER_MODE_DATA
+'''
     config = configparser.SafeConfigParser()
     config.read('../../config/general.conf')
-    con = Consumer('test_group', config, 'server_settings')
+    con = Consumer(config, settings.CONSUMER_MODE_URL, '/tmp/sample_output')
     con.consumer_url()
+
     
 
 
