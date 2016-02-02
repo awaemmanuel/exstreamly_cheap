@@ -95,12 +95,15 @@ class Consumer(object):
             url = self.url_queue.get()
             try:
                 req = rq.get(url)
-            except JSONDecodeError:
+            except rq.exceptions.RequestException:
                 continue
             if not req.ok:
                 continue
-            data = req.json()['deals']
-            if not data:
+            try:
+                data = req.json()['deals']
+            except simplejson.scanner.JSONDecodeError:
+                continue
+            if not data: # JSON Object Ok but no deals.
                 print "No deals found on page {}. Continuing....".format(page_num)
                 continue
             print "Waiting to acquire lock..."

@@ -3,6 +3,7 @@
     @Author: Emmanuel Awa
 '''
 import itertools
+import time
 from config import settings
 from fetch_sqoot_data import map_categories, get_request
 from src.kafka_files import url_producer as up
@@ -49,7 +50,7 @@ class ProcessCategories(object):
                 print "[PROCESS URLS] - Starting to process updates"
                 self._construct_and_produce_urls(base_url)
             self.process_cnt += 1
-            time.sleep(10) # check for updated deals every 25mins
+            time.sleep(300) # check for updated deals every 5mins
             
     def _construct_and_produce_urls(self, base_url, initial_visit=False):
         ''' Process all categories. For intial visit, we get everything
