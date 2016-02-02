@@ -33,11 +33,10 @@ class ProcessCategories(object):
             raise
         self._producer = up.Producer(self._kafka_hosts)
         self.process_cnt = 0
-        
+        max_deals_per_page = 100
     
     def process(self):
         ''' Process all categories in REPL '''
-        max_deals_per_page = 100
         base_url = '{}/deals?api_key={}'.format(settings.SQOOT_BASE_URL,
                                            settings.SQOOT_API_KEY)
         first_visit = True
@@ -64,7 +63,7 @@ class ProcessCategories(object):
             self._producer.produce_deal_urls(url, 
                                               self._out_topic, 
                                               partition_key,
-                                              max_deals_per_page,
+                                              self.max_deals_per_page,
                                               initial_visit)
     def _get_all_categories(self):
         ''' Retrieve all categories to process '''
