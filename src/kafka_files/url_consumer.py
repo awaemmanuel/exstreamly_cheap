@@ -87,7 +87,7 @@ class Consumer(object):
     def fetch_request_data(self, field='deals'):
         ''' Fetch request data from queued up urls '''
         print "Inside fetch_request_data"
-        while True:
+        while not self.url_queue.empty():
             print "Trying to dequeue.... Is queue empty? {}".format(self.url_queue.empty())
             url = self.url_queue.get()
             req = rq.get(url)
