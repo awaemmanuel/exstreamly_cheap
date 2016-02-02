@@ -22,16 +22,17 @@ except ImportError:
 class Consumer(object):
     
     
-    def __init__(self, config, consumer_mode, output):
+    def __init__(self, config, consumer_mode, to_producer=True):
         ''' Init a consumer based on mode activated in input '''
         self.config = config
         self.config_section = consumer_mode
+        self.to_producer = to_producer
         config_params = self.get_config_items()
         try:
             self.kafka_hosts = config_params['kafka_hosts']
             self.in_topic = config_params['in_topic']
             self.out_topic = config_params['out_topic']
-            self.group = config_params['group']
+            self.group = config_params['in_group']
             self.zk_hosts = config_params['zookeeper_hosts']
         except KeyError:
             raise
@@ -43,10 +44,14 @@ class Consumer(object):
             auto_commit_enable=True,
             zookeeper_connect=self.zk_hosts)
         print "Made connection"
-        if isinstance(output, Producer): 
-            self.output = output # write into producer
+        if self.to_producer: # write into producer
+            try:
+                self.out_group = config_params['out_group']
+                self.out_topic = config_params['out_topic']
+            except KeyError:
+                raise
         else:
-            self.output = uf.mkdir_if_not_exist() # write to file
+            self.output = uf.mkdir_if_not_exist() # write to /tmp/exstreamly_cheap
         print "Created output file or producer stage"
         self.partitions = set()
         self.msg_cnt = 0 # Num consumed by instance.
@@ -96,8 +101,9 @@ class Consumer(object):
                 print "Empty deals pages. Continuing...."
                 pass 
             self.semaphore.acquire() # Thread safe I/O write
-            if isinstance(self.output, Producer): # write to producer
-                self.output.produce(data) # send to final queue for persistence.
+            if self.to_producer: # write to producer
+                with self.out_topic.get_producer() as prod:
+                    prod.produce(data)
             else: # write to file
                 print "Trying to write to file"
                 with open('deals.json', 'a') as f:
@@ -175,5 +181,5 @@ if __name__ == '__main__':
     '''
     config = configparser.SafeConfigParser()
     config.read('../../config/general.conf')
-    con = Consumer(config, settings.CONSUMER_MODE_URL, '/tmp/sample_output')
+    con = Consumer(config, settings.CONSUMER_MODE_URL)
     con.consumer_url()
