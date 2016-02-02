@@ -118,6 +118,7 @@ class Consumer(object):
                     f.write('\n')
                 print "{} strings written to file".format(self.msg_cnt)
             self.semaphore.release()
+            print " ==> Released the lock..."
             self.url_queue.task_done()
             
     def get_consumed_partitions(self):
