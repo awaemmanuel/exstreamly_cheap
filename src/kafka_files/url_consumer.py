@@ -98,8 +98,10 @@ class Consumer(object):
             if not data:
                 print "No deals found on page {}. Continuing....".format(page_num)
                 continue
-            self.msg_cnt += 1
+            print "Waiting to acquire lock..."
             self.semaphore.acquire() # Thread safe I/O write
+            print " ==> Got the lock..."
+            self.msg_cnt += 1
             if self.to_producer: # write to producer
                 with self.out_topic.get_producer() as prod:
                     prod.produce(str(data))
