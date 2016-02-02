@@ -94,5 +94,5 @@ if __name__ == "__main__":
     partition_key = str(args[2])
     prod = Producer(ip_addr)
     #prod.produce_msgs(partition_key) 
-    prod.produce_deal_urls('http://api.sqoot.com/v2/deals?api_key=pf3lj0;per_page=100;category_slugs=spa', 'price_data_part4', b'1')
+    prod.produce_deal_urls('http://api.sqoot.com/v2/deals?api_key=pf3lj0;per_page=100;category_slugs=spa', 'deal_urls', b'1')
     print prod.get_total_msg_prod()

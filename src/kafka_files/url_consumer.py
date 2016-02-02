@@ -7,12 +7,13 @@ import os
 import sys
 import logging
 import requests as rq
+from  url_producer import Producer
 from threading import Thread, BoundedSemaphore
 from Queue import Queue
 from datetime import datetime
 from pykafka import KafkaClient
 from config import settings 
-from helper_modules import utility_functions as uf
+from src.helper_modules import utility_functions as uf
 try:
     import configparser # for Python 3
 except ImportError:
@@ -26,16 +27,27 @@ class Consumer(object):
         self.config = config
         self.config_section = consumer_mode
         config_params = self.get_config_items()
-        self.client = KafkaClient(hosts=config_params['kafka_hosts']) # Create a client
-        self.topic = self.client.topics[config_params['topic']] # create topic if not exists
+        try:
+            self.kafka_hosts = config_params['kafka_hosts']
+            self.in_topic = config_params['in_topic']
+            self.out_topic = config_params['out_topic']
+            self.group = config_params['group']
+            self.zk_hosts = config_params['zookeeper_hosts']
+        except KeyError:
+            raise
+        print "Trying to make connection {}".format(self.in_topic)
+        self.client = KafkaClient(hosts=self.kafka_hosts) # Create a client
+        self.topic = self.client.topics[self.in_topic] # create topic if not exists
         self.consumer = self.topic.get_balanced_consumer( # Zookeeper dynamically assigns partitions
-            consumer_group=config_params['group'],
+            consumer_group=self.group,
             auto_commit_enable=True,
-            zookeeper_connect=config_params['zookeeper_hosts'])
-        if isinstance(output, Producer) 
+            zookeeper_connect=self.zk_hosts)
+        print "Made connection"
+        if isinstance(output, Producer): 
             self.output = output # write into producer
         else:
             self.output = uf.mkdir_if_not_exist() # write to file
+        print "Created output file or producer stage"
         self.partitions = set()
         self.msg_cnt = 0 # Num consumed by instance.
         self.init_time = datetime.now()
@@ -46,7 +58,9 @@ class Consumer(object):
     def consumer_url(self):
         ''' Consumer a kafka message and get url to fetch '''
         self.start_time = datetime.now() # For logging
+        print "Inside Consumer url"
         while True:
+            "Trying to consume message"
             message = self.consumer.consume() # Read one message (url)
             print(message.value)
             self.partitions.add(message.partition.id)
@@ -59,7 +73,7 @@ class Consumer(object):
         url = self.get_url_msg(msg)
         list_of_pages = self.get_pagenums_msg(msg)
         num_threads = len(list_of_pages)
-        #print "Inside get_category_deals: {} \n{}".format(num_threads, url)
+        print "Inside get_category_deals: {} \n{}".format(num_threads, url)
         if self.queue_urls(url, list_of_pages):
             for idx in xrange(num_threads):
                 worker = Thread(target=self.fetch_request_data, 
@@ -72,18 +86,20 @@ class Consumer(object):
             
     def fetch_request_data(self, field='deals'):
         ''' Fetch request data from queued up urls '''
-        #print "Inside fetch_request_data"
+        print "Inside fetch_request_data"
         while True:
-            #print "Trying to dequeue.... Is queue empty? {}".format(self.url_queue.empty())
+            print "Trying to dequeue.... Is queue empty? {}".format(self.url_queue.empty())
             url = self.url_queue.get()
             req = rq.get(url)
             data = req.json()['deals']
             if not data:
+                print "Empty deals pages. Continuing...."
                 pass 
             self.semaphore.acquire() # Thread safe I/O write
             if isinstance(self.output, Producer): # write to producer
                 self.output.produce(data) # send to final queue for persistence.
             else: # write to file
+                print "Trying to write to file"
                 with open('deals.json', 'a') as f:
                     f.write(json.dumps(data))
                     f.write('\n') 
@@ -148,20 +164,16 @@ class Consumer(object):
 if __name__ == '__main__':
 #    print settings.SQOOT_API_KEY
 #    print settings.SQOOT_BASE_URL
-'''
+
+    '''
     settings.SQOOT_API_KEY
     settings.SQOOT_BASE_URL
     settings.CONSUMER_MODE_URL
     settings.CONSUMER_MODE_DATA
     settings.PRODUCER_MODE_URL
     settings.PRODUCER_MODE_DATA
-'''
+    '''
     config = configparser.SafeConfigParser()
     config.read('../../config/general.conf')
     con = Consumer(config, settings.CONSUMER_MODE_URL, '/tmp/sample_output')
     con.consumer_url()
-
-    
-
-
-
