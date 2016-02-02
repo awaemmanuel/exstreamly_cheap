@@ -38,26 +38,28 @@ class ProcessCategories(object):
     def process(self):
         ''' Process all categories in REPL '''
         max_deals_per_page = 100
-        url = '{}/deals?api_key={}'.format(settings.SQOOT_BASE_URL,
+        base_url = '{}/deals?api_key={}'.format(settings.SQOOT_BASE_URL,
                                            settings.SQOOT_API_KEY)
         first_visit = True
         while True:
             if self.process_cnt == 0:
-                self._construct_and_produce_urls(first_visit)
+                print "[PROCESS URLS] - Starting to process first time"
+                self._construct_and_produce_urls(base_url, first_visit)
                 first_visit = False
             else:
-                self._construct_and_produce_urls()
+                print "[PROCESS URLS] - Starting to process updates"
+                self._construct_and_produce_urls(base_url)
             self.process_cnt += 1
-            time.sleep(25) # check for updated deals every 25mins
+            time.sleep(10) # check for updated deals every 25mins
             
-    def _construct_and_produce_urls(self, initial_visit=False):
+    def _construct_and_produce_urls(self, base_url, initial_visit=False):
         ''' Process all categories. For intial visit, we get everything
             Subsequent visit, used for real time, we use updated_after 
             query param of the api
         '''
         for idx, category in enumerate(self._categories):
             print "Processing: {}".format(category) 
-            url = '{};category_slug={}'.format(url, category)
+            url = '{};category_slug={}'.format(base_url, category)
             partition_key = idx % 4 # creating 4 partitions by default
             self._producer.produce_deals_urls(url, 
                                               self._out_topic, 
