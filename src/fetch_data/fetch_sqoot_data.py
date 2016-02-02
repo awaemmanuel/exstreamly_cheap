@@ -9,13 +9,13 @@ import threading
 import Queue
 import requests as rq
 from collections import OrderedDict
-from helper_modules import utility_functions as uf
+from src.helper_modules import utility_functions as uf
 
 PUBLIC_KEY = 'pf3lj0'
 base_url = 'http://api.sqoot.com/v2'
-def get_request(base_api_url, endpoint='categories', extra_params='', queue=None):
+def get_request(base_api_url, endpoint='categories', extra_params='', queue=None, key='pf3lj0'):
     ''' Return url to endpoint '''
-    req =  rq.get('{}/{}/?api_key={};{}'.format(base_api_url, endpoint, PUBLIC_KEY, extra_params))
+    req =  rq.get('{}/{}/?api_key={};{}'.format(base_api_url, endpoint, key, extra_params))
     if not queue:
         return req
     queue.put(req.json()['deals'])

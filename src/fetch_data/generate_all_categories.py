@@ -5,6 +5,7 @@
 from config import settings
 from fetch_sqoot_data import map_categories, get_request
 from kafka_files import url_producer as up
+from src.helper_modules import utility_functions as uf
 try:
     import configparser # for Python 3
 except ImportError:
@@ -13,37 +14,59 @@ except ImportError:
 
 class ProcessCategories(object):
     
-    def __init__(self, url, list_of_categories=None):
+    def __init__(self, list_of_categories=None):
         ''' Initialize processing 
             :list_of_categories: List[str] - iterable. if None, then we process
                                 everything.
         '''
-        self.categories = []
-        if list_of_categories:
-            self.categories = list_of_categories
-        self.url = url
-        self.config = configparser.SafeConfigParser()
-        self.config.read('../../config/general.conf')
-        self.config_section = settings.PRODUCER_MODE_URL
+        # Get complete list of categories if none in input.
+        self._categories = list_of_categories or get_all_categories()
+        self._config = configparser.SafeConfigParser()
+        self._config.read('../../config/general.conf')
+        self._config_section = settings.PRODUCER_MODE_URL
         config_params = self.get_config_items()
         try:
-            self.kafka_hosts = config_params['kafka_hosts']
-            self.out_topic = config_params['out_topic']
-            self.zk_hosts = config_params['zookeeper_hosts']
+            self._kafka_hosts = config_params['kafka_hosts']
+            self._out_topic = config_params['out_topic']
+            self._zk_hosts = config_params['zookeeper_hosts']
         except KeyError:
             raise
-        self.producer = up.Producer(self.kafka_hosts)
+        self._producer = up.Producer(self._kafka_hosts)
+        self.process_cnt = 0
         
     
     def process(self):
         ''' Process all categories in REPL '''
-        # TODO
-        pass
-        
+        max_deals_per_page = 100
+        url = '{}/deals?api_key={}'.format(settings.SQOOT_BASE_URL,
+                                           settings.SQOOT_API_KEY)
+        first_visit = True
+        while True:
+            if self.process_cnt == 0:
+                self._construct_and_produce_urls(first_visit)
+                first_visit = False
+            else:
+                self._construct_and_produce_urls()
+            self.process_cnt += 1
+            time.sleep(25) # check for updated deals every 25mins
+            
+    def _construct_and_produce_urls(self, initial_visit=False):
+        ''' Process all categories. For intial visit, we get everything
+            Subsequent visit, used for real time, we use updated_after 
+            query param of the api
+        '''
+        for idx, category in enumerate(self._categories):
+                    url = '{};category_slug={}'.format(url, category)
+                    partition_key = idx % 4 # creating 4 partitions by default
+                    self._producer.produce_deals_urls(url, 
+                                                      self._out_topic, 
+                                                      partition_key,
+                                                      max_deals_per_page,
+                                                      initial_visit)
     def get_all_categories(self):
         ''' Retrieve all categories to process '''
-        # TODO
-        pass
+        all_categories = map_categories(settings.SQOOT_BASE_URL)
+        return list(itertools.chain(*all_categories.values()))
     
     def get_config_items(self):
         ''' Retrieve relevant config settings for section
@@ -51,7 +74,7 @@ class ProcessCategories(object):
             group, in_topic, out_topic if available
         '''
         try:
-            return dict(self.config.items(self.config_section))
+            return dict(self.config.items(self._config_section))
         except NoSectionError:
             raise NoSectionError('No section: {} exists in the config file'
-                                 .format(self.config_section))
+                                 .format(self._config_section))
