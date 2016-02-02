@@ -2,15 +2,15 @@
     Module that generates all deals categories from their parent categories.
     @Author: Emmanuel Awa
 '''
+import itertools
 from config import settings
 from fetch_sqoot_data import map_categories, get_request
-from kafka_files import url_producer as up
+from src.kafka_files import url_producer as up
 from src.helper_modules import utility_functions as uf
 try:
     import configparser # for Python 3
 except ImportError:
     import ConfigParser as configparser # Python 2
-
 
 class ProcessCategories(object):
     
@@ -20,11 +20,11 @@ class ProcessCategories(object):
                                 everything.
         '''
         # Get complete list of categories if none in input.
-        self._categories = list_of_categories or get_all_categories()
+        self._categories = list_of_categories or self._get_all_categories()
         self._config = configparser.SafeConfigParser()
         self._config.read('../../config/general.conf')
         self._config_section = settings.PRODUCER_MODE_URL
-        config_params = self.get_config_items()
+        config_params = self._get_config_items()
         try:
             self._kafka_hosts = config_params['kafka_hosts']
             self._out_topic = config_params['out_topic']
@@ -56,25 +56,35 @@ class ProcessCategories(object):
             query param of the api
         '''
         for idx, category in enumerate(self._categories):
-                    url = '{};category_slug={}'.format(url, category)
-                    partition_key = idx % 4 # creating 4 partitions by default
-                    self._producer.produce_deals_urls(url, 
-                                                      self._out_topic, 
-                                                      partition_key,
-                                                      max_deals_per_page,
-                                                      initial_visit)
-    def get_all_categories(self):
+            print "Processing: {}".format(category) 
+            url = '{};category_slug={}'.format(url, category)
+            partition_key = idx % 4 # creating 4 partitions by default
+            self._producer.produce_deals_urls(url, 
+                                              self._out_topic, 
+                                              partition_key,
+                                              max_deals_per_page,
+                                              initial_visit)
+    def _get_all_categories(self):
         ''' Retrieve all categories to process '''
         all_categories = map_categories(settings.SQOOT_BASE_URL)
         return list(itertools.chain(*all_categories.values()))
     
-    def get_config_items(self):
+    def _get_config_items(self):
         ''' Retrieve relevant config settings for section
             applicable to this type of instance for 
             group, in_topic, out_topic if available
         '''
         try:
-            return dict(self.config.items(self._config_section))
-        except NoSectionError:
+            return dict(self._config.items(self._config_section))
+        except configparser.NoSectionError:
             raise NoSectionError('No section: {} exists in the config file'
                                  .format(self._config_section))
+    def categories_in_process(self):
+        ''' Retrieve categories that the flow will process '''
+        return self._categories
+    
+if __name__ == '__main__':
+    process_flow = ProcessCategories()
+    print process_flow.categories_in_process()
+    process_flow.process() # Start producing urls
+    
