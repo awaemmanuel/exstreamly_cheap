@@ -33,7 +33,7 @@ class ProcessCategories(object):
             raise
         self._producer = up.Producer(self._kafka_hosts)
         self.process_cnt = 0
-        max_deals_per_page = 100
+        self.max_deals_per_page = 100
     
     def process(self):
         ''' Process all categories in REPL '''
