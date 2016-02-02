@@ -66,7 +66,7 @@ class Producer(object):
                                           url,
                                           chunk)
             print msg
-            self.producer.send_messages(topic, partition_key, msg)
+            self.producer.send_messages(topic, str(partition_key), msg)
             self.__class__._msg_cnt += 1
             
     def produce_deal_full_data(self):
