@@ -61,7 +61,7 @@ class ProcessCategories(object):
             print "Processing: {}".format(category) 
             url = '{};category_slug={}'.format(base_url, category)
             partition_key = idx % 4 # creating 4 partitions by default
-            self._producer.produce_deals_urls(url, 
+            self._producer.produce_deal_urls(url, 
                                               self._out_topic, 
                                               partition_key,
                                               max_deals_per_page,
