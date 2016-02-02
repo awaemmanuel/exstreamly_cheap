@@ -46,7 +46,7 @@ class Producer(object):
         try:
             total_category = req.json()['query']['total']
         except simplejson.scanner.JSONDecodeError:
-            break   
+            continue   
         num_pages_to_fetch = ((total_category / max_deals_per_page) + 1) if total_category > 1 else 1
         '''
             Produce categories and page range for consumers
