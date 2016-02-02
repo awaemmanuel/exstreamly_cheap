@@ -109,7 +109,7 @@ class Consumer(object):
                 with open('deals.json', 'a') as f:
                     f.write(json.dumps(data))
                     f.write('\n')
-            print "{} strings written to file".format(self.msg_cnt)
+                print "{} strings written to file".format(self.msg_cnt)
             self.semaphore.release()
             self.url_queue.task_done()
             
