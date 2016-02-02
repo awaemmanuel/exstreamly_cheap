@@ -70,8 +70,6 @@ class Consumer(object):
             print(message.value)
             self.partitions.add(message.partition.id)
             self.get_category_deals(message)
-#            print type(self.get_pagenums_msg(message.value))
-            self.msg_cnt += 1
             
     def get_category_deals(self, msg):
         ''' Fetch all deals from url found in msg '''
@@ -83,13 +81,13 @@ class Consumer(object):
             for idx in xrange(num_threads):
                 worker = Thread(target=self.fetch_request_data, 
                                 name='Thread-{}'.format(idx),
-                                args=(self.url_queue,))
+                                args=(list_of_pages[idx],))
                 worker.setDaemon(True)
                 worker.start()
         else:
             raise Queue.Full
             
-    def fetch_request_data(self, field='deals'):
+    def fetch_request_data(self, page_num):
         ''' Fetch request data from queued up urls '''
         print "Inside fetch_request_data"
         while True:
@@ -98,18 +96,20 @@ class Consumer(object):
             req = rq.get(url)
             data = req.json()['deals']
             if not data:
-                print "Empty deals pages. Continuing...."
-                pass 
+                print "No deals found on page {}. Continuing....".format(page_num)
+                continue
+            self.msg_cnt += 1
             self.semaphore.acquire() # Thread safe I/O write
             if self.to_producer: # write to producer
                 with self.out_topic.get_producer() as prod:
                     prod.produce(str(data))
-                    print "Written to producer"
+                    print "{} strings written to producer".format(self.msg_cnt)
             else: # write to file
                 print "Trying to write to file"
                 with open('deals.json', 'a') as f:
                     f.write(json.dumps(data))
-                    f.write('\n') 
+                    f.write('\n')
+            print "{} strings written to file".format(self.msg_cnt)
             self.semaphore.release()
             self.url_queue.task_done()
             
