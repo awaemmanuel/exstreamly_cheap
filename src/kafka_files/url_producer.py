@@ -28,7 +28,7 @@ class Producer(object):
         self.producer = KeyedProducer(self.client)
         print "Made connection with host: {}".format(addr)
         self._last_update = datetime.utcnow() # For latest deals
-        self._more_pages = 20
+        self._more_pages = 10
         self._chunk_size = 10
 
     def produce_deal_urls(self, url, topic, partition_key, max_deals_per_page=100, initial_visit=True):
@@ -42,32 +42,33 @@ class Producer(object):
             # Calculate number of pages to crawl
             # Max 100 per page, crawl total//100
             try:
-                total_category = req.json()['query']['total']       
-                num_pages_to_fetch = ((total_category / max_deals_per_page) + 1) if total_category > 1 else 1
-                '''
-                    Produce categories and page range for consumers
-                    Crawl extra pages to account for changing api.
-                    Pages with no deals will be filtered out by consumer
-                    Recommended approaches to partitioning
-                    1. max(t/p, t/c) partitions.
-                        - t: Required throughput
-                        - p: Production speed
-                        - c: consumption speed
-                    2. Rule of thumb - 100 * b * r
-                        - b: # of brokers in cluster
-                        - r: # of replication factor
-                    {category_slug; start_page; end_page}
-                '''
-                total_pages = range(1, num_pages_to_fetch + self._more_pages)
-                page_chunks = list(self.yield_chunks(total_pages, self._chunk_size))
-                for chunk in page_chunks:
-                    time_stamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%S%Z")
-                    msg = '{} => {} => {}'.format(time_stamp, 
-                                                  url,
-                                                  chunk)
-                    print msg
-                    self.producer.send_messages(topic, str(partition_key), msg)
-                    self.__class__._msg_cnt += 1
+                total_category = req.json()['query']['total'] 
+                if total_category > 0:
+                    num_pages_to_fetch = ((total_category / max_deals_per_page) + 1)
+                    '''
+                        Produce categories and page range for consumers
+                        Crawl extra pages to account for changing api.
+                        Pages with no deals will be filtered out by consumer
+                        Recommended approaches to partitioning
+                        1. max(t/p, t/c) partitions.
+                            - t: Required throughput
+                            - p: Production speed
+                            - c: consumption speed
+                        2. Rule of thumb - 100 * b * r
+                            - b: # of brokers in cluster
+                            - r: # of replication factor
+                        {category_slug; start_page; end_page}
+                    '''
+                    total_pages = range(1, num_pages_to_fetch + self._more_pages)
+                    page_chunks = list(self.yield_chunks(total_pages, self._chunk_size))
+                    for chunk in page_chunks:
+                        time_stamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%S%Z")
+                        msg = '{} => {} => {}'.format(time_stamp, 
+                                                      url,
+                                                      chunk)
+                        print msg
+                        self.producer.send_messages(topic, str(partition_key), msg)
+                        self.__class__._msg_cnt += 1
             except simplejson.scanner.JSONDecodeError:
                 pass
             
