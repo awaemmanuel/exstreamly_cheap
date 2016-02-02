@@ -93,7 +93,12 @@ class Consumer(object):
         while not self.url_queue.empty():
             print "Trying to dequeue.... Is queue empty? {}".format(self.url_queue.empty())
             url = self.url_queue.get()
-            req = rq.get(url)
+            try:
+                req = rq.get(url)
+            except JSONDecodeError:
+                continue
+            if not req.ok:
+                continue
             data = req.json()['deals']
             if not data:
                 print "No deals found on page {}. Continuing....".format(page_num)
