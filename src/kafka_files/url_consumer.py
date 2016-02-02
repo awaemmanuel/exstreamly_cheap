@@ -47,7 +47,7 @@ class Consumer(object):
         if self.to_producer: # write into producer
             try:
                 self.out_group = config_params['out_group']
-                self.out_topic = config_params['out_topic']
+                self.out_topic = self.client.topics[config_params['out_topic']]
             except KeyError:
                 raise
         else:
@@ -103,7 +103,8 @@ class Consumer(object):
             self.semaphore.acquire() # Thread safe I/O write
             if self.to_producer: # write to producer
                 with self.out_topic.get_producer() as prod:
-                    prod.produce(data)
+                    prod.produce(str(data))
+                    print "Written to producer"
             else: # write to file
                 print "Trying to write to file"
                 with open('deals.json', 'a') as f:
