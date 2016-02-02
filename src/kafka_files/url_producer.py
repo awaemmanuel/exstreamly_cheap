@@ -38,12 +38,16 @@ class Producer(object):
             checked_last = self._last_update.strftime("%Y-%m-%dT%H:%M:%S%Z")
             url = '{};updated_after={}'.format(url,checked_last)
         req = self.fetch_request(url)
-        
+        if not req.ok:
+            break
+            
         # Calculate number of pages to crawl
         # Max 100 per page, crawl total//100
-        total_per_category = req.json()['query']['total']
-        num_pages_to_fetch = (total_per_category / max_deals_per_page) + 1
-        
+        try:
+            total_category = req.json()['query']['total']
+        except simplejson.scanner.JSONDecodeError:
+            break   
+        num_pages_to_fetch = ((total_category / max_deals_per_page) + 1) if total_category > 1 else 1
         '''
             Produce categories and page range for consumers
             Crawl extra pages to account for changing api.
