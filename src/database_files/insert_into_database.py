@@ -28,9 +28,16 @@ if __name__ == '__main__':
         #  Insert dataFrames with all our categories into Cassandra
         df_category.registerTempTable('{}'.format(category))
         if category is 'merchants':            
-            df_category.select('id', 'name', 'address', 'postal_code', 'country', 'phone_number', 'region', 'longitude', 'latitude',  'url').write.format("org.apache.spark.sql.cassandra").options(table='merchants', keyspace='deals').save(mode='append')
+            df_category.select(
+                'id', 'name', 'address', 'postal_code', 'country', 
+                'phone_number', 'region', 'longitude', 'latitude',  'url')
+            .write.format("org.apache.spark.sql.cassandra")
+            .options(table='merchants', keyspace='deals')
+            .save(mode='append')
         else: # other categories
-            df_category.write.format('org.apache.spark.sql.cassandra').options(table='{}'.format(category), keyspace='deals').save(mode='append')
+            df_category.write.format('org.apache.spark.sql.cassandra')
+            .options(table='{}'.format(category), keyspace='deals')
+            .save(mode='append')
         
 
 
