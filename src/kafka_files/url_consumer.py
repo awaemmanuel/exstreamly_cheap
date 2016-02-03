@@ -106,10 +106,7 @@ class Consumer(object):
             if not data: # JSON Object Ok but no deals.
                 uf.print_out("No deals found on page {}. Continuing....".format(page_num))
                 continue
-            uf.print_out("Waiting to acquire lock...")
-            self.semaphore.acquire() # Thread safe I/O write
-            uf.print_out(" ==> Got the lock...")
-            
+        
             # Write deals to output one at a time
             for deal in self._filter_json_fields(data):
                 self.msg_cnt += 1
@@ -118,19 +115,22 @@ class Consumer(object):
                         prod.produce(str(deal))
                         uf.print_out("{} strings written to producer".format(self.msg_cnt))
                 else: # write to file
+                    uf.print_out("Waiting to acquire lock...")
+                    self.semaphore.acquire() # Thread safe I/O write
+                    uf.print_out(" ==> Got the lock...")
                     uf.print_out("Trying to write to file")
                     with open('deals.json', 'a') as f:
                         f.write(json.dumps(str(deal)))
                         f.write('\n')
                     uf.print_out("{} strings written to file".format(self.msg_cnt))
-            self.semaphore.release()
+                    self.semaphore.release()
             uf.print_out(" ==> Released the lock...")
             self.url_queue.task_done()
     
     def _filter_json_fields(self, all_deals):
         ''' Select only relevant json fields in deals '''
         for idx, deal in enumerate(all_deals):
-            uf.uf.print_out('Processing deal: {}'.format(idx))
+            uf.print_out('Processing deal: {}'.format(idx))
             if deal:
                 output = OrderedDict()
                 output['id'] = deal['deal']['id']
