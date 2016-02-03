@@ -45,7 +45,9 @@ def map_categories(base_url):
     ''' Map Sqoot API main categories to subcategories '''
     req_categories = get_request(base_url)
     main_to_sub_categories = {}
-    for cat in req_categories.json()['categories']:
+    
+    try:
+        for cat in req_categories.json()['categories']:
         category = cat['category']
         parent_slug = category['parent_slug']
         slug = category['slug']
@@ -58,8 +60,11 @@ def map_categories(base_url):
             if parent_slug not in main_to_sub_categories.keys(): # main category
                 main_to_sub_categories[parent_slug] = []
             main_to_sub_categories[parent_slug].append(slug)
-    return main_to_sub_categories
-        
+        return main_to_sub_categories
+    
+    except simplejson.scanner.JSONDecodeError:
+        pass
+    
 def fetch_sqoot_data(base_url):
     ''' Fetch Sqoot Data and save relevant information to file '''
     files_location = uf.mkdir_if_not_exist() # Folder in /tmp/exstreamly_cheap_files
