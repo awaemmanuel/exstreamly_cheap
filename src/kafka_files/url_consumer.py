@@ -125,7 +125,7 @@ class Consumer(object):
                         f.write('\n')
                     uf.print_out("{} strings written to file".format(self.msg_cnt))
                     self.semaphore.release()
-            uf.print_out(" ==> Released the lock...")
+                    uf.print_out(" ==> Released the lock...")
             self.url_queue.task_done()
     
     def _filter_json_fields(self, all_deals):
