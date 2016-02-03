@@ -170,11 +170,11 @@ class Consumer(object):
                 uf.print_out('[EMPTY DEAL] - Could not process: #{}'.format(idx))
                             
     def _clean_merchant_info(self, merchant_info_dict):
-    ''' Replace null values in merchant info with empty string '''
-    for k, v in merchant_info_dict.iteritems():
-        if not v:
-            merchant_info_dict[k] = ''
-    return merchant_info_dict
+        ''' Replace null values in merchant info with empty string '''
+        for k, v in merchant_info_dict.iteritems():
+            if not v:
+                merchant_info_dict[k] = ''
+        return merchant_info_dict
 
     def get_consumed_partitions(self):
         ''' Track partitions consumed by consumer instance '''
