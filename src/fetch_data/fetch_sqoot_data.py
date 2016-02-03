@@ -48,18 +48,18 @@ def map_categories(base_url):
     
     try:
         for cat in req_categories.json()['categories']:
-        category = cat['category']
-        parent_slug = category['parent_slug']
-        slug = category['slug']
+            category = cat['category']
+            parent_slug = category['parent_slug']
+            slug = category['slug']
 
-        # Category is a main category
-        if parent_slug is None:
-            if slug not in main_to_sub_categories.keys():
-                main_to_sub_categories[slug] = []
-        else: # Category may be a subcategory 
-            if parent_slug not in main_to_sub_categories.keys(): # main category
-                main_to_sub_categories[parent_slug] = []
-            main_to_sub_categories[parent_slug].append(slug)
+            # Category is a main category
+            if parent_slug is None:
+                if slug not in main_to_sub_categories.keys():
+                    main_to_sub_categories[slug] = []
+            else: # Category may be a subcategory 
+                if parent_slug not in main_to_sub_categories.keys(): # main category
+                    main_to_sub_categories[parent_slug] = []
+                main_to_sub_categories[parent_slug].append(slug)
         return main_to_sub_categories
     
     except simplejson.scanner.JSONDecodeError:
