@@ -135,7 +135,7 @@ class Consumer(object):
             if deal:
                 output = OrderedDict()
                 output['id'] = deal['deal']['id']
-                output['category'] = category
+                output['category'] = deal['deal']['category_slug']
                 output['sub_category'] = deal['deal']['category_slug']
                 output['title'] = deal['deal']['short_title']
                 output['description'] = deal['deal']['description']
