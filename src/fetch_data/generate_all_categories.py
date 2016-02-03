@@ -50,7 +50,7 @@ class ProcessCategories(object):
                 print "[PROCESS URLS] - Starting to process updates"
                 self._construct_and_produce_urls(base_url)
             self.process_cnt += 1
-            time.sleep(300) # check for updated deals every 5mins
+            uf.spinning_cursor(900) # check for updated deals every 15mins
             
     def _construct_and_produce_urls(self, base_url, initial_visit=False):
         ''' Process all categories. For intial visit, we get everything

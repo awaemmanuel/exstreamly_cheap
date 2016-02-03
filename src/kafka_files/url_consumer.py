@@ -36,14 +36,14 @@ class Consumer(object):
             self.zk_hosts = config_params['zookeeper_hosts']
         except KeyError:
             raise
-        print "Trying to make connection {}".format(self.in_topic)
+        uf.print_out("Trying to make connection {}".format(self.in_topic))
         self.client = KafkaClient(hosts=self.kafka_hosts) # Create a client
         self.topic = self.client.topics[self.in_topic] # create topic if not exists
         self.consumer = self.topic.get_balanced_consumer( # Zookeeper dynamically assigns partitions
             consumer_group=self.group,
             auto_commit_enable=True,
             zookeeper_connect=self.zk_hosts)
-        print "Made connection"
+        uf.print_out("Made connection")
         if self.to_producer: # write into producer
             try:
                 self.out_group = config_params['out_group']
@@ -52,7 +52,7 @@ class Consumer(object):
                 raise
         else:
             self.output = uf.mkdir_if_not_exist() # write to /tmp/exstreamly_cheap
-        print "Created output file or producer stage"
+        uf.print_out("Created output file or producer stage")
         self.partitions = set()
         self.msg_cnt = 0 # Num consumed by instance.
         self.init_time = datetime.now()
@@ -63,11 +63,11 @@ class Consumer(object):
     def consumer_url(self):
         ''' Consumer a kafka message and get url to fetch '''
         self.start_time = datetime.now() # For logging
-        print "Inside Consumer url"
+        uf.print_out("Inside Consumer url")
         while True:
             "Trying to consume message"
             message = self.consumer.consume() # Read one message (url)
-            print(message.value)
+            uf.print_out(message.value)
             self.partitions.add(message.partition.id)
             self.get_category_deals(message)
             
@@ -76,7 +76,7 @@ class Consumer(object):
         url = self.get_url_msg(msg)
         list_of_pages = self.get_pagenums_msg(msg)
         num_threads = len(list_of_pages)
-        print "Inside get_category_deals: {} \n{}".format(num_threads, url)
+        uf.print_out("Inside get_category_deals: {} \n{}".format(num_threads, url))
         if self.queue_urls(url, list_of_pages):
             for idx in xrange(num_threads):
                 worker = Thread(target=self.fetch_request_data, 
@@ -89,9 +89,9 @@ class Consumer(object):
             
     def fetch_request_data(self, page_num):
         ''' Fetch request data from queued up urls '''
-        print "Inside fetch_request_data"
+        uf.print_out("Inside fetch_request_data")
         while not self.url_queue.empty():
-            print "Trying to dequeue.... Is queue empty? {}".format(self.url_queue.empty())
+            uf.print_out("Trying to dequeue.... Is queue empty? {}".format(self.url_queue.empty()))
             url = self.url_queue.get()
             try:
                 req = rq.get(url)
@@ -104,26 +104,78 @@ class Consumer(object):
             except simplejson.scanner.JSONDecodeError:
                 continue
             if not data: # JSON Object Ok but no deals.
-                print "No deals found on page {}. Continuing....".format(page_num)
+                uf.print_out("No deals found on page {}. Continuing....".format(page_num))
                 continue
-            print "Waiting to acquire lock..."
+            uf.print_out("Waiting to acquire lock...")
             self.semaphore.acquire() # Thread safe I/O write
-            print " ==> Got the lock..."
-            self.msg_cnt += 1
-            if self.to_producer: # write to producer
-                with self.out_topic.get_producer() as prod:
-                    prod.produce(str(data))
-                    print "{} strings written to producer".format(self.msg_cnt)
-            else: # write to file
-                print "Trying to write to file"
-                with open('deals.json', 'a') as f:
-                    f.write(json.dumps(data))
-                    f.write('\n')
-                print "{} strings written to file".format(self.msg_cnt)
-            self.semaphore.release()
-            print " ==> Released the lock..."
-            self.url_queue.task_done()
+            uf.print_out(" ==> Got the lock...")
             
+            # Write deals to output one at a time
+            for deal in self._filter_json_fields(data):
+                self.msg_cnt += 1
+                if self.to_producer: # write to producer
+                    with self.out_topic.get_producer() as prod:
+                        prod.produce(str(deal))
+                        uf.print_out("{} strings written to producer".format(self.msg_cnt))
+                else: # write to file
+                    uf.print_out("Trying to write to file")
+                    with open('deals.json', 'a') as f:
+                        f.write(json.dumps(str(deal)))
+                        f.write('\n')
+                    uf.print_out("{} strings written to file".format(self.msg_cnt))
+            self.semaphore.release()
+            uf.print_out(" ==> Released the lock...")
+            self.url_queue.task_done()
+    
+    def _filter_json_fields(self, all_deals):
+        ''' Select only relevant json fields in deals '''
+        for idx, deal in enumerate(all_deals):
+            uf.uf.print_out('Processing deal: {}'.format(idx))
+            if deal:
+                output = OrderedDict()
+                output['id'] = deal['deal']['id']
+                output['category'] = category
+                output['sub_category'] = deal['deal']['category_slug']
+                output['title'] = deal['deal']['short_title']
+                output['description'] = deal['deal']['description']
+                output['fine_print'] = deal['deal']['fine_print']
+                output['number_sold'] = deal['deal']['number_sold']
+                output['url'] = deal['deal']['untracked_url']
+                output['price'] = deal['deal']['price']
+                output['discount_percentage'] = deal['deal']['discount_percentage']
+                output['provider_name'] = deal['deal']['provider_name']
+                output['online'] = deal['deal']['online']
+                output['expires_at'] = deal['deal']['expires_at']
+                output['created_at'] = deal['deal']['created_at']
+                output['updated_at'] = deal['deal']['updated_at']
+                output['merchant_id'] = deal['deal']['merchant']['id']
+
+                # Online merchants have fields null. Change to ''
+                # and then flatten merchant info
+                merchant_info = deal['deal']['merchant']
+                if not all(merchant_info.values()):
+                    merchant_info = self._clean_merchant_info(merchant_info) 
+                output['merchant_name'] = merchant_info['name']
+                output['merchant_address'] = merchant_info['address']
+                output['merchant_locality'] = merchant_info['locality']
+                output['merchant_region'] = merchant_info['region']
+                output['merchant_postal_code'] = merchant_info['postal_code']
+                output['merchant_country'] = merchant_info['country']
+                output['merchant_latitude'] = merchant_info['latitude']
+                output['merchant_longitude'] = merchant_info['longitude']
+                output['merchant_phone_number'] = merchant_info['phone_number']
+                
+                yield output
+            else:
+                uf.print_out('[EMPTY DEAL] - Could not process: #{}'.format(idx))
+                            
+    def _clean_merchant_info(self, merchant_info_dict):
+    ''' Replace null values in merchant info with empty string '''
+    for k, v in merchant_info_dict.iteritems():
+        if not v:
+            merchant_info_dict[k] = ''
+    return merchant_info_dict
+
     def get_consumed_partitions(self):
         ''' Track partitions consumed by consumer instance '''
         return sorted(self.partitions)
@@ -180,8 +232,8 @@ class Consumer(object):
                                  .format(self.config_section))
 
 if __name__ == '__main__':
-#    print settings.SQOOT_API_KEY
-#    print settings.SQOOT_BASE_URL
+#    uf.print_out(settings.SQOOT_API_KEY)
+#    uf.print_out(settings.SQOOT_BASE_URL)
 
     '''
     settings.SQOOT_API_KEY
