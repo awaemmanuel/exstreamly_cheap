@@ -28,8 +28,8 @@ class SimulateInteraction(object):
             self.out_topic = config_params['out_topic']
             self.group = config_params['in_group']
             self.zk_hosts = config_params['zookeeper_hosts']
-        except config.NoSectionError:
-            raise config.NoSectionError('No section: {} exists in the config file'
+        except configparser.NoSectionError:
+            raise configparser.NoSectionError('No section: {} exists in the config file'
                                  .format(settings.PRODUCER_SIMULATE_USERS)) 
         except KeyError:
             raise
