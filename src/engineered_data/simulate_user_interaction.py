@@ -10,6 +10,10 @@ from datetime import datetime
 from pykafka import KafkaClient
 from config import settings 
 from generate_user_subscription import SubscribeDeal
+try:
+    import configparser # for Python 3
+except ImportError:
+    import ConfigParser as configparser # Python 2
     
 
 class SimulateInteraction(object):
