@@ -14,8 +14,7 @@ from generate_user_subscription import SubscribeDeal
 
 class SimulateInteraction(object):
     
-    def __init__(self, num_users_to_gen):                       
-        self._num = num_users_to_gen
+    def __init__(self):
         self._max_num_channels = 10 # User can sub to max 10 channels
         config = configparser.SafeConfigParser()
         config.read('../../config/general.conf')
