@@ -69,6 +69,7 @@ class Producer(object):
                         print msg
                         self.producer.send_messages(topic, str(partition_key), msg)
                         self.__class__._msg_cnt += 1
+                self._last_update = datetime.utcnow()
             except simplejson.scanner.JSONDecodeError:
                 pass
             

@@ -2,6 +2,7 @@
     Module that generates all deals categories from their parent categories.
     @Author: Emmanuel Awa
 '''
+import simplejson
 import itertools
 import time
 from config import settings
