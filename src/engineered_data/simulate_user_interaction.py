@@ -26,7 +26,7 @@ class SimulateInteraction(object):
             config_params = dict(config.items(settings.PRODUCER_SIMULATE_USERS))
             self.kafka_hosts = config_params['kafka_hosts']
             self.out_topic = config_params['out_topic']
-            self.group = config_params['in_group']
+            self.group = config_params['group']
             self.zk_hosts = config_params['zookeeper_hosts']
         except configparser.NoSectionError:
             raise configparser.NoSectionError('No section: {} exists in the config file'
