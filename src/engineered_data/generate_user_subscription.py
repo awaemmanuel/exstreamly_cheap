@@ -10,7 +10,7 @@ from src.helper_modules import utility_functions as uf
 
 class SubscribeDeal(object):
     
-    def __init__(self, user_name, num_channels):
+    def __init__(self, user_name):
         ''' Subscribe to channels (deals) for future recommendation '''
         self._all_deals = self._define_all_deals()
         self._channels = []
@@ -26,14 +26,14 @@ class SubscribeDeal(object):
     
     def subscribe(self, num_channels):
         ''' Subscribe to certain deals '''
-            user_ref = OrderedDict()
-            user_ref['name'] = str(self._user)
-            res = []
-            self._channels = self._random_channels_select(num_channels)
-            for deal_type in self._channels:
-                res.append(deal_type)
-            user_ref['subscribed_to'] = res
-            return json.dumps(user_ref)
+        user_ref = OrderedDict()
+        user_ref['name'] = str(self._user)
+        res = []
+        self._channels = self._random_channels_select(num_channels)
+        for deal_type in self._channels:
+            res.append(deal_type)
+        user_ref['subscribed_to'] = res
+        return json.dumps(user_ref)
     
     def _random_channels_select(self, num_of_selections):
         ''' Randomly sample entire deals n times '''
