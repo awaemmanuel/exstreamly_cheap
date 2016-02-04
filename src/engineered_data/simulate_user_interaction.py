@@ -36,7 +36,7 @@ class SimulateInteraction(object):
         
     def simulate(self, num_of_users=1000000): 
         ''' Simulate users subscribing to channels '''  
-        for num in num_of_users:
+        for num in xrange(1, num_of_users + 1):
             full_name = self._generate_random_name()
             num_channels = randint(1, self._max_num_channels)
             sub = SubscribeDeal(full_name)
