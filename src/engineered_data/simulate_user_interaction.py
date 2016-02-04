@@ -50,6 +50,10 @@ class SimulateInteraction(object):
             Using open source library from treyhunner
         '''
         return names.get_full_name()
+    
+if __name__ == '__main__':
+    sim = SimulateInteraction()
+    sim.simulate()
 
         
         
