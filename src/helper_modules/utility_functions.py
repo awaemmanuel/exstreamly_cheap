@@ -25,4 +25,10 @@ def spinning_cursor(time_to_wait):
         sys.stdout.flush()
         time.sleep(1)
         sys.stdout.write('\b')
+        
+def round_robin(list_int, num_iters):
+    ''' A simple round robin implementation '''
+    r_robin = itertools.cycle(list_int)
+    for _ in range(num_iters):
+        yield r_robin.next()
     
