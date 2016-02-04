@@ -4,6 +4,7 @@
     
     @Author: Emmanuel
 '''
+import random
 import json
 from collections import OrderedDict
 from src.helper_modules import utility_functions as uf
@@ -42,10 +43,9 @@ class SubscribeDeal(object):
         channels = []
         while not stop_sampling:
             choice = random.choice(self._all_deals)
-            channels.append(choice) if choice not in result else 0
+            channels.append(choice) if choice not in channels else 0
             # change flag when found enough
             stop_sampling = False or len(channels) == num_of_selections
-            uf.print_out("Chose {} ==> result: {}".format(choice, channels))
         return channels
     
     def get_users_channels(self):
