@@ -1,5 +1,5 @@
 '''
-    kafka_consumer.py
+    url_consumer.py
     A module that consumers from kafka topics subscribed to
 '''
 import json
@@ -228,8 +228,8 @@ class Consumer(object):
         '''
         try:
             return dict(self.config.items(self.config_section))
-        except NoSectionError:
-            raise NoSectionError('No section: {} exists in the config file'
+        except configparser.NoSectionError:
+            raise configparser.NoSectionError('No section: {} exists in the config file'
                                  .format(self.config_section))
 
 if __name__ == '__main__':
