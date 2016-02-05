@@ -79,7 +79,7 @@ class ConsumerToHDFS(object):
             try:
                 # get one consumer message - max_queued = 2000
                 message = self.consumer.consume()
-                print "Message size {}".format(len(message), type(message))
+                #print "Message size {}".format(len(message), type(message))
                 #uf.print_out(message.value)
                 self.temp_file.write('{} {}'.format(message.value, '\n'))
                 # file size > 100MB
