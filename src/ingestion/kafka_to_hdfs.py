@@ -107,8 +107,8 @@ class ConsumerToHDFS(object):
         timestamp = time.strftime('%Y%m%d%H%M%S')
 
 
-        hadoop_fullpath = '{}/{}_{}_{}.dat'.format(self.hadoop_path, self.group, self.topic, timestamp)
-        cached_fullpath = '{}/{}_{}_{}.dat'.format(self.cached_path, self.group, self.topic, timestamp)
+        hadoop_fullpath = '{}/{}_{}_{}.dat'.format(self.hadoop_path, self.group, self.out_topic, timestamp)
+        cached_fullpath = '{}/{}_{}_{}.dat'.format(self.cached_path, self.group, self.out_topic, timestamp)
         print "Block {}: Flushing 100MB file to HDFS => {}".format(str(self.block_cnt), hadoop_fullpath)
         self.block_cnt += 1
 
