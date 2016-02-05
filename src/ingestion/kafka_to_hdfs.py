@@ -42,7 +42,7 @@ class ConsumerToHDFS(object):
         config_params = self.get_config_items()
         try:
             self.kafka_hosts = config_params['kafka_hosts']
-            self.out_topic = 'all_deals_data' #str(config_params['out_topic'])
+            self.out_topic = str(config_params['out_topic'])
             self.group = str(config_params['hdfs_group'])
             self.hadoop_path = str(config_params['hadoop_path'])
             self.cached_path = str(config_params['cached_path'])
@@ -72,11 +72,8 @@ class ConsumerToHDFS(object):
         timestamp = time.strftime('%Y%m%d%H%M%S')
         
         # open file for writing
-        self.temp_file_path = "%s/kafka_%s_%s_%s.dat" % (output_dir,
-                                                         self.out_topic,
-                                                         self.group,
-                                                         timestamp)
-        self.temp_file = open(self.temp_file_path,"w")
+        self.temp_file_path = '{}/kafka_{}_{}_{}.dat'.format(output_dir, self.out_topic, self.group, timestamp)
+        self.temp_file = open(self.temp_file_path, 'w')
 
         while True:
             print "Outside the try catch"
@@ -113,29 +110,20 @@ class ConsumerToHDFS(object):
         timestamp = time.strftime('%Y%m%d%H%M%S')
 
 
-        hadoop_fullpath = "%s/%s_%s_%s.dat" % (self.hadoop_path, self.group,
-                                               self.topic, timestamp)
-        cached_fullpath = "%s/%s_%s_%s.dat" % (self.cached_path, self.group,
-                                               self.topic, timestamp)
-        print "Block {}: Flushing 100MB file to HDFS => {}".format(str(self.block_cnt),
-                                                                  hadoop_fullpath)
+        hadoop_fullpath = '{}/{}_{}_{}.dat'.format(self.hadoop_path, self.group, self.topic, timestamp)
+        cached_fullpath = '{}/{}_{}_{}.dat'.format(self.cached_path, self.group, self.topic, timestamp)
+        print "Block {}: Flushing 100MB file to HDFS => {}".format(str(self.block_cnt), hadoop_fullpath)
         self.block_cnt += 1
 
         # place blocked messages into history and cached folders on hdfs
-        os.system("hdfs dfs -put {} {}".format(self.temp_file_path, hadoop_fullpath))
-        os.system("hdfs dfs -put %s %s" % (self.temp_file_path,
-                                                        cached_fullpath))
+        os.system('hdfs dfs -put {} {}'.format(self.temp_file_path, hadoop_fullpath))
+        os.system('hdfs dfs -put {} {}'.format(self.temp_file_path, cached_fullpath))
         
-        uf.print_out('Removing temporary file - {}'
-                     .format(os.path.basename(self.temp_file_path)))
-        os.remove(self.temp_file_path)
+        uf.print_out('Removing temporary file - {}'.format(os.path.basename(self.temp_file_path)))
+        # os.remove(self.temp_file_path)
 
         timestamp = time.strftime('%Y%m%d%H%M%S')
-
-        self.temp_file_path = "%s/kafka_%s_%s_%s.dat" % (output_dir,
-                                                         self.out_topic,
-                                                         self.group,
-                                                         timestamp)
+        self.temp_file_path = '{}/kafka_{}_{}_{}.dat'.format(output_dir, self.out_topic, self.group, timestamp)
         self.temp_file = open(self.temp_file_path, "w")
     
     def get_config_items(self):
