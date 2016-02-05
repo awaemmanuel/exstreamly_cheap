@@ -76,14 +76,11 @@ class ConsumerToHDFS(object):
         self.temp_file = open(self.temp_file_path, 'w')
 
         while True:
-            print "Outside the try catch"
             try:
                 # get one consumer message - max_queued = 2000
-                print "In the try catch"
                 message = self.consumer.consume()
                 print "Message size {}".format(len(message), type(message))
-                print "In the for statement with {}".format(message)
-                uf.print_out(message.value)
+                #uf.print_out(message.value)
                 self.temp_file.write('{} {}'.format(message.value, '\n'))
                 # file size > 100MB
                 if self.temp_file.tell() > 100000000:
@@ -119,7 +116,7 @@ class ConsumerToHDFS(object):
         os.system('hdfs dfs -put {} {}'.format(self.temp_file_path, hadoop_fullpath))
         os.system('hdfs dfs -put {} {}'.format(self.temp_file_path, cached_fullpath))
         
-        uf.print_out('Removing temporary file - {}'.format(os.path.basename(self.temp_file_path)))
+        #uf.print_out('Removing temporary file - {}'.format(os.path.basename(self.temp_file_path)))
         # os.remove(self.temp_file_path)
 
         timestamp = time.strftime('%Y%m%d%H%M%S')
@@ -141,7 +138,7 @@ class ConsumerToHDFS(object):
 if __name__ == '__main__':
     tmp_out_dir = '/home/ubuntu/exstreamly_cheap_all_deals/ingestion/kafka_messages'
     tmp_out_dir = uf.mkdir_if_not_exist(tmp_out_dir)
-    
+    uf.print_out('Output format: {}'.format(tmp_out_dir))
     config = configparser.SafeConfigParser()
     config.read('../../config/general.conf')
     print "\nConsuming messages..."
