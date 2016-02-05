@@ -125,10 +125,12 @@ class ConsumerToHDFS(object):
 
 
 if __name__ == '__main__':
+    tmp_out_dir = '/home/ubuntu/Deals/ingestion/kafka_messages'
     config = configparser.SafeConfigParser()
     config.read('../../config/general.conf')
-    config_section = settings.CONSUMER_MODE_DATA
-    
+    params = dict(config.items(settings.CONSUMER_MODE_DATA))
     print "\nConsuming messages..."
-    cons = ConsumerToHDFS(addr="localhost:9092", group="deals_hdfs", topic="all_deals_data")
-    cons.consume_topic("/home/ubuntu/Deals/ingestion/kafka_messages")
+    cons = ConsumerToHDFS(addr=params['kafka_hosts'], 
+                          group=params['hdfs_group'], 
+                          topic=params['out_topic'])
+    cons.consume_topic(tmp_out_dir)
