@@ -42,19 +42,18 @@ class ConsumerToHDFS(object):
         config_params = self.get_config_items()
         try:
             self.kafka_hosts = config_params['kafka_hosts']
-            self.topic = config_params['out_topic']
-            self.group = config_params['hdfs_group']
+            self.out_topic = 'all_deals_data' #str(config_params['out_topic'])
+            self.group = str(config_params['hdfs_group'])
             self.hadoop_path = str(config_params['hadoop_path'])
             self.cached_path = str(config_params['cached_path'])
             self.zk_hosts = config_params['zookeeper_hosts']
         except KeyError:
             raise
-        uf.print_out("Trying to make connection {}".format(self.topic))
+        uf.print_out("Trying to make connection with params {}".format(config_params))
         self.client = KafkaClient(hosts=self.kafka_hosts) # Create a client
-        self.topic = self.client.topics[self.topic] # create topic if not exists
+        self.topic = self.client.topics[self.out_topic] # create topic if not exists
         self.consumer = self.topic.get_balanced_consumer( # Zookeeper dynamically assigns partitions
             consumer_group=self.group,
-            auto_commit_enable=True,
             zookeeper_connect=self.zk_hosts)
         uf.print_out("Made connection")
 
@@ -74,23 +73,27 @@ class ConsumerToHDFS(object):
         
         # open file for writing
         self.temp_file_path = "%s/kafka_%s_%s_%s.dat" % (output_dir,
-                                                         self.topic,
+                                                         self.out_topic,
                                                          self.group,
                                                          timestamp)
         self.temp_file = open(self.temp_file_path,"w")
 
         while True:
+            print "Outside the try catch"
             try:
                 # get one consumer message - max_queued = 2000
-                messages = self.consumer.consume()
-                for message in messages:
-                    uf.print_out(message.value)
-                    self.temp_file.write('{} {}'.format(message.value, '\n'))
+                print "In the try catch"
+                message = self.consumer.consume()
+                print "Message size {}".format(len(message), type(message))
+                print "In the for statement with {}".format(message)
+                uf.print_out(message.value)
+                self.temp_file.write('{} {}'.format(message.value, '\n'))
                 # file size > 100MB
                 if self.temp_file.tell() > 100000000:
                     self.flush_to_hdfs(output_dir)
             except:
-                pass # Balanced consumer restarts automatically.
+                print "In the except"
+                raise # Balanced consumer restarts automatically.
 
     def flush_to_hdfs(self, output_dir):
         '''Flushes the File into HDFS.
@@ -119,8 +122,7 @@ class ConsumerToHDFS(object):
         self.block_cnt += 1
 
         # place blocked messages into history and cached folders on hdfs
-        os.system("hdfs dfs -put %s %s" % (self.temp_file_path,
-                                                        hadoop_fullpath))
+        os.system("hdfs dfs -put {} {}".format(self.temp_file_path, hadoop_fullpath))
         os.system("hdfs dfs -put %s %s" % (self.temp_file_path,
                                                         cached_fullpath))
         
@@ -131,7 +133,7 @@ class ConsumerToHDFS(object):
         timestamp = time.strftime('%Y%m%d%H%M%S')
 
         self.temp_file_path = "%s/kafka_%s_%s_%s.dat" % (output_dir,
-                                                         self.topic,
+                                                         self.out_topic,
                                                          self.group,
                                                          timestamp)
         self.temp_file = open(self.temp_file_path, "w")
