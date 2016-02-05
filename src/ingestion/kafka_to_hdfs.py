@@ -40,8 +40,8 @@ class ConsumerToHDFS(object):
                                        max_buffer_size=None) # Infinite size, take all possible.
         self.temp_file_path = None
         self.temp_file = None
-        self.hadoop_path = "/user/Deals/history"
-        self.cached_path = "/user/Deals/cached"
+        self.hadoop_path = '/exstreamly_cheap_main_files/all_deals/history'
+        self.cached_path = '/exstreamly_cheap_main_files/all_deals/cached'
         self.topic = topic
         self.group = group
         self.block_cnt = 0
@@ -85,10 +85,9 @@ class ConsumerToHDFS(object):
     def flush_to_hdfs(self, output_dir):
         """Flushes the File into HDFS.
 
-        Code template from https://github.com/ajmssc/bitcoin-inspector.git
         Flushes the file into two folders under
-        hdfs://user/Deals/history and
-        hdfs://user/Deals/cached
+        hdfs - History (to rebuild batch view if source of truth is down) and 
+        Cache that gets flushed in time intervals
 
         Args:
             output_dir: temp folder before loading to HDFS
@@ -110,9 +109,9 @@ class ConsumerToHDFS(object):
         self.block_cnt += 1
 
         # place blocked messages into history and cached folders on hdfs
-        os.system("sudo -u ubuntu hdfs dfs -put %s %s" % (self.temp_file_path,
+        os.system("hdfs dfs -put %s %s" % (self.temp_file_path,
                                                         hadoop_fullpath))
-        os.system("sudo -u ubuntu hdfs dfs -put %s %s" % (self.temp_file_path,
+        os.system("hdfs dfs -put %s %s" % (self.temp_file_path,
                                                         cached_fullpath))
         os.remove(self.temp_file_path)
 
@@ -126,7 +125,7 @@ class ConsumerToHDFS(object):
 
 
 if __name__ == '__main__':
-    tmp_out_dir = '/home/ubuntu/Deals/ingestion/kafka_messages'
+    tmp_out_dir = '/home/ubuntu/exstreamly_cheap_all_deals/ingestion/kafka_messages'
     tmp_out_dir = uf.mkdir_if_not_exist(tmp_out_dir)
     config = configparser.SafeConfigParser()
     config.read('../../config/general.conf')
