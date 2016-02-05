@@ -7,6 +7,7 @@ import time
 from kafka.client import KafkaClient
 from kafka.consumer import SimpleConsumer
 from config import settings
+from src.helper_modules import utility_functions as uf
 try:
     import configparser # for Python 3
 except ImportError:
@@ -36,7 +37,7 @@ class ConsumerToHDFS(object):
         """Initialize Consumer with kafka broker IP, group, and topic."""
         self.client = KafkaClient(addr)
         self.consumer = SimpleConsumer(self.client, group, topic,
-                                       max_buffer_size=0) # Infinite size, take all possible.
+                                       max_buffer_size=None) # Infinite size, take all possible.
         self.temp_file_path = None
         self.temp_file = None
         self.hadoop_path = "/user/Deals/history"
@@ -126,6 +127,7 @@ class ConsumerToHDFS(object):
 
 if __name__ == '__main__':
     tmp_out_dir = '/home/ubuntu/Deals/ingestion/kafka_messages'
+    tmp_out_dir = uf.mkdir_if_not_exist(tmp_out_dir)
     config = configparser.SafeConfigParser()
     config.read('../../config/general.conf')
     params = dict(config.items(settings.CONSUMER_MODE_DATA))
