@@ -34,3 +34,10 @@ def get_all_merchants(merchants, full=False):
                           'country': x.country} for x in response_list]
         return jsonify(merchants=json_response)
             
+@app.route('/category')
+def get_categories():
+    return render_template('index.html')
+
+@app.route('/main/page')
+def main_index():
+    return render_template('index-h5.html')
