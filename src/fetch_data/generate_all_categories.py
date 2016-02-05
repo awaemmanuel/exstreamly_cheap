@@ -80,7 +80,7 @@ class ProcessCategories(object):
         try:
             return dict(self._config.items(self._config_section))
         except configparser.NoSectionError:
-            raise NoSectionError('No section: {} exists in the config file'
+            raise configparser.NoSectionError('No section: {} exists in the config file'
                                  .format(self._config_section))
     def categories_in_process(self):
         ''' Retrieve categories that the flow will process '''
