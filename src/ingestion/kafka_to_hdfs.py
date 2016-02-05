@@ -151,11 +151,9 @@ class ConsumerToHDFS(object):
 if __name__ == '__main__':
     tmp_out_dir = '/home/ubuntu/exstreamly_cheap_all_deals/ingestion/kafka_messages'
     tmp_out_dir = uf.mkdir_if_not_exist(tmp_out_dir)
+    
     config = configparser.SafeConfigParser()
     config.read('../../config/general.conf')
-    params = dict(config.items(settings.CONSUMER_MODE_DATA))
     print "\nConsuming messages..."
-    cons = ConsumerToHDFS(addr=params['kafka_hosts'], 
-                          group=params['hdfs_group'], 
-                          topic=params['out_topic'])
+    cons = ConsumerToHDFS(config, settings.CONSUMER_MODE_DATA)
     cons.consume_topic(tmp_out_dir)
