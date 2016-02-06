@@ -67,6 +67,7 @@ class ProcessCategories(object):
                                               partition_key,
                                               self.max_deals_per_page,
                                               initial_visit)
+            uf.spinning_cursor(120) # Wait for 120 seconds in between categories
     def _get_all_categories(self):
         ''' Retrieve all categories to process '''
         all_categories = map_categories(settings.SQOOT_BASE_URL)
