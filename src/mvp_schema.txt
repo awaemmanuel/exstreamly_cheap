@@ -87,4 +87,46 @@ cqlsh:deals> create table dining_nightlife (id bigint, merchant_id bigint, provi
 cqlsh:deals> .schemas
 
 
+create table wine-tasting (id bigint, merchant_id bigint, provider text, title text, category text, sub_category text, description text, fine_print text, price float, percentage_disc float, number_sold int, created_at timestamp, expires_at timestamp, updated_at timestamp, url text, online boolean, PRIMARY KEY (id,category,merchant_id,price,percentage_disc,number_soldupdated_at));
+
+
+
+['adult', 'audio', 'automotive', 'beauty_health', 'crafts_hobbies', 'electronics', 'fashion_accessories', 'fitness_product', 'food_alcohol', 'gifts', 'home_goods', 'kitchen', 'luggage', 'mens_fashion', 'mobile', 'movies_music_games', 'office_supplies', 'tools', 'toys', 'women_fashion', 'baby', 'bridal', 'college', 'jewish', 'kids', 'kosher', 'pets', 'travel', 'automotive-services', 'food-grocery', 'home-services', 'mens-clothing', 'photography-services', 'treats', 'womens-clothing', 'chiropractic', 'dental', 'dermatology', 'eye-vision', 'facial', 'hair-removal', 'hair-salon', 'makeup', 'manicure-pedicure', 'massage', 'spa', 'tanning', 'teeth-whitening', 'bars-clubs', 'restaurants', 'boot-camp', 'fitness-classes', 'gym', 'martial-arts', 'personal-training', 'pilates', 'yoga', 'bowling', 'city-tours', 'comedy-clubs', 'concerts', 'dance-classes', 'golf', 'life-skills-classes', 'museums', 'outdoor-adventures', 'skiing', 'skydiving', 'sporting-events', 'theater', 'wine-tasting']
+
+output = OrderedDict()
+                output['id'] = deal['deal']['id']
+                output['category'] = deal['deal']['category_slug']
+                output['sub_category'] = deal['deal']['category_slug']
+                output['title'] = deal['deal']['short_title']
+                output['description'] = deal['deal']['description']
+                output['fine_print'] = deal['deal']['fine_print']
+                output['number_sold'] = deal['deal']['number_sold']
+                output['url'] = deal['deal']['untracked_url']
+                output['price'] = deal['deal']['price']
+                output['discount_percentage'] = deal['deal']['discount_percentage']
+                output['provider_name'] = deal['deal']['provider_name']
+                output['online'] = deal['deal']['online']
+                output['expires_at'] = deal['deal']['expires_at']
+                output['created_at'] = deal['deal']['created_at']
+                output['updated_at'] = deal['deal']['updated_at']
+                output['merchant_id'] = deal['deal']['merchant']['id']
+
+                # Online merchants have fields null. Change to ''
+                # and then flatten merchant info
+                merchant_info = deal['deal']['merchant']
+                if not all(merchant_info.values()):
+                    merchant_info = self._clean_merchant_info(merchant_info) 
+                output['merchant_name'] = merchant_info['name']
+                output['merchant_address'] = merchant_info['address']
+                output['merchant_locality'] = merchant_info['locality']
+                output['merchant_region'] = merchant_info['region']
+                output['merchant_postal_code'] = merchant_info['postal_code']
+                output['merchant_country'] = merchant_info['country']
+                output['merchant_latitude'] = merchant_info['latitude']
+                output['merchant_longitude'] = merchant_info['longitude']
+                output['merchant_phone_number'] = merchant_info['phone_number']
+
 create table merchants (id bigint, name text, address text, postal_code text, country text, phone_number text,  longitude double, latitude double,  url text, region text,  PRIMARY KEY (id));
+
+NEW TABLE TO USE
+create table wine_tasting (id bigint, merchant_id bigint, provider text, title text, category text, sub_category text, description text, fine_print text, price float, percentage_disc float, number_sold int, created_at timestamp, expires_at timestamp, updated_at timestamp, url text, online boolean, unique_deals set<bigint>, PRIMARY KEY ((category, price, percentage_disc, number_sold, merchant_id), updated_at, created_at, expires_at, online)) with clustering order by (updated_at desc);
