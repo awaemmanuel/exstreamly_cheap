@@ -37,6 +37,7 @@ class ConsumerToHDFS(object):
         self.temp_file_path = None
         self.temp_file = None
         self.block_cnt = 0
+        self.msg_cnt = 0
         self.config = config
         self.config_section = consumer_mode
         config_params = self.get_config_items()
@@ -74,15 +75,18 @@ class ConsumerToHDFS(object):
         # open file for writing
         self.temp_file_path = '{}/kafka_{}_{}_{}.dat'.format(output_dir, self.out_topic, self.group, timestamp)
         self.temp_file = open(self.temp_file_path, 'w')
-
+        uf.print_out('Starting to consume and write to temp')
         while True:
             try:
                 # get one consumer message - max_queued = 2000
                 message = self.consumer.consume()
+                print('consuming {}....'.format(message.value))
+                self.msg_cnt += 1
                 #print "Message size {}".format(len(message), type(message))
                 #uf.print_out(message.value)
                 self.temp_file.write('{} {}'.format(message.value, '\n'))
                 # file size > 100MB
+                uf.print_out('Consumed {}: of File size now: {}KB'.format(self.msg_cnt, (self.temp_file.tell()/1000)))
                 if self.temp_file.tell() > 100000000:
                     self.flush_to_hdfs(output_dir)
             except:
@@ -102,6 +106,7 @@ class ConsumerToHDFS(object):
         Returns:
             None
         '''
+        uf.print_out('Written {} to {}'.format(self.temp_file.tell(), self.temp_file_path))
         self.temp_file.close()
 
         timestamp = time.strftime('%Y%m%d%H%M%S')
@@ -141,6 +146,6 @@ if __name__ == '__main__':
     uf.print_out('Output format: {}'.format(tmp_out_dir))
     config = configparser.SafeConfigParser()
     config.read('../../config/general.conf')
-    print "\nConsuming messages..."
+    print '\nConsuming messages...'
     cons = ConsumerToHDFS(config, settings.CONSUMER_MODE_DATA)
     cons.consume_topic(tmp_out_dir)

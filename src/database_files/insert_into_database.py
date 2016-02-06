@@ -21,6 +21,7 @@ if __name__ == '__main__':
         uf.print_out('Cleaning {} Table.'.format(category.capitalize()))
         file_name = 'hdfs://52.1.154.19:9000/exstreamly_cheap_files/exstreamly_cheap_files/{}.json'.format(category)
         df_category = hbp.create_dataframe(file_name)
+        df_category = df_category.dropna()
         df_category = hbp.remove_duplicate_deals(df_category)
         unique_vals = hbp.count_unique_rows(df_category)
         uf.print_out('Number of unique {} serving deals: {}'.format(category, unique_vals))
@@ -28,19 +29,17 @@ if __name__ == '__main__':
         #  Insert dataFrames with all our categories into Cassandra
         df_category.registerTempTable('{}'.format(category))
         if category is 'merchants':            
-            df_category.select(
-                'id', 'name', 'address', 'postal_code', 'country', 
-                'phone_number', 'region', 'longitude', 'latitude',  'url')
-            .write.format("org.apache.spark.sql.cassandra")
-            .options(table='merchants', keyspace='deals')
-            .save(mode='append')
+            df_category.select('id', 'name', 'address', 'postal_code', 'country', 'phone_number', 'region', 'longitude', 'latitude', 'url').write.format("org.apache.spark.sql.cassandra").options(table='merchants', keyspace='deals').save(mode='append')
         else: # other categories
-            df_category.write.format('org.apache.spark.sql.cassandra')
-            .options(table='{}'.format(category), keyspace='deals')
-            .save(mode='append')
-        
-
-
-        
-    
+            df_category.write.format('org.apache.spark.sql.cassandra').options(table='{}'.format(category), keyspace='deals').save(mode='append')
+            
+            # Insert everything into these specific query tables
+            # Return results for cheapest categories
+            df_category.write.format('org.apache.spark.sql.cassandra').options(table='cheapest_category_selection', keyspace='deals').save(mode='append')
+            # Return results for all deals with ability to vary price and discount
+            df_category.write.format('org.apache.spark.sql.cassandra').options(table='events_with_price_manipulation', keyspace='deals').save(mode='append')
+            df_category.write.format('org.apache.spark.sql.cassandra').options(table='category_disc_matters', keyspace='deals').save(mode='append')
+            df_category.write.format('org.apache.spark.sql.cassandra').options(table='price_matters', keyspace='deals').save(mode='append')
+            df_category.write.format('org.apache.spark.sql.cassandra').options(table='products_by_price', keyspace='deals').save(mode='append')
+            df_category.write.format('org.apache.spark.sql.cassandra').options(table='category_disc_matters', keyspace='deals').save(mode='append')
     
