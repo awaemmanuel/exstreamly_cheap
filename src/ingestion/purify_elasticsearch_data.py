@@ -49,7 +49,7 @@ def clean_data(msg):
     temp_msg['fine_print'] = clean_fineprint
     return temp_msg
 
-def fetch_and_clean_up():
+def fetch_and_clean_up(index_name):
     ''' Fetch Elastic data and clean it up '''
     # Logstash and HDFS general info
     output_dir = uf.mkdir_if_not_exist('/tmp/exstreamly_cheap_files/elasticsearch_cleanup')
@@ -69,7 +69,7 @@ def fetch_and_clean_up():
     
     block_cnt = 0
     client = make_client()
-    cc = Search(using=client, index='all_deals_data_index')
+    cc = Search(using=client, index=index_name)
     gen = cc.scan()
     
     config = configparser.SafeConfigParser()
@@ -118,4 +118,7 @@ def strip_html_tags(text):
     return clean_text 
 
 if __name__ == '__main__':
-    fetch_and_clean_up()
+    # Clean up both indexes in ES now and merge them as one
+    for index in ['all_deals_data', 'all_deals_data_index']:
+        uf.print_out('Processing {}....'.format(index))
+        fetch_and_clean_up(index)
