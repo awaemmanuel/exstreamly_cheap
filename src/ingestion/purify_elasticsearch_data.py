@@ -46,7 +46,7 @@ def clean_data(msg):
     clean_fineprint = strip_html_tags(msg['fine_print'])
     msg['description'] = clean_description
     msg['fine_print'] = clean_fineprint
-    return temp_msg
+    return msg
 
 def fetch_and_clean_up(index_name):
     ''' Fetch Elastic data and clean it up '''
