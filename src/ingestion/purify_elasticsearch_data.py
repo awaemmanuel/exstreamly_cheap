@@ -97,7 +97,7 @@ def fetch_and_clean_up(index_name):
         
         # Produce to kafka for distributed consumption
         with kafka_topic.get_producer() as producer:
-            producer.produce(json.dumps('{}{}'.format(msg, '\n')))
+            producer.produce(json.dumps(msg))
             
         with open(hadoop_file, 'a') as hdp_output:
             hdp_output.write(json.dumps(msg) + '\n')
