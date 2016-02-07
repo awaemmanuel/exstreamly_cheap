@@ -42,11 +42,10 @@ def clean_data(msg):
         
         :args: msg - Dictionary of deal components.
     '''
-    temp_msg = msg
-    clean_description = strip_html_tags(temp_msg['description'])
-    clean_fineprint = strip_html_tags(temp_msg['fine_print'])
-    temp_msg['description'] = clean_description
-    temp_msg['fine_print'] = clean_fineprint
+    clean_description = strip_html_tags(msg['description'])
+    clean_fineprint = strip_html_tags(msg['fine_print'])
+    msg['description'] = clean_description
+    msg['fine_print'] = clean_fineprint
     return temp_msg
 
 def fetch_and_clean_up(index_name):
@@ -114,10 +113,9 @@ def fetch_and_clean_up(index_name):
         
         uf.print_out('Cleaned {} blocks'.format(block_cnt))
         block_cnt += 1
-def strip_html_tags(text):
+def strip_html_tags(string_with_html):
     ''' Use BeautifulSoup to strip html tags '''
-    clean_text = ''.join(BeautifulSoup(text).findAll(text=True)) if text is not None else ''
-    return clean_text 
+    return ''.join(BeautifulSoup(string_with_html).findAll(text=True)) if string_with_html is not None else ''
 
 if __name__ == '__main__':
     # Clean up both indexes in ES now and merge them as one
