@@ -111,6 +111,8 @@ def fetch_and_clean_up(index_name):
                 uf.print_out('Syncing {} to S3 for back up'.format(output_dir))
                 os.system('aws s3 sync {} s3://emmanuel-awa/clean_data_from_elastic'.format(output_dir))
                 hadoop_file = os.path.join(output_dir, 'hdfs_{}.dat'.format(time.strftime('%Y%m%d%H%M%S')))
+        
+        uf.print_out('Cleaned {} blocks'.format(block_cnt))
         block_cnt += 1
 def strip_html_tags(text):
     ''' Use BeautifulSoup to strip html tags '''
