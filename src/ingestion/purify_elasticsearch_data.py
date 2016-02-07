@@ -85,7 +85,7 @@ def fetch_and_clean_up():
     
     kafka_client = KafkaClient(hosts=kafka_hosts)
     kafka_topic = kafka_client.topics[topic] # Create if not exist
-    uf.print_out('Producing messages to topic {}. Press Ctrl-C to terminate'.format(topic.name))
+    uf.print_out('Producing messages to topic {}. Press Ctrl-C to terminate'.format(kafka_topic.name))
     
     for event in gen:
         new_string = dict(eval(event.message.encode('utf-8')))
@@ -96,7 +96,7 @@ def fetch_and_clean_up():
 #            log_output.write(json.dumps(msg) + '\n')
         
         # Produce to kafka for distributed consumption
-        with topic.get_producer() as producer:
+        with kafka_topic.get_producer() as producer:
             producer.produce(json.dumps('{}{}'.format(msg, '\n')))
             
         with open(hadoop_file, 'a') as hdp_output:
