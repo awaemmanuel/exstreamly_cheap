@@ -55,6 +55,7 @@ class ConsumerToHDFS(object):
         self.topic = self.client.topics[self.out_topic] # create topic if not exists
         self.consumer = self.topic.get_balanced_consumer( # Zookeeper dynamically assigns partitions
             consumer_group=self.group,
+            auto_commit_enable=True,
             zookeeper_connect=self.zk_hosts)
         uf.print_out("Made connection")
 
