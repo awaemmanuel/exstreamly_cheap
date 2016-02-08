@@ -112,7 +112,7 @@ class Consumer(object):
                 self.msg_cnt += 1
                 if self.to_producer: # write to producer
                     with self.out_topic.get_producer() as prod:
-                        prod.produce(json.dumps('{}{}'.format(deal, '\n')))
+                        prod.produce(json.dumps(deal))
                         uf.print_out("{} strings written to producer".format(self.msg_cnt))
                 else: # write to file
                     uf.print_out("Waiting to acquire lock...")
