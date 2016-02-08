@@ -84,7 +84,8 @@ class ConsumerToHDFS(object):
                 self.msg_cnt += 1
                 #print "Message size {}".format(len(message), type(message))
                 #uf.print_out(message.value)
-                self.temp_file.write('{} {}'.format(message.value, '\n'))
+                self.temp_file.write(message.value)
+                self.temp_file.write('\n')
                 # file size > 100MB
                 uf.print_out('Consumed {}: of File size now: {}KB'.format(self.msg_cnt, (self.temp_file.tell()/1000)))
                 if self.temp_file.tell() > 100000000:
