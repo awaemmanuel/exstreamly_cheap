@@ -164,4 +164,31 @@ create table disc_matters  (id bigint, merchant_id bigint, provider text, title 
 
 create table category_disc_matters  (id bigint, merchant_id bigint, provider text, title text, category text, sub_category text, description text, fine_print text, price float, discount_percentage float, number_sold int, created_at timestamp, expires_at timestamp, updated_at timestamp, url text, online boolean, PRIMARY KEY ((sub_category, discount_percentage), price, number_sold, sub_category, category, merchant_id, updated_at, created_at, expires_at, online)) with clustering order by (price asc);
 
+## TRENDING TABLE - For each minute, hour or so... what is the total count of user interaction with 
+## these categories. All including Page visits, read description, and purchase. Affinity Score.
+Score definition -
+    Viewing = .1
+    Favoriting = .5
+    Purchase = 1
+
+## USER and CATEGORY DRIVEN QUERIES
+    - Get user by user id
+    - Get item by item id
+    - Get all the items that a particular user likes
+    - Get all the users who like a particular item
+TABLE DEFINITIONS
+1. CREATE TABLE users (id timeuuid, full_name text, PRIMARY KEY(id));
+2. CREATE TABLE categories(id uuid, name text, PRIMARY KEY(name));
+3. CREATE TABLE category_by_parent (id uuid, parent text, category text, PRIMARY KEY (parent, category));
+4. CREATE TABLE users_by_category (datetime timeuuid, user text, category text, PRIMARY KEY((user), datetime,  category));
+5. CREATE TABLE category_by_user (datetime timeuuid, user text, category text, PRIMARY KEY (category), datetime,  user);
+Algorithm - 
+    1. For each user, calculate the affinity score of a category
+    2. User can only have 1 if already have .5 and .1
+    3. User can only have .5 if already have .1
+    4. Every one gets a .1
+    5. At end tally the category affinity scores by minute and by hour
+
 {"id": 4464085, "category": "dining-nightlife", "sub_category": "restaurants", "title": "60% off at Shewaber Restaurant and Lounge", "description": "<p>The menu at Shewaber Restaurant and Lounge features a wide array of great selections, made from only the freshest and highest quality ingredients, with something sure to please every member of your group. Shewaber Restaurant and Lounge has established itself as one of the area's favorite culinary destinations and is sure to offer you a pleasant and unique dining experience every time you visit. Please stop in soon!</p>", "fine_print": "Minimum purchase amounts and other restrictions may apply. See the deal for additional information. Restaurant.com Terms and Conditions apply for all purchases; for Restaurant.com's terms and conditions please see here http://www.restaurant.com/about/terms.", "number_sold": 0, "url": "https://www.groupon.com/deals/shewaber-restaurant-and-lounge-1", "price": 4.0, "discount_percentage": 0.6, "provider_name": "Groupon", "online": false, "expires_at": "2039-06-24T23:59:59Z", "created_at": "2016-01-05T14:38:15Z", "updated_at": "2016-01-10T20:27:05Z", "merchant_id": 987569}
+
+

@@ -35,7 +35,7 @@ class SimulateInteraction(object):
         except KeyError:
             raise
         
-    def simulate(self, num_of_users=1000000): 
+    def simulate(self, num_of_users=1000000000): 
         ''' Simulate users subscribing to channels '''  
         for num in xrange(1, num_of_users + 1):
             full_name = self._generate_random_name()
