@@ -177,7 +177,8 @@ Score definition -
     - Get all the items that a particular user likes
     - Get all the users who like a particular item
 TABLE DEFINITIONS
-1. CREATE TABLE users (id timeuuid, full_name text, PRIMARY KEY(id));
+1. CREATE TABLE users (id timeuuid, full_name text, latitude double, longitude double, PRIMARY KEY((full_name), id, latitude, longitude));
+
 2. CREATE TABLE categories(id uuid, name text, PRIMARY KEY(name));
 3. CREATE TABLE category_by_parent (id uuid, parent text, category text, PRIMARY KEY (parent, category));
 4. CREATE TABLE users_by_category (datetime timeuuid, user text, category text, PRIMARY KEY((user), datetime,  category));

@@ -5,11 +5,13 @@
     @Author: Emmanuel Awa
 '''
 import names
+import time
 from random import randint
 from datetime import datetime
 from pykafka import KafkaClient
 from config import settings 
 from generate_user_subscription import SubscribeDeal
+from generate_user_profiles import UserProfile
 from src.helper_modules import utility_functions as uf
 try:
     import configparser # for Python 3
