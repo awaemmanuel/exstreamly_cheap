@@ -11,7 +11,7 @@ import csv
 import uuid
 import random
 from cassandra.cluster import Cluster
-from cassandra.query import BatchStatement
+from cassandra.query import BatchStatement, ConsistencyLevel
 from src.helper_modules import utility_functions as uf
 
 class UserProfile(object):
@@ -64,11 +64,11 @@ if __name__ == '__main__':
         locations.append(line)
     
     # User table prepared table statement
-    stmt = session.prepare('INSERT INTO users (full_name, id, latitude, longitude) VALUES (?,?,?,?)')
-    batch = BatchStatement(consistency_level=ConsistencyLevel.QUORUM)
-    
+    query = 'INSERT INTO users (full_name, time_of_creation, latitude, longitude) VALUES (?,?,?,?)'
+    prepared = session.prepare(query)
+
     # From the locations lists assign user a get random location
-    for num in xrange(1, 11):
+    for num in xrange(1, 1000000001):
         random_location = random.choice(locations)
         # Create user object
         user = UserProfile()
@@ -77,12 +77,11 @@ if __name__ == '__main__':
                  
         # Insert into DB
         uf.print_out('Inserting into database...')
-        ts = str(uuid.uuid1())
-        batch.add(stmt, 
-                  (user.get_name(),
+        ts = uuid.uuid1()
+        bound = prepared.bind((user.get_name(),
                    ts,
                    float(random_location[1]),
                    float(random_location[2])))
         
-    session.execute(batch)
-        
+        session.execute(bound)
+    session.shutdown()
