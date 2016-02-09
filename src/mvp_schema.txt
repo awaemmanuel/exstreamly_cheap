@@ -177,12 +177,13 @@ Score definition -
     - Get all the items that a particular user likes
     - Get all the users who like a particular item
 TABLE DEFINITIONS
-1. CREATE TABLE users (id timeuuid, full_name text, latitude double, longitude double, PRIMARY KEY((full_name), id, latitude, longitude));
+1. CREATE TABLE users (time_of_creation timeuuid, full_name text, latitude double, longitude double, PRIMARY KEY((full_name), time_of_creation, latitude, longitude));
 
 2. CREATE TABLE categories(id uuid, name text, PRIMARY KEY(name));
 3. CREATE TABLE category_by_parent (id uuid, parent text, category text, PRIMARY KEY (parent, category));
 4. CREATE TABLE users_by_category (datetime timeuuid, user text, category text, PRIMARY KEY((user), datetime,  category));
 5. CREATE TABLE category_by_user (datetime timeuuid, user text, category text, PRIMARY KEY (category), datetime,  user);
+6. CREATE TABLE trending_categories_by_time (datetime timeuuid, category text, count bigint, PRIMARY KEY ((category), datetime, count)) with clustering order by (datetime desc);
 Algorithm - 
     1. For each user, calculate the affinity score of a category
     2. User can only have 1 if already have .5 and .1
@@ -192,4 +193,9 @@ Algorithm -
 
 {"id": 4464085, "category": "dining-nightlife", "sub_category": "restaurants", "title": "60% off at Shewaber Restaurant and Lounge", "description": "<p>The menu at Shewaber Restaurant and Lounge features a wide array of great selections, made from only the freshest and highest quality ingredients, with something sure to please every member of your group. Shewaber Restaurant and Lounge has established itself as one of the area's favorite culinary destinations and is sure to offer you a pleasant and unique dining experience every time you visit. Please stop in soon!</p>", "fine_print": "Minimum purchase amounts and other restrictions may apply. See the deal for additional information. Restaurant.com Terms and Conditions apply for all purchases; for Restaurant.com's terms and conditions please see here http://www.restaurant.com/about/terms.", "number_sold": 0, "url": "https://www.groupon.com/deals/shewaber-restaurant-and-lounge-1", "price": 4.0, "discount_percentage": 0.6, "provider_name": "Groupon", "online": false, "expires_at": "2039-06-24T23:59:59Z", "created_at": "2016-01-05T14:38:15Z", "updated_at": "2016-01-10T20:27:05Z", "merchant_id": 987569}
 
+insert into deals.trending_categories_by_time (category, count, datetime) values ('Coffee', 1925, now());
+insert into deals.trending_categories_by_time (category, count, datetime) values ('Restaurant', 1925, now());
+insert into deals.trending_categories_by_time (category, count, datetime) values ('Spa', 1025, now());
+insert into deals.trending_categories_by_time (category, count, datetime) values ('Tea', 895, now());
+insert into deals.trending_categories_by_time (category, count, datetime) values ('Cane', 2865, now());
 
