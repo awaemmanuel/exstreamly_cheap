@@ -64,8 +64,8 @@ if __name__ == '__main__':
         locations.append(line)
     
     # User table prepared table statement
-    stmt = session.prepare('INSERT INTO users (id, full_name, latitude, longitude) VALUES (?,?,?,?)')
-    batch = BatchedStatement(consistency_level=ConsistencyLevel.QUORUM)
+    stmt = session.prepare('INSERT INTO users (full_name, id, latitude, longitude) VALUES (?,?,?,?)')
+    batch = BatchStatement(consistency_level=ConsistencyLevel.QUORUM)
     
     # From the locations lists assign user a get random location
     for num in xrange(1, 11):
@@ -79,13 +79,10 @@ if __name__ == '__main__':
         uf.print_out('Inserting into database...')
         ts = str(uuid.uuid1())
         batch.add(stmt, 
-                  (ts, user.get_name(), 
-                   random_location[1],
-                   random_location[2]))
+                  (user.get_name(),
+                   ts,
+                   float(random_location[1]),
+                   float(random_location[2])))
         
     session.execute(batch)
-        
-        
-        
-        response = session.execute(stmt)
         
