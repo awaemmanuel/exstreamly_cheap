@@ -53,20 +53,19 @@ class SimulateInteraction(object):
         
     def simulate(self, num_of_users=1000000000): 
         ''' Simulate users subscribing to channels '''  
-        for num in xrange(1, num_of_users + 1):
-            full_name = self._generate_random_name()
-            num_channels = randint(1, self._max_num_channels)
-            sub = SubscribeDeal(full_name)
-            subscription = sub.subscribe(num_channels)
+        with self.topic.get_producer() as prod:
+            for num in xrange(1, num_of_users + 1):
+                full_name = self._generate_random_name()
+                num_channels = randint(1, self._max_num_channels)
+                sub = SubscribeDeal(full_name)
+                subscription = sub.subscribe(num_channels)
             
-            #   Produce the subscription object to producer
-            with self.topic.get_producer() as prod:
+                #   Produce the subscription object to producer
                 prod.produce(subscription)
-            uf.print_out("[SUCCESSFUL] - {} subscribed ==> {}.".format(full_name,
+                uf.print_out("[SUCCESSFUL] - {} subscribed ==> {}.".format(full_name,
                                                                        sub.get_users_channels()))
-            uf.print_out("[SUCCESSFUL] - {} Users written to producer".format(num))
+                uf.print_out("[SUCCESSFUL] - {} Users written to producer".format(num))
     
-#            uf.spinning_cursor(2) # Wait two seconds to produce
     def _generate_random_name(self):
         ''' Generate random full name
             Using open source library from treyhunner
