@@ -3,6 +3,7 @@
     Module that streams the way users interact and subscribe to types of deals.
     Output will be to display trending deals and live feed on display.
 '''
+import json
 from pyspark import SparkContext, SparkConf
 from pyspark.streaming.kafka import KafkaUtils, TopicAndPartition
 from pyspark.streaming import StreamingContext
@@ -46,7 +47,8 @@ if __name__ == '__main__':
     =fromOffset)
     
     # Read json
-    parsed_lines = directKafkaStream.map(lambda json_line: json.loads(json_line))
+    parsed_lines = directKafkaStream.map(lambda (info, json_line): json.loads(json_line))
+    
     extracted = parsed_lines.map(lambda msg: retrieve_subscriptions(msg))
     
     print 'Extracted ', extracted.pprint()
