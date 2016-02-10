@@ -13,20 +13,22 @@ from pyspark.streaming import StreamingContext
 ##########################################################################
 if __name__ == '__main__':
     # Configure spark instance
-    conf = (SparkConf().setMaster('spark://ip-172-31-2-36:7077')
+    conf = (SparkConf().setMaster('spark://localhost:7077')
            .setAppName('DealsUsersSubscriptions')
            .set('spark.executor.memory', '2g')
            .set('spark.cores.max', '3'))
-    sc = SparkContext(conf=conf)
+    sc = SparkContext()
     
     # Retrieve broadcast variaable from cassandra
-    count = sc.accumulator(0)
+    #count = sc.accumulator(0)
     ssc = StreamingContext(sc, 2)
     start = 0
     partition = 0
     topic = 'user_subscription'
-    topicPartion = TopicAndPartition(topic,partition)
-    fromOffset = {topicPartion: long(start)}
+    topicPartition1 = TopicAndPartition(topic,0)
+    topicPartition2 = TopicAndPartition(topic,1)
+    topicPartition3 = TopicAndPartition(topic,3)
+    fromOffset = {topicPartition1: long(start), topicPartition2: long(start), topicPartition3: long(start)}
 
     directKafkaStream = KafkaUtils.createDirectStream(ssc, [topic], {"metadata.broker.list": '52.71.152.72.147.112:9092,52.72.209.156:9092,52.72.105.140:9092,52.72.200.42:9092'}, fromOffsets\
     =fromOffset)
