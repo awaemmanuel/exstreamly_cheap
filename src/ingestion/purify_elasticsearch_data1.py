@@ -86,33 +86,40 @@ def fetch_and_clean_up(index_name):
     kafka_topic = kafka_client.topics[topic] # Create if not exist
     uf.print_out('Producing messages to topic {}. Press Ctrl-C to terminate'.format(kafka_topic.name))
     
-    for event in gen:
-        new_string = dict(eval(event.message.encode('utf-8')))
-        msg = clean_data(new_string)
-        
-        # We can decide to have logstash read from file instead
-#        with open(logstash_file, 'a') as log_output:
-#            log_output.write(json.dumps(msg) + '\n')
-        
-        # Produce to kafka for distributed consumption
-        with kafka_topic.get_producer() as producer:
+    # Produce to kafka for distributed consumption
+    hdp_output = open(hadoop_file, 'w')
+    with kafka_topic.get_producer() as producer:
+        for event in gen:
+            new_string = dict(eval(event.message.encode('utf-8')))
+            msg = clean_data(new_string)
+
+            # We can decide to have logstash read from file instead
+    #        with open(logstash_file, 'a') as log_output:
+    #            log_output.write(json.dumps(msg) + '\n')
+            # Write to producer.
             producer.produce(json.dumps(msg))
             
-        with open(hadoop_file, 'a') as hdp_output:
+            # Back up to file for HDFS and S3
             hdp_output.write(json.dumps(msg) + '\n')
             if hdp_output.tell() > 100000000:
+                hdp_output.close()
+                
                 uf.print_out("Block {}: Flushing 100MB file to HDFS => {}".format(str(block_cnt), hadoop_fullpath))
+                
                 # place blocked messages into history and cached folders on hdfs
                 os.system('hdfs dfs -put {} {}'.format(hadoop_file, hadoop_fullpath))
                 os.system('hdfs dfs -put {} {}'.format(hadoop_file, cached_fullpath))
-                
+
                 # Back up in S3
                 uf.print_out('Syncing {} to S3 for back up'.format(output_dir))
                 os.system('aws s3 sync {} s3://emmanuel-awa/clean_data_from_elastic'.format(output_dir))
+                
+                # Recreate file handler
                 hadoop_file = os.path.join(output_dir, 'hdfs_{}.dat'.format(time.strftime('%Y%m%d%H%M%S')))
-        
+                hdp_output = open(hadoop_file, 'w')
+
             uf.print_out('Cleaned {} blocks. File size: {}KB'.format(block_cnt, hdp_output.tell()/1000))
-        block_cnt += 1
+            block_cnt += 1
 def strip_html_tags(string_with_html):
     ''' Use BeautifulSoup to strip html tags '''
     return ''.join(BeautifulSoup(string_with_html).findAll(text=True)) if string_with_html is not None else ''
