@@ -6,6 +6,7 @@
 '''
 import names
 import time
+import json
 from random import randint
 from datetime import datetime
 from pykafka import KafkaClient
@@ -37,6 +38,19 @@ class SimulateInteraction(object):
         except KeyError:
             raise
         
+        # Create kafka client and produce to topic, if exists
+        # else create it.
+        
+        self.kafka_client = KafkaClient(hosts=self.kafka_hosts)
+        self.topic = kafka_client.topics[self.out_topic]  
+        
+        uf.print_out('''
+            Connected with Client.
+            Getting ready to produce messages to topic {}. Press Ctrl-C to interrupt. 
+            '''.format(self.topic.name))
+        self.msg_cnt = 0
+        
+        
     def simulate(self, num_of_users=1000000000): 
         ''' Simulate users subscribing to channels '''  
         for num in xrange(1, num_of_users + 1):
@@ -44,13 +58,15 @@ class SimulateInteraction(object):
             num_channels = randint(1, self._max_num_channels)
             sub = SubscribeDeal(full_name)
             subscription = sub.subscribe(num_channels)
-            uf.print_out("[SUCCESSFUL] - {} subscribed ==> {}."
-                         .format(full_name, sub.get_users_channels()))
-#            with self.out_topic.get_producer() as prod:
-#                prod.produce(str(subscription))
-#                uf.print_out("[SUCCESSFUL] - {} Users written to producer".format(num))
-#    
+            
+            #   Produce the subscription object to producer
+            with self.topic.get_producer() as prod:
+                prod.produce(subscription)
+            uf.print_out("[SUCCESSFUL] - {} subscribed ==> {}.".format(full_name,
+                                                                       sub.get_users_channels()))
+            uf.print_out("[SUCCESSFUL] - {} Users written to producer".format(num))
     
+#            uf.spinning_cursor(2) # Wait two seconds to produce
     def _generate_random_name(self):
         ''' Generate random full name
             Using open source library from treyhunner
@@ -59,8 +75,9 @@ class SimulateInteraction(object):
     
 if __name__ == '__main__':
     sim = SimulateInteraction()
+    uf.print_out('[START] - {}....'.format((datetime.now()).strftime("%Y-%m-%dT%H:%M:%S%Z")))
     sim.simulate()
-
+    uf.print_out('[FINISH] - {}....'.format((datetime.now()).strftime("%Y-%m-%dT%H:%M:%S%Z")))
         
         
         

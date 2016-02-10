@@ -38,7 +38,6 @@ class SubscribeDeal(object):
     
     def _random_channels_select(self, num_of_selections):
         ''' Randomly sample entire deals n times '''
-        uf.print_out("Randomly assigning ")
         stop_sampling = False
         channels = []
         while not stop_sampling:
