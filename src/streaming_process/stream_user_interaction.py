@@ -19,6 +19,28 @@ def retrieve_subscriptions(subscriber_info):
         return subscriber_info['subscribed_to']
     else:
         return []
+
+# Convert RDDs of the words DStream to DataFrame and run SQL query
+def process(time, rdd):
+    print("========= %s =========" % str(time))
+
+    try:
+        # Get the singleton instance of SQLContext
+        sqlContext = getSqlContextInstance(rdd.context)
+
+        # Convert RDD[String] to RDD[Row] to DataFrame
+        rowRdd = rdd.map(lambda w: Row(word=w))
+        categories_df = sqlContext.createDataFrame(rowRdd)
+
+        # Register as table
+        categories_df.registerTempTable('trending_categories_by_time')
+
+        # Do word count on table using SQL and print it
+        category_counts_df = \
+            sqlContext.sql('select categories, count(*) as total from trending_categories_by_time group by categories')
+        category_counts_df.show()
+    except:
+        pass
     
 ##########################################################################
 #                       MAIN EXECUTION                                   #
@@ -51,12 +73,17 @@ if __name__ == '__main__':
     
     extracted = parsed_lines.map(lambda msg: retrieve_subscriptions(msg))
     
-    print 'Extracted ', extracted.pprint()
+    # Convert the subscriptions into a string of subscriptions.
+    subscription_string = ' '.join(extracted)
+    categories = lines.flatMap(lambda line: line.split(' '))
+    
     
 #    lines = directKafkaStream.map(lambda x: x[1])
 #    counts = lines.flatMap(lambda line: line.split(" ")).map(lambda word: (word, 1)).reduceByKey(lambda a, b: a+b)
 #    counts.pprint()
 
+    # Count the categories subscripted in the last 10 seconds.
+    categories.foreachRDD(process)
     ssc.start()
     ssc.awaitTermination()
 
