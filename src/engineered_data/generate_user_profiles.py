@@ -11,7 +11,6 @@ import csv
 import uuid
 import random
 from cassandra.cluster import Cluster
-from cassandra.query import BatchStatement, ConsistencyLevel
 from src.helper_modules import utility_functions as uf
 
 class UserProfile(object):

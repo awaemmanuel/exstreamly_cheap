@@ -3,7 +3,7 @@
     Module that streams the way users interact and subscribe to types of deals.
     Output will be to display trending deals and live feed on display.
 '''
-from pyspark import SparkContext
+from pyspark import SparkContext, SparkConf
 from pyspark.streaming.kafka import KafkaUtils, TopicAndPartition
 from pyspark.streaming import StreamingContext
 

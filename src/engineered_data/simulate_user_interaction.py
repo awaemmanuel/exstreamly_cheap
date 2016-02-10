@@ -42,7 +42,7 @@ class SimulateInteraction(object):
         # else create it.
         
         self.kafka_client = KafkaClient(hosts=self.kafka_hosts)
-        self.topic = kafka_client.topics[self.out_topic]  
+        self.topic = self.kafka_client.topics[self.out_topic]  
         
         uf.print_out('''
             Connected with Client.
