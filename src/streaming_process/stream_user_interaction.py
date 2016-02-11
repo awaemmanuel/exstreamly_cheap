@@ -4,6 +4,8 @@
     Output will be to display trending deals and live feed on display.
 '''
 import json
+import uuid
+import pyspark_cassandra
 from pyspark import SparkContext, SparkConf
 from pyspark.streaming.kafka import KafkaUtils, TopicAndPartition
 from pyspark.streaming import StreamingContext
@@ -31,17 +33,18 @@ def process(time, rdd):
         sqlContext = getSqlContextInstance(rdd.context)
     
         # Convert RDD[String] to RDD[Row] to DataFrame
-        rowRdd = rdd.map(lambda c: Row(categories=c))
+        rowRdd = rdd.map(lambda c: Row(categories=c, ts=str(uuid.uuid1())))
         categories_df = sqlContext.createDataFrame(rowRdd)
-
+        #new_time  = time_uuid.TimeUUID.convert(str(time))
         # Register as table
         categories_df.registerTempTable('trending_categories_by_time')
 
         # Do word count on table using SQL and print it
-        category_counts_df = sqlContext.sql('select categories, count(*) as total from trending_categories_by_time group by categories')
-        category_counts_df.show()
+        category_counts_df = sqlContext.sql('select categories, first(ts) as ts, count(*) as count from trending_categories_by_time group by categories')
+        #category_counts_df.show()
+        category_counts_df.write.format("org.apache.spark.sql.cassandra").options(table="trending_categories_by_time",keyspace="deals_streaming").save(mode="append")
     except:
-        pass
+        raise
     
 ##########################################################################
 #                       MAIN EXECUTION                                   #
@@ -50,7 +53,7 @@ if __name__ == '__main__':
     # Configure spark instance
     sc = SparkContext()
 
-    ssc = StreamingContext(sc, 10)
+    ssc = StreamingContext(sc, 1)
     
     # Start from beginning and consume all partitions of topic
     start = 0

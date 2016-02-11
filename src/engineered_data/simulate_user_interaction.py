@@ -65,6 +65,7 @@ class SimulateInteraction(object):
                 uf.print_out("[SUCCESSFUL] - {} subscribed ==> {}.".format(full_name,
                                                                        sub.get_users_channels()))
                 uf.print_out("[SUCCESSFUL] - {} Users written to producer".format(num))
+                uf.spinning_cursor(2)
     
     def _generate_random_name(self):
         ''' Generate random full name
