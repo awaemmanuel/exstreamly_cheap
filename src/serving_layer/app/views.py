@@ -28,7 +28,7 @@ def get_all_merchants(merchants, full=False):
         stmt = 'SELECT id, name, address, postal_code, country, phone_number from merchants'
         response = session.execute(stmt)
         response_list = []
-        for val in response_list:
+        for val in response:
             response_list.append(val)
         json_response = [{'merchant id': x.id, 'name': x.name, 'address': x.address,\
                          'postal code': x.postal_code, 'phone': x.phone_number, \
@@ -42,3 +42,18 @@ def get_categories():
 @app.route('/main/page')
 def main_index():
     return render_template('index-h5.html')
+
+# Fetch all users location and populate map on view
+@app.route('/api/<users_locations>')
+def get_users_locations(users_locations):
+    response_list = []
+    stmt = 'SELECT dateOf(time_of_creation) as t_of_c, latitude, longitude from deals.users'
+    response = session.execute(stmt)
+    for val in response:
+        response_list.append(val)
+    json_response = [{
+            'Joined at': x.t_of_c, 
+            'lat': x.latitude,
+            'long': x.longitude
+        } for x in response_list]
+    return jsonify(users_locations=json_response)

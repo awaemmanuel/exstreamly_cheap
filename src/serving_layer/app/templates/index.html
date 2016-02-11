@@ -1822,6 +1822,39 @@
 
 		map.on('click', onMapClick);
 
+        function anyFunction()
+        {
+         function fixTimeFormat(i) {
+            return ( i < 10 ) ? "0" + i : i;
+         }
+         var today = new Date(),
+            h = fixTimeFormat(today.getHours()),
+            m = fixTimeFormat(today.getMinutes()),
+            s = fixTimeFormat(today.getSeconds());
+         document.getElementById("clock").innerHTML = h + ":" + m + ":" + s;
+        }
+
+        function userLocations() {
+          $.getJSON( mTrendsURL )    
+            .done(function( data ) {
+              $('#trendsTb').empty();
+              console.log(data.lenght);
+              $.each( data.minute_trends, function( i, item ) {                                                                     
+            row_html = '<tr><td>';
+            if (country){
+              row_html += item.country + '</td><td>';
+            }
+            if (city){
+              row_html += item.city + '</td><td>';
+            }
+            row_html += item.topic + '</td><td>' + item.count + '</td></tr>';
+            $('#trendsTb').append(row_html);
+                })                                                                                            
+            });
+
+        $(function () {
+         setInterval(userLocations, 2000);
+        });
         </script>
     </body>
 </html>
