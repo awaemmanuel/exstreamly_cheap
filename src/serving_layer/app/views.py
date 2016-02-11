@@ -12,7 +12,7 @@ def index():
 #    return '<h1 style="font-size:50px;text-align:center;color:red">ExStreamly Cheap is still under construction</h1>'
     return render_template('index.html')
 
-@app.route('/api/<email>/<date>')
+@app.route('/api/email/<date>')
 def get_email(email, date):
         stmt = "SELECT * FROM email WHERE id=%s and date=%s"
         response = session.execute(stmt, parameters=[email, date])
