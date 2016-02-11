@@ -44,7 +44,7 @@ def main_index():
     return render_template('index-h5.html')
 
 # Fetch all users location and populate map on view
-@app.route('/api/<users_locations>/<num>')
+@app.route('/api/users_locations/<num>')
 def get_users_locations(users_locations):
     response_list = []
     stmt = 'SELECT dateOf(time_of_creation) as t_of_c, latitude, longitude from deals.users LIMIT num'
