@@ -3,8 +3,8 @@ from flask import jsonify, render_template
 from cassandra.cluster import Cluster
 
 # setting up connections to cassandra
-#cluster = Cluster(['172.31.2.39']) 
-#session = cluster.connect('deals') 
+cluster = Cluster(['172.31.2.39']) 
+session = cluster.connect('deals') 
 
 @app.route('/')
 @app.route('/index')
@@ -26,7 +26,7 @@ def get_email(email, date):
 def get_all_merchants(merchants, full=False):
     if not full:
         stmt = 'SELECT id, name, address, postal_code, country, phone_number from merchants'
-        #response = session.execute(stmt)
+        response = session.execute(stmt)
         response_list = []
         for val in response_list:
             response_list.append(val)
