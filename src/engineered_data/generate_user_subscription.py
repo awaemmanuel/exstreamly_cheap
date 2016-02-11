@@ -7,6 +7,7 @@
 import random
 import json
 from collections import OrderedDict
+from datetime import datetime
 from src.helper_modules import utility_functions as uf
 
 class SubscribeDeal(object):
@@ -34,6 +35,7 @@ class SubscribeDeal(object):
         for deal_type in self._channels:
             res.append(deal_type)
         user_ref['subscribed_to'] = res
+        user_ref['timestamp'] = int(datetime.now().strftime('%Y%m%d%H%M%S'))
         return json.dumps(user_ref)
     
     def _random_channels_select(self, num_of_selections):

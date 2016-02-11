@@ -1,6 +1,9 @@
 '''
     Module that helps insert data from spark to database
     @Author: Emmanuel Awa
+    
+    To run:
+    spark-submit   --executor-memory 6800M --driver-memory 6800M --packages datastax:spark-cassandra-connector:1.5.0-RC1-s_2.10 --conf spark.cassandra.connection.host=172.31.2.39  insert_into_database.py
 '''
 from cassandra.cluster import Cluster
 from src.helper_modules import utility_functions as uf

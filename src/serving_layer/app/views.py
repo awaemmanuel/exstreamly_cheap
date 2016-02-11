@@ -1,15 +1,16 @@
 from app import app
-from flask import jsonify 
+from flask import jsonify, render_template 
 from cassandra.cluster import Cluster
 
 # setting up connections to cassandra
-cluster = Cluster(['172.31.2.39']) 
-session = cluster.connect('deals') 
+#cluster = Cluster(['172.31.2.39']) 
+#session = cluster.connect('deals') 
 
 @app.route('/')
 @app.route('/index')
 def index():
-    return '<h1 style="font-size:50px;text-align:center;color:red">ExStreamly Cheap is still under construction</h1>'
+#    return '<h1 style="font-size:50px;text-align:center;color:red">ExStreamly Cheap is still under construction</h1>'
+    return render_template('index.html')
 
 @app.route('/api/<email>/<date>')
 def get_email(email, date):
@@ -25,9 +26,9 @@ def get_email(email, date):
 def get_all_merchants(merchants, full=False):
     if not full:
         stmt = 'SELECT id, name, address, postal_code, country, phone_number from merchants'
-        response = session.execute(stmt)
+        #response = session.execute(stmt)
         response_list = []
-        for val in response:
+        for val in response_list:
             response_list.append(val)
         json_response = [{'merchant id': x.id, 'name': x.name, 'address': x.address,\
                          'postal code': x.postal_code, 'phone': x.phone_number, \
@@ -36,7 +37,7 @@ def get_all_merchants(merchants, full=False):
             
 @app.route('/category')
 def get_categories():
-    return render_template('index.html')
+    return render_template('webpage/index.html')
 
 @app.route('/main/page')
 def main_index():
