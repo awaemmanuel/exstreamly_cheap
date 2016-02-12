@@ -1846,7 +1846,7 @@
           $.getJSON( '/api/users_locations/100' )    
             .done(function( data ) {
               $('#trendsTb').empty();
-              console.log(data.length);
+              console.log(data.lenght);
               $.each( data.users_loc_info, function( i, item ) {                                                                     
             row_html = '<tr><td>';
             row_html += item.t_of_c + '</td><td>';
