@@ -10,7 +10,13 @@ session = cluster.connect('deals')
 @app.route('/index')
 def index():
 #    return '<h1 style="font-size:50px;text-align:center;color:red">ExStreamly Cheap is still under construction</h1>'
-    return render_template('index.html', locations=get_users_locations())
+    response_list = []
+    stmt = 'SELECT full_name, latitude, longitude from deals.users LIMIT %s'
+    response = session.execute(stmt, parameters=[int(10)])
+    for val in response:
+        response_list.append(val)
+    res_tuples = [(x.full_name, x.latitude, x.longitude) for x in response_list]
+    return render_template('index.html', locations=res_tuples)
 
 @app.route('/api/email/<date>')
 def get_email(email, date):
