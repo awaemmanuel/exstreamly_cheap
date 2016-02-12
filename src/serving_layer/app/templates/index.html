@@ -1804,6 +1804,11 @@
 
 		L.marker([40.746581, -74.001997]).addTo(map)
 			.bindPopup("<b>Hello!</b><br />I'm at Insight Data Science.").openPopup();
+
+        {% for event in locations %}
+               L.marker([{{event[1]}}, {{event[2]}}]).addTo(map).openPopup({{event[0]}});
+        {% endfor %}
+         
 		L.circle([51.508, -0.11], 500, {
 			color: 'red',
 			fillColor: '#f03',
