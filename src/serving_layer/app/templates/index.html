@@ -1842,43 +1842,44 @@
          document.getElementById("clock").innerHTML = h + ":" + m + ":" + s;
         }
 
-//        function userLocations() {
-//          $.getJSON( '/api/users_locations/100' )    
-//            .done(function( data ) {
-//              $('#trendsTb').empty();
+        function userLocations() {
+          $.getJSON( '/api/users_locations/100' )    
+            .done(function( data ) {
+              $('#trendsTb').empty();
+	      console.log('Emptied it');
 //              console.log(data.length);
-//              $.each( data.users_loc_info, function( i, item ) {                                                                     
-//            row_html = '<tr><td>';
-//            row_html += item.t_of_c + '</td><td>';
-//            row_html += item.latitude + '</td><td>';row_html += item.longitude + '</td></tr>';
-//            $('#trendsTb').append(row_html);
-//                })                                                                                       
-//            });
-//        }
+              $.each( data.users_loc_info, function( i, item ) {                                                                     
+            row_html = '<tr><td>';
+            row_html += item.joined + '</td><td>';
+	    row_html += item.name + '</td><td>';
+            row_html += item.lat + '</td><td>';
+	    row_html += item.long + '</td></tr>';
+            $('#trendsTb').append(row_html);
+                });                                                                                       
+            });
+        }
 
         $(function () {
          setInterval(userLocations, 2000);
         });
         </script>
         <script>
-        (function userLocations() {
-            var loc_api = "http://ec2-52-72-114-143.compute-1.amazonaws.com:5000/api/user_locations/10";
-            $.getJSON( loc_api, {
-                format: "json"
-              })
-            .done(function( data ) {
-                $('#trendsTb').empty();
-                console.log(data.length);
-                alert(data);
-              $.each( data.items, function( i, item ) {
-                  alert(item)
+//        function userLocations() {
+//            var loc_api = "http://ec2-52-72-114-143.compute-1.amazonaws.com:5000/api/users_locations/10";
+//            $.getJSON( loc_api)
+//            .done(function( data ) {
+//                $('#trendsTb').empty();
+//                // console.log(data.length);
+//                // alert(data);
+//              $.each( data.items, function( i, item ) {
+//                  alert(item.t_of_c)
 //                $( "<img>" ).attr( "src", item.media.m ).appendTo( "#images" );
 //                    row_html = '<tr><td>';
 //                    row_html += item.t_of_c + '</td><td>';
-                
-              });
-            });
-        })();
+//                
+//              });
+//            });
+//         }
         </script>
     </body>
 </html>

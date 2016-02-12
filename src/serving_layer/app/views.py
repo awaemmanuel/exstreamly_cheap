@@ -52,8 +52,8 @@ def get_users_locations(num=100):
     for val in response:
         response_list.append(val)
     json_response = [{
-            'name': x.full_name
-            'Joined at': x.t_of_c, 
+            'name': x.full_name,
+            'joined': x.t_of_c, 
             'lat': x.latitude,
             'long': x.longitude
         } for x in response_list]
