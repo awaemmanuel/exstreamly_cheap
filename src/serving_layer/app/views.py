@@ -48,7 +48,7 @@ def main_index():
 def get_users_locations(num=100):
     response_list = []
     stmt = 'SELECT dateOf(time_of_creation) as t_of_c, latitude, longitude from deals.users LIMIT %s'
-    response = session.execute(stmt, parameters=[num])
+    response = session.execute(stmt, parameters=[int(num)])
     for val in response:
         response_list.append(val)
     json_response = [{
