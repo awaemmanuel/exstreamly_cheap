@@ -776,29 +776,28 @@
 					
                     <!--Section user locations -->
                     <div id="leaflet_map" style="height: 780px"></div>
-					<!-- /section title -->
-					<h3>Top trends for the last minute</h3>
-<div class="container live">
-      <div class="starter-template">
-        <div class="row" style="height:100vh;">
-                <div class="col-md-10 col-md-offset-1 trend-results">
-                    <table class="table" id="trendsTable">
-                      <thead>
-                        <tr id="trendsHeadTr">
-                        </tr>
-                      </thead>
-                      <tbody id="trendsTb">
-                      </tbody>
-                    </table>
-                </div>
-        </div>
-      </div>
-
-    </div>
-                    
-						
+					<!-- /section title -->	
 				</div> 		<!-- End row -->
 			</div>   	<!-- End container -->
+			
+			<h3>Top trends for the last minute</h3>
+                    <div class="container live">
+                          <div class="starter-template">
+                            <div class="row" style="height:100vh;">
+                                    <div class="col-md-10 col-md-offset-1 trend-results">
+                                        <table class="table" id="trendsTable">
+                                          <thead>
+                                            <tr id="trendsHeadTr">
+                                            </tr>
+                                          </thead>
+                                          <tbody id="trendsTb">
+                                          </tbody>
+                                        </table>
+                                    </div>
+                            </div>
+                          </div>
+
+                        </div>
 		</section>   <!-- End section -->
 		
 		
@@ -1855,18 +1854,18 @@
           $.getJSON( '/api/users_locations/100' )    
             .done(function( data ) {
               $('#trendsTb').empty();
-              console.log(data.lenght);
-              $.each( data.minute_trends, function( i, item ) {                                                                     
+              console.log(data.length);
+              $.each( data.users_loc_info, function( i, item ) {                                                                     
             row_html = '<tr><td>';
             if (country){
-              row_html += item.country + '</td><td>';
+              row_html += item.t_of_c + '</td><td>';
             }
             if (city){
-              row_html += item.city + '</td><td>';
+              row_html += item.latitude + '</td><td>';
             }
-            row_html += item.topic + '</td><td>' + item.count + '</td></tr>';
+            row_html += item.longitude + '</td></tr>';
             $('#trendsTb').append(row_html);
-                })                                                                                            
+                })                                                                                       
             });
 
         $(function () {
