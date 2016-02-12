@@ -1849,13 +1849,8 @@
               console.log(data.length);
               $.each( data.users_loc_info, function( i, item ) {                                                                     
             row_html = '<tr><td>';
-            if (country){
-              row_html += item.t_of_c + '</td><td>';
-            }
-            if (city){
-              row_html += item.latitude + '</td><td>';
-            }
-            row_html += item.longitude + '</td></tr>';
+            row_html += item.t_of_c + '</td><td>';
+            row_html += item.latitude + '</td><td>';row_html += item.longitude + '</td></tr>';
             $('#trendsTb').append(row_html);
                 })                                                                                       
             });
