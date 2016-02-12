@@ -10,7 +10,7 @@ session = cluster.connect('deals')
 @app.route('/index')
 def index():
 #    return '<h1 style="font-size:50px;text-align:center;color:red">ExStreamly Cheap is still under construction</h1>'
-    return render_template('index.html')
+    return render_template('index.html', locations=get_users_locations())
 
 @app.route('/api/email/<date>')
 def get_email(email, date):
