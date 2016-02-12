@@ -777,7 +777,24 @@
                     <!--Section user locations -->
                     <div id="leaflet_map" style="height: 780px"></div>
 					<!-- /section title -->
-					
+					<h3>Top trends for the last minute</h3>
+<div class="container live">
+      <div class="starter-template">
+        <div class="row" style="height:100vh;">
+                <div class="col-md-10 col-md-offset-1 trend-results">
+                    <table class="table" id="trendsTable">
+                      <thead>
+                        <tr id="trendsHeadTr">
+                        </tr>
+                      </thead>
+                      <tbody id="trendsTb">
+                      </tbody>
+                    </table>
+                </div>
+        </div>
+      </div>
+
+    </div>
                     
 						
 				</div> 		<!-- End row -->
@@ -1835,7 +1852,7 @@
         }
 
         function userLocations() {
-          $.getJSON( mTrendsURL )    
+          $.getJSON( '/api/users_locations/100' )    
             .done(function( data ) {
               $('#trendsTb').empty();
               console.log(data.lenght);
