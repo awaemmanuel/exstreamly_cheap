@@ -56,4 +56,4 @@ def get_users_locations(num=100):
             'lat': x.latitude,
             'long': x.longitude
         } for x in response_list]
-    return jsonify(users_locations=json_response)
+    return jsonify(users_loc_info=json_response)
