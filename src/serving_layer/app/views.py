@@ -45,7 +45,7 @@ def main_index():
 
 # Fetch all users location and populate map on view
 @app.route('/api/users_locations/<num>')
-def get_users_locations(users_locations):
+def get_users_locations(num=100):
     response_list = []
     stmt = 'SELECT dateOf(time_of_creation) as t_of_c, latitude, longitude from deals.users LIMIT %s'
     response = session.execute(stmt, parameters=[num])
