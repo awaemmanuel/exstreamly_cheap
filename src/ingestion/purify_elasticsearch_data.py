@@ -36,8 +36,13 @@ def make_client():
     warnings.filterwarnings("ignore",category=UserWarning)
     return Elasticsearch([hostname], timeout=100)
 
+def strip_html_tags(string_with_html):
+    ''' Use BeautifulSoup to strip html tags '''
+    return ''.join(BeautifulSoup(string_with_html)\
+                   .findAll(text=True)) if string_with_html is not None else ''
+
 def clean_data(msg):
-    ''' Clean data. Convert python dict to json object.
+    ''' 
         Remove html elements and return just plain text
         
         :args: msg - Dictionary of deal components.
@@ -120,12 +125,9 @@ def fetch_and_clean_up(index_name):
 
             uf.print_out('Cleaned {} blocks. File size: {}KB'.format(block_cnt, hdp_output.tell()/1000))
             block_cnt += 1
-def strip_html_tags(string_with_html):
-    ''' Use BeautifulSoup to strip html tags '''
-    return ''.join(BeautifulSoup(string_with_html).findAll(text=True)) if string_with_html is not None else ''
-
+            
 if __name__ == '__main__':
     # Clean up both indexes in ES now and merge them as one
-    for index in ['all_deals_data_index', 'all_deals_data']:
+    for index in ['all_deals_data', 'all_deals_data_index']:
         uf.print_out('Processing {}....'.format(index))
         fetch_and_clean_up(index)
