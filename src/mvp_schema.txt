@@ -199,3 +199,8 @@ insert into deals.trending_categories_by_time (category, count, datetime) values
 insert into deals.trending_categories_by_time (category, count, datetime) values ('Tea', 895, now());
 insert into deals.trending_categories_by_time (category, count, datetime) values ('Cane', 2865, now());
 
+requirements
+    - time_uuid
+    - pykafka
+    - cassandra-driver
+    - kafka-python

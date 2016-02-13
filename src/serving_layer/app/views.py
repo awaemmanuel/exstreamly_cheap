@@ -1,5 +1,5 @@
 from app import app
-from flask import jsonify 
+from flask import jsonify, render_template 
 from cassandra.cluster import Cluster
 
 # setting up connections to cassandra
@@ -9,9 +9,16 @@ session = cluster.connect('deals')
 @app.route('/')
 @app.route('/index')
 def index():
-    return '<h1 style="font-size:50px;text-align:center;color:red">ExStreamly Cheap is still under construction</h1>'
+#    return '<h1 style="font-size:50px;text-align:center;color:red">ExStreamly Cheap is still under construction</h1>'
+    response_list = []
+    stmt = 'SELECT full_name, latitude, longitude from deals.users LIMIT %s'
+    response = session.execute(stmt, parameters=[int(10)])
+    for val in response:
+        response_list.append(val)
+    res_tuples = [(x.full_name, x.latitude, x.longitude) for x in response_list]
+    return render_template('index.html', locations=res_tuples)
 
-@app.route('/api/<email>/<date>')
+@app.route('/api/email/<date>')
 def get_email(email, date):
         stmt = "SELECT * FROM email WHERE id=%s and date=%s"
         response = session.execute(stmt, parameters=[email, date])
@@ -36,8 +43,24 @@ def get_all_merchants(merchants, full=False):
             
 @app.route('/category')
 def get_categories():
-    return render_template('index.html')
+    return render_template('webpage/index.html')
 
 @app.route('/main/page')
 def main_index():
     return render_template('index-h5.html')
+
+# Fetch all users location and populate map on view
+@app.route('/api/users_locations/<num>')
+def get_users_locations(num=100):
+    response_list = []
+    stmt = 'SELECT full_name, dateOf(time_of_creation) as t_of_c, latitude, longitude from deals.users LIMIT %s'
+    response = session.execute(stmt, parameters=[int(num)])
+    for val in response:
+        response_list.append(val)
+    json_response = [{
+            'name': x.full_name,
+            'joined': x.t_of_c, 
+            'lat': x.latitude,
+            'long': x.longitude
+        } for x in response_list]
+    return jsonify(users_loc_info=json_response)

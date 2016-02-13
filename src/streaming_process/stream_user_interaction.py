@@ -19,8 +19,12 @@ def getSqlContextInstance(sparkContext):
 def retrieve_subscriptions(subscriber_info):
     ''' Retrieve the subscription list to process top 10 '''
     if subscriber_info:
+        time_and_categories = []
         subscriptions = subscriber_info['subscribed_to']
-        return ' '.join(subscriptions).encode('utf-8')
+        subscribetime = subscriber_info['timestamp']
+        time_and_categories.append(str(subscribetime))
+        time_and_categories.extend(subscriptions)
+        return ' '.join(time_and_categories).encode('utf-8')
     else:
         return ''
 
