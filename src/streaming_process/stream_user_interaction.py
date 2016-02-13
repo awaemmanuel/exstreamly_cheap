@@ -26,14 +26,15 @@ def retrieve_subscriptions(subscriber_info):
 
 # Convert RDDs of the words DStream to DataFrame and run SQL query
 def process(time, rdd):
-    print("========= %s =========" % str(time))
-
+    print("========= %s =========" % str(time.strftime("%Y%m%d%H%M%S")))
+    
     try:
         # Get the singleton instance of SQLContext
         sqlContext = getSqlContextInstance(rdd.context)
     
         # Convert RDD[String] to RDD[Row] to DataFrame
-        rowRdd = rdd.map(lambda c: Row(categories=c, ts=str(uuid.uuid1())))
+        rowRdd = rdd.map(lambda c: Row(categories=c, ts=str(time)))
+        #rowRdd = rdd.map(lambda c: Row(categories=c))
         categories_df = sqlContext.createDataFrame(rowRdd)
         #new_time  = time_uuid.TimeUUID.convert(str(time))
         # Register as table
@@ -41,10 +42,14 @@ def process(time, rdd):
 
         # Do word count on table using SQL and print it
         category_counts_df = sqlContext.sql('select categories, first(ts) as ts, count(*) as count from trending_categories_by_time group by categories')
-        #category_counts_df.show()
+        new_df = sqlContext.sql('select * from trending_categories_by_time')
+        #category_counts_df = sqlContext.sql('select *  from trending_categories_by_time')
+        category_counts_df.show()
+        
+        new_df.show()
         category_counts_df.write.format("org.apache.spark.sql.cassandra").options(table="trending_categories_by_time",keyspace="deals_streaming").save(mode="append")
     except:
-        raise
+        pass
     
 ##########################################################################
 #                       MAIN EXECUTION                                   #
@@ -53,7 +58,7 @@ if __name__ == '__main__':
     # Configure spark instance
     sc = SparkContext()
 
-    ssc = StreamingContext(sc, 1)
+    ssc = StreamingContext(sc, 10)
     
     # Start from beginning and consume all partitions of topic
     start = 0
