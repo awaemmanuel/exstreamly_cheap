@@ -7,6 +7,7 @@
 from pyspark import SparkContext, SparkConf
 from pyspark.sql import SQLContext
 from collections import OrderedDict
+from src.ingestion import purify_elasticsearch_data as purify
 
 def evaluate_and_purify(msg):
     ''' Evaluate string as literal,
@@ -19,13 +20,15 @@ def evaluate_and_purify(msg):
     try:
         print "Inside Try block\n"
         msg = eval(msg.encode('utf-8'))
-        if isinstance(msg, OrderedDict):
-            print "Inside isinstance\n"
-            return dict(msg)
-        return msg
     except SyntaxError:
         print "Inside Exception\n"
         raise
+    if isinstance(msg, OrderedDict):
+        print "Inside isinstance\n"
+        msg = dict(msg)
+        
+    return purify.clean_data(msg) # Remove html tags from deals description
+
 if __name__ == '__main__':
 
     appName = 'CleanUpHDFSFiles'
