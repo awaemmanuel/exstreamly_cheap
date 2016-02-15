@@ -207,3 +207,48 @@ requirements
 
 !/bin/bash                                                                                                             
 cqlsh -e'use test; CREATE Table playtest (adate text, btime bigint, cloc_x text, dloc_y text, etips text, fratio text, pay text, PRIMARY KEY (adate, btime), );'
+
+
+{u'sub_category': u'restaurants', u'updated_at': u'2016-02-09T06:18:35Z', u'fine_print': u'Minimum purchase of $30 at restaurant. Dine In Only.', u'id': 4107830, u'merchant_postal_code': u'', u'category': u'restaurants', u'title': u'60% off at Kendalben Barbeque - Smoked Pork, Beef and Bison', u'merchant_latitude': 35.172347, u'online': False, u'provider_name': u'Restaurant.com', u'merchant_country': u'', u'merchant_locality': u'Barbeque', u'merchant_name': u'Kendalben Barbeque - Smoked Pork, Beef and Bison', u'merchant_region': u'American', u'description': u'At Kendalben Barbeque, we believe that food is about much more than mere sustenance. We see it as an experience all its own. That is why we work hard to provide you with the best tasting food in Grants, NM. When you come to our restaurant, you can be confident that you will taste the most exquisite food you have ever had.', u'price': 6.0, u'expires_at': None, u'merchant_longitude': -107.891707, u'merchant_id': 1252377, u'url': u'http://www.restaurant.com/microsite/231530', u'created_at': u'2015-10-23T18:57:53Z', u'discount_percentage': 0.6, u'merchant_phone_number': u'', u'merchant_address': u'Moderate', u'number_sold': None}
+
+new_table = distFile.map(lambda p: Row(sub_category=p['sub_category'], category=p['category'], updated_at=p['updated_at'], fine_print=p['fine_print'], id=int(p['id']), merchant_postal_code=int(p[merchant_postal_code]), title=p['title'], price=float(p['price']), discount_percentage=float(p['discount_percentage']), merchant_longitude=float(p['merchant_longitude']), merchant_latitude=float(p['merchant_latitude']), number_sold=p['number_sold'], merchant_id=p['merchant_id'], ))
+
+new_table = distFile.map(lambda p: Row(sub_category=p['sub_category'], category=p['category'], updated_at=p['updated_at'], fine_print=p['fine_print'], id=int(p['id']), merchant_postal_code=p['merchant_postal_code'], title=p['title'], price=p['price'], discount_percentage=p['discount_percentage'], merchant_name=p['merchant_name'], merchant_address=p['merchant_address'], merchant_locality=p['merchant_locality'], merchant_region=p['merchant_region'], merchant_country=p['merchant_country'], merchant_longitude=p['merchant_phone_number'], merchant_latitude=p['merchant_latitude'], number_sold=p['number_sold'], merchant_id=p['merchant_id'], description=p['description'], fine_print=p['fine_print'], url=p['url'], online=p['online']))
+
+new_table = distFile.map(lambda p: Row(sub_category=p['sub_category'], category=p['category'], updated_at=p['updated_at'], id=int(p['id']), merchant_postal_code=p['merchant_postal_code'], title=p['title'], price=p['price'], discount_percentage=p['discount_percentage'], merchant_name=p['merchant_name'], merchant_address=p['merchant_address'], merchant_locality=p['merchant_locality'], merchant_region=p['merchant_region'], merchant_country=p['merchant_country'], merchant_phone_number=p['merchant_phone_number'], merchant_longitude=p['merchant_longitude'], merchant_latitude=p['merchant_latitude'], number_sold=p['number_sold'], merchant_id=p['merchant_id'], description=p['description'], fine_print=p['fine_print'], url=p['url'], online=p['online']))
+
+New Config
+new_table = distFile.map(lambda p: Row(id=int(p['id']), title=p['title'], category=p['category'], sub_category=p['sub_category'], description=p['description'], fine_print=p['fine_print'], price=p['price'], discount_percentage=p['discount_percentage'], created_at=p['created_at'], updated_at=p['updated_at'], expires_at=p['expires_at'], number_sold=p['number_sold'], url=p['url'], online=p['online'], provider_name=p['provider_name'], merchant_id=p['merchant_id'], merchant_name=p['merchant_name'], merchant_address=p['merchant_address'], merchant_locality=p['merchant_locality'], merchant_region=p['merchant_region'], merchant_country=p['merchant_country'], merchant_phone_number=p['merchant_phone_number'], merchant_longitude=p['merchant_longitude'], merchant_latitude=p['merchant_latitude']))
+
+
+output['id'] = deal['deal']['id']
+                output['category'] = deal['deal']['category_slug']
+                output['sub_category'] = deal['deal']['category_slug']
+                output['title'] = deal['deal']['short_title']
+                output['description'] = deal['deal']['description']
+                output['fine_print'] = deal['deal']['fine_print']
+                output['number_sold'] = deal['deal']['number_sold']
+                output['url'] = deal['deal']['untracked_url']
+                output['price'] = deal['deal']['price']
+                output['discount_percentage'] = deal['deal']['discount_percentage']
+                output['provider_name'] = deal['deal']['provider_name']
+                output['online'] = deal['deal']['online']
+                output['expires_at'] = deal['deal']['expires_at']
+                output['created_at'] = deal['deal']['created_at']
+                output['updated_at'] = deal['deal']['updated_at']
+                output['merchant_id'] = deal['deal']['merchant']['id']
+
+                # Online merchants have fields null. Change to ''
+                # and then flatten merchant info
+                merchant_info = deal['deal']['merchant']
+                if not all(merchant_info.values()):
+                    merchant_info = self._clean_merchant_info(merchant_info) 
+                output['merchant_name'] = merchant_info['name']
+                output['merchant_address'] = merchant_info['address']
+                output['merchant_locality'] = merchant_info['locality']
+                output['merchant_region'] = merchant_info['region']
+                output['merchant_postal_code'] = merchant_info['postal_code']
+                output['merchant_country'] = merchant_info['country']
+                output['merchant_latitude'] = merchant_info['latitude']
+                output['merchant_longitude'] = merchant_info['longitude']
+                output['merchant_phone_number'] = merchant_info['phone_number']
