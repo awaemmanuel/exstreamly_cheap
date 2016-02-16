@@ -126,6 +126,6 @@ def strip_html_tags(string_with_html):
 
 if __name__ == '__main__':
     # Clean up both indexes in ES now and merge them as one
-    for index in ['all_deals_data_index', 'all_deals_data']:
+    for index in ['all_deals_data_index']:
         uf.print_out('Processing {}....'.format(index))
         fetch_and_clean_up(index)
