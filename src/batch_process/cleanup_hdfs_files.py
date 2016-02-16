@@ -7,6 +7,7 @@
 import time
 import json
 import uuid
+import pyspark_cassandra
 from cassandra.cluster import Cluster
 from pyspark import SparkContext, SparkConf
 from pyspark.sql import SQLContext, Row
@@ -90,7 +91,7 @@ def clean_data(msg):
         msg['description'] = clean_description
         msg['fine_print'] = clean_fineprint
         #msg['id'] = int(msg['id'])
-        #msg['price'] = float(msg['price']) if msg['price'] else 0.0
+        msg['price'] = float(msg['price']) if msg['price'] else 0.0
         msg['discount_percentage'] = float(msg['discount_percentage']) if msg['discount_percentage'] else 0.0
         msg['merchant_longitude'] = str(msg['merchant_longitude']) if msg['merchant_longitude'] else '0.0'
         msg['merchant_latitude'] = str(msg['merchant_latitude']) if msg['merchant_latitude'] else '0.0'
@@ -100,6 +101,7 @@ def clean_data(msg):
         msg['expires_at'] = msg['expires_at'] or '2040-12-31T00:00:00Z'
         msg['created_at'] = msg['created_at'] or '2015-12-31T00:00:00Z'
         msg['updated_at'] = msg['updated_at'] or '2016-01-15T00:00:00Z'
+        msg['category'] = msg['category'] or 'invalid category'
         return msg 
     else:
          print "{} is not a dictionary, moving on...".format(msg)
@@ -146,8 +148,8 @@ if __name__ == '__main__':
     conf = SparkConf().setAppName(appName).setMaster(master).set(executor_memory, '6g').set(driver_memory, '10g')
     sc = SparkContext(conf=conf)
     sqlContext = SQLContext(sc)
-    #base_uri = 'hdfs://52.1.154.19:9000/exstreamly_cheap_main_files/all_deals/cached'
-    base_uri = 'hdfs://52.1.154.19:9000/exstreamly_cheap_main_files/all_deals/history/deals_data_hdfs_all_deals_data_20160210063946.dat'
+    base_uri = 'hdfs://52.1.154.19:9000/exstreamly_cheap_main_files/all_deals/cached'
+    #base_uri = 'hdfs://52.1.154.19:9000/exstreamly_cheap_main_files/all_deals/history/deals_data_hdfs_all_deals_data_20160210063946.dat'
     
     # Create external dataset
     distFile = sc.textFile(base_uri)
@@ -166,9 +168,12 @@ if __name__ == '__main__':
 
     #sample = sqlContext.sql("SELECT category, merchant_name, provider_name FROM Deals limit 50")
     sample = sqlContext.sql('SELECT * FROM Deals')
+    
+    ## Drop Null Values
+    sample.dropna()
     #sample.collect()
     
-    sample.printSchema()
+    #sample.printSchema()
     #sample.show()
     #num_deals
     time_now = int(datetime.now().strftime('%Y%m%d%H%M'))
@@ -182,13 +187,13 @@ if __name__ == '__main__':
     #total_deals = sample
     #total_deals = total_deals.map(lambda r: Row(ts=str(uuid.uuid1()), total_num_deals=r))
     #schemaTotalDeals.write.format('org.apache.spark.sql.cassandra').options(table='num_deals', keyspace='deals').save(mode='append')
-    #print_stats(distFile)
-    #distFile.saveAsTextFile('hdfs://52.1.154.19:9000/exstreamly_cheap_main_files/all_deals/temp.json2')
-    #df = sqlContext.read.json('hdfs://52.1.154.19:9000/exstreamly_cheap_main_files/all_deals/temp.json2')
-    #df = distFile.toDF()
-    #df.printSchema()
-    #distFile.printSchema()
-    #distFile.show()
+    ## Write the trending categories by price into database
+    sample.write.format('org.apache.spark.sql.cassandra').options(table='trending_categories_with_price', keyspace='deals').save(mode='append')
 
+    ## Write the trending categories by discount into database
+    sample.write.format('org.apache.spark.sql.cassandra').options(table='trending_categories_with_disc', keyspace='deals').save(mode='append')
+
+    ## Write to the provider_by_category table
+    sqlContext.sql('select category, provider_name, merchant_address, merchant_country, merchant_id, merchant_latitude, merchant_locality,merchant_longitude,merchant_name,merchant_phone_number,merchant_region,number_sold from Deals').write.format('org.apache.spark.sql.cassandra').options(table='provider_by_category', keyspace='deals').save(mode='append')
     #print "Finished at..... {}".format(time.strftime('%Y%m%dH%M%S'))
     print "Finished at..... {}".format(time.strftime('%H:%M:%S'))
