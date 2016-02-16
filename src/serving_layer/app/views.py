@@ -14,8 +14,8 @@ def index():
     stmt = 'SELECT full_name, latitude, longitude from deals.users LIMIT %s'
     response = session.execute(stmt, parameters=[int(10)])
     for val in response:
-        response_list.append([val.fullname, float(val.latitude), float(val.longitude)])
-    return render_template('index.html', locations=res_tuples)
+        response_list.append([val.full_name, float(val.latitude), float(val.longitude)])
+    return render_template('index.html', locations=response_list)
 
 @app.route('/api/email/<date>')
 def get_email(email, date):
