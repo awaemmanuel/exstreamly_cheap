@@ -9,13 +9,13 @@ import threading
 import Queue
 import requests as rq
 from collections import OrderedDict
-from helper_modules import utility_functions as uf
+from src.helper_modules import utility_functions as uf
 
 PUBLIC_KEY = 'pf3lj0'
 base_url = 'http://api.sqoot.com/v2'
-def get_request(base_api_url, endpoint='categories', extra_params='', queue=None):
+def get_request(base_api_url, endpoint='categories', extra_params='', queue=None, key='pf3lj0'):
     ''' Return url to endpoint '''
-    req =  rq.get('{}/{}/?api_key={};{}'.format(base_api_url, endpoint, PUBLIC_KEY, extra_params))
+    req =  rq.get('{}/{}/?api_key={};{}'.format(base_api_url, endpoint, key, extra_params))
     if not queue:
         return req
     queue.put(req.json()['deals'])
@@ -45,21 +45,26 @@ def map_categories(base_url):
     ''' Map Sqoot API main categories to subcategories '''
     req_categories = get_request(base_url)
     main_to_sub_categories = {}
-    for cat in req_categories.json()['categories']:
-        category = cat['category']
-        parent_slug = category['parent_slug']
-        slug = category['slug']
+    
+    try:
+        for cat in req_categories.json()['categories']:
+            category = cat['category']
+            parent_slug = category['parent_slug']
+            slug = category['slug']
 
-        # Category is a main category
-        if parent_slug is None:
-            if slug not in main_to_sub_categories.keys():
-                main_to_sub_categories[slug] = []
-        else: # Category may be a subcategory 
-            if parent_slug not in main_to_sub_categories.keys(): # main category
-                main_to_sub_categories[parent_slug] = []
-            main_to_sub_categories[parent_slug].append(slug)
-    return main_to_sub_categories
-        
+            # Category is a main category
+            if parent_slug is None:
+                if slug not in main_to_sub_categories.keys():
+                    main_to_sub_categories[slug] = []
+            else: # Category may be a subcategory 
+                if parent_slug not in main_to_sub_categories.keys(): # main category
+                    main_to_sub_categories[parent_slug] = []
+                main_to_sub_categories[parent_slug].append(slug)
+        return main_to_sub_categories
+    
+    except simplejson.scanner.JSONDecodeError:
+        pass
+    
 def fetch_sqoot_data(base_url):
     ''' Fetch Sqoot Data and save relevant information to file '''
     files_location = uf.mkdir_if_not_exist() # Folder in /tmp/exstreamly_cheap_files
@@ -140,8 +145,9 @@ def fetch_sqoot_data(base_url):
         except rq.exceptions.ConnectTimeout:
             uf.print_out("[ConnectionTimeout] ==> Server connection timing out.")
 
-# Generate data
-fetch_sqoot_data(base_url)
+if __name__ == '__main__':
+    # Generate data
+    fetch_sqoot_data(base_url)
         
 
 
