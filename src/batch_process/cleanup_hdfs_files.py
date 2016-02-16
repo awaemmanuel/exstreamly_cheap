@@ -6,11 +6,14 @@
 '''
 import time
 import json
+import uuid
+from cassandra.cluster import Cluster
 from pyspark import SparkContext, SparkConf
 from pyspark.sql import SQLContext, Row
 from datetime import datetime
 from collections import OrderedDict
 from BeautifulSoup import BeautifulSoup
+from datetime import datetime
 #from src.ingestion import purify_elasticsearch_data as purify
 
 def evaluate_and_purify(msg):
@@ -134,6 +137,8 @@ def print_stats(rdd):
 
 if __name__ == '__main__':
     print "Starting at..... {}".format(time.strftime('%H:%M:%S'))
+    cluster = Cluster(['172.31.2.39', '172.31.2.40','172.31.2.41', '172.31.2.42'])
+    session = cluster.connect('deals')
     appName = 'CleanUpHDFSFiles'
     master = 'spark://ip-172-31-2-36:7077'
     executor_memory = 'spark.executor.memory'
@@ -159,11 +164,24 @@ if __name__ == '__main__':
     schemaDeals = sqlContext.inferSchema(new_table)#, samplingRatio=None)
     schemaDeals.registerTempTable("Deals")
 
-    sample = sqlContext.sql("SELECT category, merchant_name, provider_name FROM Deals limit 50")
+    #sample = sqlContext.sql("SELECT category, merchant_name, provider_name FROM Deals limit 50")
+    sample = sqlContext.sql('SELECT COUNT(*) as total_num_deals FROM Deals')
     #sample.collect()
-    sample.printSchema()
+    
+    #sample.printSchema()
     sample.show()
-
+    #num_deals
+    time_now = int(datetime.now().strftime('%Y%m%d%H%M'))
+    total_deals = sample.map(lambda r: Row(ts=time_now, total_num_deals=r[0]))
+    schemaTotalDeals = total_deals.toDF()#.inferSchema(total_deals)
+    #total_deals_df = total_deals.toDF(['column', 'value'])
+    #total_deals.collect()
+    
+    schemaTotalDeals.printSchema()
+    schemaTotalDeals.show()
+    #total_deals = sample
+    #total_deals = total_deals.map(lambda r: Row(ts=str(uuid.uuid1()), total_num_deals=r))
+    schemaTotalDeals.write.format('org.apache.spark.sql.cassandra').options(table='num_deals', keyspace='deals').save(mode='append')
     #print_stats(distFile)
     #distFile.saveAsTextFile('hdfs://52.1.154.19:9000/exstreamly_cheap_main_files/all_deals/temp.json2')
     #df = sqlContext.read.json('hdfs://52.1.154.19:9000/exstreamly_cheap_main_files/all_deals/temp.json2')
