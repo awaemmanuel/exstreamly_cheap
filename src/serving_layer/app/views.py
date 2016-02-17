@@ -4,12 +4,15 @@ from cassandra.cluster import Cluster
 
 # setting up connections to cassandra
 cluster = Cluster(['172.31.2.39']) 
-session = cluster.connect('deals') 
+session = cluster.connect('deals')
+
+# setting up connections to realtime cluster
+cluster_rt = Cluster(['172.31.2.36'])
+session_rt = cluster_rt.connect('deals_streaming')
 
 @app.route('/')
 @app.route('/index')
 def index():
-#    return '<h1 style="font-size:50px;text-align:center;color:red">ExStreamly Cheap is still under construction</h1>'
     response_list = []
     stmt = 'SELECT full_name, latitude, longitude from deals.users LIMIT %s'
     response = session.execute(stmt, parameters=[int(10)])
@@ -63,3 +66,17 @@ def get_users_locations(num=100):
             'long': x.longitude
         } for x in response_list]
     return jsonify(users_loc_info=json_response)
+
+
+
+###################### REAL TIME QUERIES ###############################
+@app.route('/api/trending_categories_by_time')
+def get_trending_categories_by_time():
+    ''' Return the trending categories in real time '''
+    response_list = []
+    stmt = 'SELECT * FROM trending_categories_by_time LIMIT 30;'
+    response = session_rt.execute(stmt)
+    for val in response:
+        response_list.append([val.ts, val.category, val.count])
+    return jsonify(data=response_list)
+        
