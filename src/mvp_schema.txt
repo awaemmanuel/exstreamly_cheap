@@ -191,7 +191,7 @@ Algorithm -
     4. Every one gets a .1
     5. At end tally the category affinity scores by minute and by hour
 
-{"id": 4464085, "category": "dining-nightlife", "sub_category": "restaurants", "title": "60% off at Shewaber Restaurant and Lounge", "description": "<p>The menu at Shewaber Restaurant and Lounge features a wide array of great selections, made from only the freshest and highest quality ingredients, with something sure to please every member of your group. Shewaber Restaurant and Lounge has established itself as one of the area's favorite culinary destinations and is sure to offer you a pleasant and unique dining experience every time you visit. Please stop in soon!</p>", "fine_print": "Minimum purchase amounts and other restrictions may apply. See the deal for additional information. Restaurant.com Terms and Conditions apply for all purchases; for Restaurant.com's terms and conditions please see here http://www.restaurant.com/about/terms.", "number_sold": 0, "url": "https://www.groupon.com/deals/shewaber-restaurant-and-lounge-1", "price": 4.0, "discount_percentage": 0.6, "provider_name": "Groupon", "online": false, "expires_at": "2039-06-24T23:59:59Z", "created_at": "2016-01-05T14:38:15Z", "updated_at": "2016-01-10T20:27:05Z", "merchant_id": 987569}
+
 
 insert into deals.trending_categories_by_time (category, count, datetime) values ('Coffee', 1925, now());
 insert into deals.trending_categories_by_time (category, count, datetime) values ('Restaurant', 1925, now());
@@ -207,3 +207,108 @@ requirements
 
 !/bin/bash                                                                                                             
 cqlsh -e'use test; CREATE Table playtest (adate text, btime bigint, cloc_x text, dloc_y text, etips text, fratio text, pay text, PRIMARY KEY (adate, btime), );'
+
+
+{u'sub_category': u'restaurants', u'updated_at': u'2016-02-09T06:18:35Z', u'fine_print': u'Minimum purchase of $30 at restaurant. Dine In Only.', u'id': 4107830, u'merchant_postal_code': u'', u'category': u'restaurants', u'title': u'60% off at Kendalben Barbeque - Smoked Pork, Beef and Bison', u'merchant_latitude': 35.172347, u'online': False, u'provider_name': u'Restaurant.com', u'merchant_country': u'', u'merchant_locality': u'Barbeque', u'merchant_name': u'Kendalben Barbeque - Smoked Pork, Beef and Bison', u'merchant_region': u'American', u'description': u'At Kendalben Barbeque, we believe that food is about much more than mere sustenance. We see it as an experience all its own. That is why we work hard to provide you with the best tasting food in Grants, NM. When you come to our restaurant, you can be confident that you will taste the most exquisite food you have ever had.', u'price': 6.0, u'expires_at': None, u'merchant_longitude': -107.891707, u'merchant_id': 1252377, u'url': u'http://www.restaurant.com/microsite/231530', u'created_at': u'2015-10-23T18:57:53Z', u'discount_percentage': 0.6, u'merchant_phone_number': u'', u'merchant_address': u'Moderate', u'number_sold': None}
+
+new_table = distFile.map(lambda p: Row(sub_category=p['sub_category'], category=p['category'], updated_at=p['updated_at'], fine_print=p['fine_print'], id=int(p['id']), merchant_postal_code=int(p[merchant_postal_code]), title=p['title'], price=float(p['price']), discount_percentage=float(p['discount_percentage']), merchant_longitude=float(p['merchant_longitude']), merchant_latitude=float(p['merchant_latitude']), number_sold=p['number_sold'], merchant_id=p['merchant_id'], ))
+
+new_table = distFile.map(lambda p: Row(sub_category=p['sub_category'], category=p['category'], updated_at=p['updated_at'], fine_print=p['fine_print'], id=int(p['id']), merchant_postal_code=p['merchant_postal_code'], title=p['title'], price=p['price'], discount_percentage=p['discount_percentage'], merchant_name=p['merchant_name'], merchant_address=p['merchant_address'], merchant_locality=p['merchant_locality'], merchant_region=p['merchant_region'], merchant_country=p['merchant_country'], merchant_longitude=p['merchant_phone_number'], merchant_latitude=p['merchant_latitude'], number_sold=p['number_sold'], merchant_id=p['merchant_id'], description=p['description'], fine_print=p['fine_print'], url=p['url'], online=p['online']))
+
+new_table = distFile.map(lambda p: Row(sub_category=p['sub_category'], category=p['category'], updated_at=p['updated_at'], id=int(p['id']), merchant_postal_code=p['merchant_postal_code'], title=p['title'], price=p['price'], discount_percentage=p['discount_percentage'], merchant_name=p['merchant_name'], merchant_address=p['merchant_address'], merchant_locality=p['merchant_locality'], merchant_region=p['merchant_region'], merchant_country=p['merchant_country'], merchant_phone_number=p['merchant_phone_number'], merchant_longitude=p['merchant_longitude'], merchant_latitude=p['merchant_latitude'], number_sold=p['number_sold'], merchant_id=p['merchant_id'], description=p['description'], fine_print=p['fine_print'], url=p['url'], online=p['online']))
+
+New Config
+new_table = distFile.map(lambda p: Row(id=int(p['id']), title=p['title'], category=p['category'], sub_category=p['sub_category'], description=p['description'], fine_print=p['fine_print'], price=p['price'], discount_percentage=p['discount_percentage'], created_at=p['created_at'], updated_at=p['updated_at'], expires_at=p['expires_at'], number_sold=p['number_sold'], url=p['url'], online=p['online'], provider_name=p['provider_name'], merchant_id=p['merchant_id'], merchant_name=p['merchant_name'], merchant_address=p['merchant_address'], merchant_locality=p['merchant_locality'], merchant_region=p['merchant_region'], merchant_country=p['merchant_country'], merchant_phone_number=p['merchant_phone_number'], merchant_longitude=p['merchant_longitude'], merchant_latitude=p['merchant_latitude']))
+
+
+
+
+
+root
+ |-- category: string (nullable = true)
+ |-- discount_percentage: double (nullable = true)
+ |-- fine_print: string (nullable = true)
+ |-- id: long (nullable = true)
+ |-- merchant_id: long (nullable = true)
+ |-- merchant_latitude: string (nullable = true)
+ |-- merchant_longitude: string (nullable = true)
+ |-- merchant_postal_code: string (nullable = true)
+ |-- number_sold: long (nullable = true)
+ |-- price: double (nullable = true)
+ |-- sub_category: string (nullable = true)
+ |-- title: string (nullable = true)
+ |-- updated_at: string (nullable = true)
+ 
+
+output['id'] = deal['deal']['id']
+                output['category'] = deal['deal']['category_slug']
+                output['sub_category'] = deal['deal']['category_slug']
+                output['title'] = deal['deal']['short_title']
+                output['description'] = deal['deal']['description']
+                output['fine_print'] = deal['deal']['fine_print']
+                output['number_sold'] = deal['deal']['number_sold']
+                output['url'] = deal['deal']['untracked_url']
+                output['price'] = deal['deal']['price']
+                output['discount_percentage'] = deal['deal']['discount_percentage']
+                output['provider_name'] = deal['deal']['provider_name']
+                output['online'] = deal['deal']['online']
+                output['expires_at'] = deal['deal']['expires_at']
+                output['created_at'] = deal['deal']['created_at']
+                output['updated_at'] = deal['deal']['updated_at']
+                output['merchant_id'] = deal['deal']['merchant']['id']
+
+                # Online merchants have fields null. Change to ''
+                # and then flatten merchant info
+                merchant_info = deal['deal']['merchant']
+                if not all(merchant_info.values()):
+                    merchant_info = self._clean_merchant_info(merchant_info) 
+                output['merchant_name'] = merchant_info['name']
+                output['merchant_address'] = merchant_info['address']
+                output['merchant_locality'] = merchant_info['locality']
+                output['merchant_region'] = merchant_info['region']
+                output['merchant_postal_code'] = merchant_info['postal_code']
+                output['merchant_country'] = merchant_info['country']
+                output['merchant_latitude'] = merchant_info['latitude']
+                output['merchant_longitude'] = merchant_info['longitude']
+                output['merchant_phone_number'] = merchant_info['phone_number']
+                
+FINAL SCHEMA
+root
+ |-- category: string (nullable = true)
+ |-- created_at: string (nullable = true)
+ |-- description: string (nullable = true)
+ |-- discount_percentage: double (nullable = true)
+ |-- expires_at: string (nullable = true)
+ |-- fine_print: string (nullable = true)
+ |-- id: long (nullable = true)
+ |-- merchant_address: string (nullable = true)
+ |-- merchant_country: string (nullable = true)
+ |-- merchant_id: long (nullable = true)
+ |-- merchant_latitude: string (nullable = true)
+ |-- merchant_locality: string (nullable = true)
+ |-- merchant_longitude: string (nullable = true)
+ |-- merchant_name: string (nullable = true)
+ |-- merchant_phone_number: string (nullable = true)
+ |-- merchant_region: string (nullable = true)
+ |-- number_sold: long (nullable = true)
+ |-- online: boolean (nullable = true)
+ |-- price: double (nullable = true)
+ |-- provider_name: string (nullable = true)
+ |-- sub_category: string (nullable = true)
+ |-- title: string (nullable = true)
+ |-- updated_at: string (nullable = true)
+ |-- url: string (nullable = true)
+ 
+CREATE TABLE trending_categories_with_price (category text, sub_category text, created_at timestamp, updated_at timestamp, expires_at timestamp, description text, fine_print text, price float, discount_percentage float, id bigint, merchant_address text, merchant_country text, merchant_id bigint,merchant_latitude text, merchant_longitude text, merchant_locality text, merchant_name text ,merchant_phone_number text, merchant_region text, number_sold float, online boolean, provider_name text, title text, url text, PRIMARY KEY ((price) category, discount_percentage)) WITH CLUSTERING ORDER BY (discount_percentage DESC) ;
+
+CREATE TABLE trending_categories_with_disc (category text, sub_category text, created_at timestamp, updated_at timestamp, expires_at timestamp, description text, fine_print text, price float, discount_percentage float, id bigint, merchant_address text, merchant_country text, merchant_id bigint,merchant_latitude text, merchant_longitude text, merchant_locality text, merchant_name text ,merchant_phone_number text, merchant_region text, number_sold float, online boolean, provider_name text, title text, url text, PRIMARY KEY (discount_percentage, price));
+
+DROP TABLE provider_by_category IF EXISTS;
+CREATE TABLE provider_by_category (category text, provider_name text, merchant_address text,merchant_country text,merchant_id bigint,merchant_latitude text,merchant_locality text,merchant_longitude text,merchant_name text,merchant_phone_number text,merchant_region text,number_sold text, PRIMARY KEY (provider_name, category))
+
+ QUERY 1: 
+ create table trending_products_with_price  (id bigint, merchant_id bigint, provider text, title text, category text, sub_category text, description text, fine_print text, price float, percentage_disc float, number_sold int, created_at timestamp, expires_at timestamp, updated_at timestamp, url text, online boolean, unique_deals set<bigint>, PRIMARY KEY ((sub_category, price, percentage_disc),  number_sold, category, merchant_id, updated_at, created_at, expires_at, online)) with clustering order by (number_sold desc);
+ 
+ 
+ SAMPLE DATA:
+ {"id": 4464085, "category": "dining-nightlife", "sub_category": "restaurants", "title": "60% off at Shewaber Restaurant and Lounge", "description": "<p>The menu at Shewaber Restaurant and Lounge features a wide array of great selections, made from only the freshest and highest quality ingredients, with something sure to please every member of your group. Shewaber Restaurant and Lounge has established itself as one of the area's favorite culinary destinations and is sure to offer you a pleasant and unique dining experience every time you visit. Please stop in soon!</p>", "fine_print": "Minimum purchase amounts and other restrictions may apply. See the deal for additional information. Restaurant.com Terms and Conditions apply for all purchases; for Restaurant.com's terms and conditions please see here http://www.restaurant.com/about/terms.", "number_sold": 0, "url": "https://www.groupon.com/deals/shewaber-restaurant-and-lounge-1", "price": 4.0, "discount_percentage": 0.6, "provider_name": "Groupon", "online": false, "expires_at": "2039-06-24T23:59:59Z", "created_at": "2016-01-05T14:38:15Z", "updated_at": "2016-01-10T20:27:05Z", "merchant_id": 987569}
