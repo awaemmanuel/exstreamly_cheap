@@ -160,7 +160,9 @@ comments = [
     'Now I know where to go and get deals in ',
     'Yoh! Dude, check out deals in ',
     'Rush! Rush!! Rush!!! Find really cheap and trending deals in ',
-    'No retreat no surrender, I just got deals in '
+    'No retreat no surrender, I just got deals in ',
+    'Wake up and smell the coffee. I got cheap ',
+    'I have saved a lot. ExStreamly Cheap offers deals in '
 ]
 
 def split_and_match_categories(msg):
