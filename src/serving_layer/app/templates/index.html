@@ -117,7 +117,7 @@
                         <li><a href="#showcase">Portfolio</a></li>
                         <li><a href="#our-team">Team</a></li>
                         <li><a href="#live">Live Feed</a></li>
-                        <li><a href="#blog">Blog</a></li>
+                        <li><a href="http://bit.ly/1PP6ARg" target="_blank">Slides</a></li>
                         <li><a href="#contact-us">Customer Search</a></li>
                     </ul>
                 </nav>
@@ -208,14 +208,14 @@
 				
 					<!-- section title -->
 					<div class="title text-center wow fadeIn" data-wow-duration="1500ms" >
-                        <h2>Trending <span class="color">Deals</span></h2>
+					  <h2>Trending <span class="color">Deals</span></h2>
 						<div class="border"></div>
 						<h5> In the past ten seconds </h5>
 					</div>
 					<!-- /section title -->
 					
                     <!-- Table section	-->
-                <table id="trendTable" class="table table-striped display" cellspacing="0" width="100%">
+                <table id="trendTable" class="table table-striped display" cellspacing="0" width="80%" >
                         <thead>
                             <tr>
                                 <th>Time</th>
@@ -223,6 +223,7 @@
                                 <th>Amount Purchased</th>
                             </tr>
                         </thead>
+			<tbody id='trendsTbBody' style='color: black; font-size: 20px'></tbody>
                         <tfoot>
                             <tr>
                                 <th>Time</th>
@@ -320,7 +321,7 @@
 				</div> 		<!-- End row -->
 			</div>   	<!-- End container -->
 		</section>   <!-- End section -->
-		<div class="row" style="height:100vh;">
+	<!--	<div class="row" style="height:100vh;">
                 <div class="col-md-10 col-md-offset-1 trend-results">
                     <table class="table" id="trendsTable">
                       <thead>
@@ -331,7 +332,7 @@
                       </tbody>
                     </table>
                 </div>
-        </div>
+        </div> -->
 		
 		<!-- Start Portfolio Section
 		=========================================== -->
@@ -1316,14 +1317,9 @@
         <script>
         $(document).ready(function(){
                 $('#trendTable').DataTable( {
-                    "paging": true,
-                    "processing": true,
-                    "serverSide": true,
-                    "ajax": {
-                        "url": "/api/trending_categories_by_time"
-                        "dataType": "jsonp"
-                    }
-                });
+                      "paging": false,
+	              "searching": false
+      	          });
           });
             
        var map = L.map('leaflet_map').setView([40.746581, -74.001997], 5);
@@ -1381,9 +1377,23 @@
                 });                                                                                       
             });
         }
-      //  $(function () {
-      //   setInterval(userLocations, 2000);
-      //  });
+	
+       function trendingByTime() {
+	  $.getJSON('/api/trending_categories_by_time')
+	    .done(function(data) {
+		$('#trendsTbBody').empty();
+			 $.each(data.data, function(i, item) {
+			 row_html = '<tr><td>';
+			 row_html += item[0] + '</td><td>';
+			 row_html += item[1] + '</td><td>';
+			 row_html += item[2] + '</td></tr>';
+			 $('#trendsTbBody').append(row_html)
+			 });
+	        });
+       }
+        $(function () {
+         setInterval(trendingByTime, 2000);
+        });
         </script>
     </body>
 </html>
