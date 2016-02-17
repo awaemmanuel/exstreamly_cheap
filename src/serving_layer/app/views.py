@@ -73,85 +73,107 @@ def get_users_locations(num=100):
 
 
 ###################### REAL TIME QUERIES ###############################
-categories_formal_name = {u'activities-events': u'Activities & Events',
- u'adult': u'Adult Products',
- u'audio': u'Audio & Accessories',
- u'automotive': u'Automotive',
- u'automotive-services': u'Automotive Services',
- u'baby': u'Baby',
- u'bars-clubs': u'Bars & Clubs',
- u'beauty_health': u'Beauty & Health',
- u'boot-camp': u'Boot Camp',
- u'bowling': u'Bowling',
- u'bridal': u'Bridal',
- u'chiropractic': u'Chiropractic',
- u'city-tours': u'City Tours',
- u'college': u'College',
- u'comedy-clubs': u'Comedy Clubs',
- u'concerts': u'Concerts',
- u'crafts_hobbies': u'Crafts & Hobbies',
- u'dance-classes': u'Dance Classes',
- u'dental': u'Dental',
- u'dermatology': u'Dermatology',
- u'dining-nightlife': u'Dining & Nightlife',
- u'electronics': u'Electronics',
- u'eye-vision': u'Eye & Vision',
- u'facial': u'Facial',
- u'fashion_accessories': u'Fashion Accessories',
- u'fitness': u'Fitness',
- u'fitness-classes': u'Fitness Classes',
- u'fitness_product': u'Fitness',
- u'food-grocery': u'Food & Grocery',
- u'food_alcohol': u'Food & Alcohol',
- u'gay': u'Gay',
- u'gifts': u'Gift Ideas',
- u'golf': u'Golf',
- u'gym': u'Gym',
- u'hair-removal': u'Hair Removal',
- u'hair-salon': u'Hair Salon',
- u'health-beauty': u'Health & Beauty',
- u'home-services': u'Home Services',
- u'home_goods': u'Home Goods',
- u'jewish': u'Jewish',
- u'kids': u'Kids',
- u'kitchen': u'Kitchen',
- u'kosher': u'Kosher',
- u'life-skills-classes': u'Life Skills Classes',
- u'luggage': u'Luggage & Baggage',
- u'makeup': u'Makeup',
- u'manicure-pedicure': u'Manicure & Pedicure',
- u'martial-arts': u'Martial Arts',
- u'massage': u'Massage',
- u'mens-clothing': u"Men's Clothing",
- u'mens_fashion': u"Men's Fashion",
- u'mobile': u'Mobile Devices & Accessories',
- u'movies_music_games': u'Movies, Music, & Games',
- u'museums': u'Museums',
- u'office_supplies': u'Office Supplies',
- u'outdoor-adventures': u'Outdoor Adventures',
- u'personal-training': u'Personal Training',
- u'pets': u'Pets',
- u'photography-services': u'Photography Services',
- u'pilates': u'Pilates',
- u'product': u'Product',
- u'restaurants': u'Restaurants',
- u'retail-services': u'Retail & Services',
- u'skiing': u'Skiing',
- u'skydiving': u'Skydiving',
- u'spa': u'Spa',
- u'special-interest': u'Special Interest',
- u'sporting-events': u'Sporting Events',
- u'tanning': u'Tanning',
- u'teeth-whitening': u'Teeth Whitening',
- u'theater': u'Theater',
- u'tools': u'Tools & Hardware',
- u'toys': u'Toys',
- u'travel': u'Travel',
- u'treats': u'Treats',
- u'wine-tasting': u'Wine Tasting',
- u'women_fashion': u"Women's Fashion",
- u'womens-clothing': u"Women's Clothing",
- u'yoga': u'Yoga'}
+categories_formal_name = {
+ 'activities-events': 'Activities & Events',
+ 'adult': 'Adult Products',
+ 'audio': 'Audio & Accessories',
+ 'automotive': 'Automotive',
+ 'automotive-services': 'Automotive Services',
+ 'baby': 'Baby',
+ 'bars-clubs': 'Bars & Clubs',
+ 'beauty_health': 'Beauty & Health',
+ 'boot-camp': 'Boot Camp',
+ 'bowling': 'Bowling',
+ 'bridal': 'Bridal',
+ 'chiropractic': 'Chiropractic',
+ 'city-tours': 'City Tours',
+ 'college': 'College',
+ 'comedy-clubs': 'Comedy Clubs',
+ 'concerts': 'Concerts',
+ 'crafts_hobbies': 'Crafts & Hobbies',
+ 'dance-classes': 'Dance Classes',
+ 'dental': 'Dental',
+ 'dermatology': 'Dermatology',
+ 'dining-nightlife': 'Dining & Nightlife',
+ 'electronics': 'Electronics',
+ 'eye-vision': 'Eye & Vision',
+ 'facial': 'Facial',
+ 'fashion_accessories': 'Fashion Accessories',
+ 'fitness': 'Fitness',
+ 'fitness-classes': 'Fitness Classes',
+ 'fitness_product': 'Fitness',
+ 'food-grocery': 'Food & Grocery',
+ 'food_alcohol': 'Food & Alcohol',
+ 'gay': 'Gay',
+ 'gifts': 'Gift Ideas',
+ 'golf': 'Golf',
+ 'gym': 'Gym',
+ 'hair-removal': 'Hair Removal',
+ 'hair-salon': 'Hair Salon',
+ 'health-beauty': 'Health & Beauty',
+ 'home-services': 'Home Services',
+ 'home_goods': 'Home Goods',
+ 'jewish': 'Jewish',
+ 'kids': 'Kids',
+ 'kitchen': 'Kitchen',
+ 'kosher': 'Kosher',
+ 'life-skills-classes': 'Life Skills Classes',
+ 'luggage': 'Luggage & Baggage',
+ 'makeup': 'Makeup',
+ 'manicure-pedicure': 'Manicure & Pedicure',
+ 'martial-arts': 'Martial Arts',
+ 'massage': 'Massage',
+ 'mens-clothing': u"Men's Clothing",
+ 'mens_fashion': u"Men's Fashion",
+ 'mobile': 'Mobile Devices & Accessories',
+ 'movies_music_games': 'Movies, Music, & Games',
+ 'museums': 'Museums',
+ 'office_supplies': 'Office Supplies',
+ 'outdoor-adventures': 'Outdoor Adventures',
+ 'personal-training': 'Personal Training',
+ 'pets': 'Pets',
+ 'photography-services': 'Photography Services',
+ 'pilates': 'Pilates',
+ 'product': 'Product',
+ 'restaurants': 'Restaurants',
+ 'retail-services': 'Retail & Services',
+ 'skiing': 'Skiing',
+ 'skydiving': 'Skydiving',
+ 'spa': 'Spa',
+ 'special-interest': 'Special Interest',
+ 'sporting-events': 'Sporting Events',
+ 'tanning': 'Tanning',
+ 'teeth-whitening': 'Teeth Whitening',
+ 'theater': 'Theater',
+ 'tools': 'Tools & Hardware',
+ 'toys': 'Toys',
+ 'travel': 'Travel',
+ 'treats': 'Treats',
+ 'wine-tasting': 'Wine Tasting',
+ 'women_fashion': u"Women's Fashion",
+ 'womens-clothing': u"Women's Clothing",
+ 'yoga': 'Yoga'}
+
+comments = [
+    'Found amazing deals in ',
+    'ExStreamly Cheap gave me the best prices in ',
+    'Now I know where to go and get deals in ',
+    'Yoh! Dude, check out deals in ',
+    'Rush! Rush!! Rush!!! Find really cheap and trending deals in ',
+    'No retreat no surrender, I just got deals in '
+]
+
+def split_and_match_categories(msg):
+    ''' Split the string of categories, match them up 
+        with their formal names and return new string.
+    '''
+    msgs = msg.split(' ')
+    new_msg = [categories_formal_name(category) for category in msgs]
+    return ' '.join(new_msg).encode('utf-8')
+
+def time_formatted(time_int):
+    ''' Format time for display '''
+    return datetime.strptime(str(time_int), "%Y%m%d%H%M%S").strftime("%H:%M:%S %Y-%m-%d")
 
 @app.route('/api/trending_categories_by_time')
 def get_trending_categories_by_time():
@@ -162,8 +184,22 @@ def get_trending_categories_by_time():
     for val in response:
         # Format the category : bars-club => Bars & Club
         category = categories_formal_name[val.category]
-        ts = datetime.strptime(str(val.ts), "%Y%m%d%H%M%S").strftime("%H:%M:%S %Y-%m-%d")
+        ts = time_formatted(val.ts)
         count = random.randint(1, 10) + val.count
         response_list.append([ts, category, count])
     return jsonify(data=response_list)
+
+@app.route('/api/users_purchasing_pattern')
+def get_users_purchasing_timeline():
+    ''' Retrieve the purchasing pattern of users in real time '''
+    response_list = []
+    stmt = 'SELECT * FROM users_purchasing_pattern limit 15;'
+    response = session_rt.execute(stmt)
+    for val in response:
+        response_list.append([val.name, 
+                              time_formatted(val.purchasetime), 
+                              '{}{}'.format(random.choice(comments), split_and_match_categories(val.purchased))])
+    return jsonify(data=response_list)
+        
+    
         
