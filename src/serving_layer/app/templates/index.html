@@ -236,33 +236,7 @@
 			</div>   	<!-- End container -->
 		</section>   <!-- End section -->
 		
-		<section></section>
-        <!-- Time Line
-        =========================================== -->
 
-        <section id="live" class="bg-one">
-            <div class="container">
-                <div class="row">
-                  <!-- /.panel -->
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <i class="fa fa-clock-o fa-fw"></i> Timeline
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body" id='newTimeLine'>
-                            <ul class="timeline" >
-
-                            </ul>
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
-                </div>
-
-            </div>
-        </section>
-		
-		
 		<!--
 		Start Counter Section
 		==================================== -->
@@ -359,7 +333,67 @@
                 </div>
         </div> -->
 	
+				
+        <!-- Time Line
+        =========================================== -->
+
+        <section id="live" class="bg-one">
+            <div class="container">
+                <div class="row">
+                 
+                 <!-- section title -->
+					<div class="title text-center wow fadeIn" data-wow-duration="1500ms" >
+					  <h2>Time <span class="color">Line</span></h2>
+						<div class="border"></div>
+						<h5> Listen to what your friends have to say... </h5>
+					</div>
+					<!-- /section title -->
+                 
+                  <!-- /.panel -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-clock-o fa-fw"></i> Timeline
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body" id='newTimeLine'>
+                            <ul class="timeline" >
+
+                            </ul>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+
+            </div>
+        </section>
 		
+    <!-- End of Timeline
+        ======================================== -->
+        
+        <section>
+            <div class="col-md-4 col-md-offset-4" style="margin-top:10vh;">
+                <form action"searchop" method="POST">
+<!-- action is the html template that will return the result to this input query -->
+                    <div class="form-group text-center">
+                            <label style="font-weight:300; font-size:36px;">Type in an email id</label>
+                                       <br /><br />
+                                       <input type="text" class="form-control" id="emailid" name="emailid" placeholder="abc@example.com">
+                                       <select class="form-control" name="date">
+                                               <option>2015-09-01</option>
+                                               <option>2015-09-02</option>
+                                               <option>2015-09-03</option>
+                                       </select>
+                                       <br /><br />
+
+                                       <button type="submit" value="Send" name="emailid-container" class="btn btn-default id-submit">Submit</button>
+                               </div>
+                       </form>
+               </div>
+       </div>
+            
+        </section>
+        
          <!--  Footer
         ===========================================	-->
 		<footer id="footer" class="bg-one">
@@ -560,7 +594,7 @@
 
         $(function () {
          setInterval(trendingByTime, 2000);
-         setInterval(usersPurchasesByTime, 3000);
+         setInterval(usersPurchasesByTime, 1000);
         });
         </script>
     </body>

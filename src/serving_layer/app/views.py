@@ -70,7 +70,21 @@ def get_users_locations(num=100):
         } for x in response_list]
     return jsonify(users_loc_info=json_response)
 
-
+@app.route('/api/trending_categories_with_price', methods=['POST'])
+def get_cheapest_product_with_price():
+    ''' Return cheapest products with highest price discount '''
+    price = request.form["priceid"]
+    discount = request.form["discountid"]
+    response_list = []
+    stmt = 'SELECT category, price, discount_percentage, title from deals.trending_categories_with_price where discount_percentage >= %s and price = %s  ALLOW FILTERING'
+    response = session.execute(stmt, parameters=[int(price), float(discount)])
+    for val in response:
+        response_list.append(categories_formal_name[val.category], 
+                             '${}'.format(val.price),
+                            val.title])
+    jsonresponse = jsonify(data=response_list)
+    return render_template("search.html", output=jsonresponse)
+    
 
 ###################### REAL TIME QUERIES ###############################
 categories_formal_name = {
