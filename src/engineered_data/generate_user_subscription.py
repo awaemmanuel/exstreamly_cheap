@@ -58,6 +58,13 @@ class SubscribeDeal(object):
             return self._channels
         else:
             uf.print_out("[ERROR] - User: {} needs to subscribe first.".format(self._user))
-            
+    
+    def get_users_name(self):
+        ''' Return subscriber's full name '''
+        return str(self._user)
                 
-                
+####### TESTING ONLY ##############                
+if __name__ == '__main__':
+    user = SubscribeDeal('Emmanuel')
+    print user.subscribe(2)
+    
