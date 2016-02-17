@@ -168,7 +168,7 @@ def split_and_match_categories(msg):
         with their formal names and return new string.
     '''
     msgs = msg.split(' ')
-    new_msg = [categories_formal_name(category) for category in msgs]
+    new_msg = [categories_formal_name[category] for category in msgs]
     return ' '.join(new_msg).encode('utf-8')
 
 def time_formatted(time_int):
@@ -197,7 +197,7 @@ def get_users_purchasing_timeline():
     response = session_rt.execute(stmt)
     for val in response:
         response_list.append([val.name, 
-                              time_formatted(val.purchasetime), 
+                              time_formatted(val.purchase_time), 
                               '{}{}'.format(random.choice(comments), split_and_match_categories(val.purchased))])
     return jsonify(data=response_list)
         
