@@ -817,7 +817,7 @@
         function usersPurchasesByTime() {
             $.getJSON('/api/users_purchasing_pattern')
             .done(function(data) {
-                $('#newTimeLine').empty();
+//                $('#newTimeLine').empty();
                 $.each(data.data, function(i, item) {
                     new_post = '<li><div class="timeline-badge"><i class="fa fa-check"></i></div><div class="timeline-panel"><div class="timeline-heading"><h4 class="timeline-title">';
 
