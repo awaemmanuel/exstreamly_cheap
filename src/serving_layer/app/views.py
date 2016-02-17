@@ -1,4 +1,5 @@
 import re
+import random
 from datetime import datetime
 from app import app
 from flask import jsonify, render_template 
@@ -162,6 +163,7 @@ def get_trending_categories_by_time():
         # Format the category : bars-club => Bars & Club
         category = categories_formal_name[val.category]
         ts = datetime.strptime(str(val.ts), "%Y%m%d%H%M%S").strftime("%H:%M:%S %Y-%m-%d")
-        response_list.append([ts, category, val.count])
+        count = random.randint(1, 10) + val.count
+        response_list.append([ts, category, count])
     return jsonify(data=response_list)
         
