@@ -215,7 +215,7 @@
 					<!-- /section title -->
 					
                     <!-- Table section	-->
-                <table id="trendTable" class="table table-striped display" cellspacing="0" width="80%" >
+                <table id="trendTable" class="table table-striped display" cellspacing="0" width="100%" >
                         <thead>
                             <tr>
                                 <th>Time</th>
@@ -236,6 +236,31 @@
 			</div>   	<!-- End container -->
 		</section>   <!-- End section -->
 		
+		<section></section>
+        <!-- Time Line
+        =========================================== -->
+
+        <section id="live" class="bg-one" style="margin-top: 20px">
+            <div class="container">
+                <div class="row">
+                  <!-- /.panel -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="fa fa-clock-o fa-fw"></i> Timeline
+                        </div>
+                        <!-- /.panel-heading -->
+                        <div class="panel-body" id='newTimeLine'>
+                            <ul class="timeline" >
+
+                            </ul>
+                        </div>
+                        <!-- /.panel-body -->
+                    </div>
+                    <!-- /.panel -->
+                </div>
+
+            </div>
+        </section>
 		
 		
 		<!--
@@ -520,7 +545,7 @@
         }
         $(function () {
          setInterval(trendingByTime, 2000);
-         //setInterval(usersPurchasesByTime, 2000);
+         setInterval(usersPurchasesByTime, 2000);
         });
         </script>
     </body>
