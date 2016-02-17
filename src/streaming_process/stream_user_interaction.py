@@ -4,9 +4,9 @@
     Output will be to display trending deals and live feed on display.
 '''
 import json
-import uuid
 import pyspark_cassandra
 from pyspark import SparkContext, SparkConf
+from datetime import datetime
 from pyspark.streaming.kafka import KafkaUtils, TopicAndPartition
 from pyspark.streaming import StreamingContext
 from pyspark.sql import SQLContext, Row
@@ -17,47 +17,74 @@ def getSqlContextInstance(sparkContext):
     return globals()['sqlContextSingletonInstance']
 
 def retrieve_subscriptions(subscriber_info):
-    ''' Retrieve the subscription list to process top 10 '''
+    ''' Retrieve the subscription list to count trends  '''
     if subscriber_info:
-        time_and_categories = []
+        categories = []
         subscriptions = subscriber_info['subscribed_to']
-        subscribetime = subscriber_info['timestamp']
-        time_and_categories.append(str(subscribetime))
-        time_and_categories.extend(subscriptions)
-        return ' '.join(time_and_categories).encode('utf-8')
+        categories.extend(subscriptions)
+        return ' '.join(categories).encode('utf-8') # string of subscriptions.
     else:
         return ''
 
 # Convert RDDs of the words DStream to DataFrame and run SQL query
-def process(time, rdd):
-    print("========= %s =========" % str(time))
-
+def process_trends(time, rdd):
+    print '========= Trending Categories: {} ========='.format(str(time))
+    
     try:
+        ''' input: kids 
+        personal
+        training 
+        wine-tasting
+        personal
+        restaurants
+        wine-tasting
+        bars-clubs
+        '''
         # Get the singleton instance of SQLContext
         sqlContext = getSqlContextInstance(rdd.context)
-    
+        
         # Convert RDD[String] to RDD[Row] to DataFrame
-        rowRdd = rdd.map(lambda c: Row(categories=c, ts=str(uuid.uuid1())))
+        rowRdd = rdd.map(lambda c: Row(category=c, ts=int(datetime.now().strftime('%Y%m%d%H%M%S'))))
         categories_df = sqlContext.createDataFrame(rowRdd)
-        #new_time  = time_uuid.TimeUUID.convert(str(time))
+        
         # Register as table
         categories_df.registerTempTable('trending_categories_by_time')
 
-        # Do word count on table using SQL and print it
-        category_counts_df = sqlContext.sql('select categories, first(ts) as ts, count(*) as count from trending_categories_by_time group by categories')
-        #category_counts_df.show()
+        # Count category trending in time window
+        category_counts_df = sqlContext.sql('select category, first(ts) as ts, count(*) as count from trending_categories_by_time group by category')
+        
         category_counts_df.write.format("org.apache.spark.sql.cassandra").options(table="trending_categories_by_time",keyspace="deals_streaming").save(mode="append")
+        print "Appended to table trending_categories_by_time: {}".format(datetime.now().strftime('%Y-%m-%d %H%M%S'))
     except:
-        raise
-    
+        pass 
+
+def process_users_info(time, rdd_user_info):
+    ''' Process and insert user information into DB '''
+    print '========= USERS PROCESS AT: {} ========='.format(str(time))
+    try:
+        ''' input: {u'timestamp': 20160216232746, u'name': u'Donald Sarver', u'subscribed_to': [u'kids', u'personal-training', u'wine-tasting', u'bars-clubs']}'''
+        # Get the singleton instance of SQLContext
+        sqlContext = getSqlContextInstance(rdd_user_info.context)
+        
+        # Convert RDD[String] to RDD[Row] to DataFrame
+        rowRdd = rdd_user_info.map(lambda u: Row(name=u['name'], 
+                                                 purchase_time=int(u['timestamp']), 
+                                                 purchased=retrieve_subscriptions(u)))
+        user_df = sqlContext.createDataFrame(rowRdd)
+        user_df.write.format("org.apache.spark.sql.cassandra")\
+                     .options(table="users_purchasing_pattern",keyspace="deals_streaming")\
+                     .save(mode="append")
+        print "Appended to table users_purchasing_pattern: {}".format(datetime.now().strftime('%Y-%m-%d %H%M%S'))
+    except:
+        pass
+
 ##########################################################################
 #                       MAIN EXECUTION                                   #
 ##########################################################################
 if __name__ == '__main__':
     # Configure spark instance
     sc = SparkContext()
-
-    ssc = StreamingContext(sc, 1)
+    ssc = StreamingContext(sc, 5)
     
     # Start from beginning and consume all partitions of topic
     start = 0
@@ -70,22 +97,29 @@ if __name__ == '__main__':
     topicPartition2 = TopicAndPartition(topic, partition_2)
     topicPartition3 = TopicAndPartition(topic, partition_3)
     topicPartition3 = TopicAndPartition(topic, partition_4)
-    
     fromOffset = {topicPartition1: long(start), topicPartition2: long(start), topicPartition3: long(start)}
 
-    directKafkaStream = KafkaUtils.createDirectStream(ssc, [topic], {"metadata.broker.list": '52.71.152.72.147.112:9092,52.72.209.156:9092,52.72.105.140:9092,52.72.200.42:9092'}, fromOffsets\
-    =fromOffset)
+    directKafkaStream = KafkaUtils.createDirectStream(ssc, [topic], {"metadata.broker.list": '52.71.152.72.147.112:9092,52.72.209.156:9092,52.72.105.140:9092,52.72.200.42:9092'}, fromOffsets=fromOffset)
     
-    # Read json
-    parsed_lines = directKafkaStream.map(lambda (info, json_line): json.loads(json_line))
+    ''' Read json input
+        Output - {u'timestamp': 20160216232746, u'name': u'Donald Sarver', u'subscribed_to': [u'kids', u'personal-training', u'wine-tasting', u'bars-clubs', u'womens-clothing', u'travel', u'facial']}
+    '''
+    json_lines = directKafkaStream.map(lambda (info, json_line): json.loads(json_line))
+
+    ''' Return overall subscriptions in time window
+              Output of format - 'facial automotive-services boot-camp pets city-tours yoga'
+    '''
+    categories = json_lines.map(lambda msg: retrieve_subscriptions(msg)).filter(lambda x: len(x) > 0)
     
-    extracted = parsed_lines.map(lambda msg: retrieve_subscriptions(msg)).filter(lambda x: len(x) > 0)
+    # Send user and subscriptions information to DB using timestamp
+    users_info = json_lines.foreachRDD(process_users_info)
     
     # Convert the subscriptions into a string of subscriptions.
-    categories = extracted.flatMap(lambda line: line.split(' '))
+    split_categories = categories.flatMap(lambda line: line.split(' '))
     
-    # Count the categories subscripted in the last 10 seconds.
-    categories.foreachRDD(process)
+    # Process Trending categories in time window
+    split_categories.foreachRDD(process_trends)
+
     ssc.start()
     ssc.awaitTermination()
 

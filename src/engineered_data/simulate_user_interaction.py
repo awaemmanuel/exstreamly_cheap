@@ -42,7 +42,10 @@ class SimulateInteraction(object):
         # else create it.
         
         self.kafka_client = KafkaClient(hosts=self.kafka_hosts)
+        
+        self.out_topic = self.to_str(self.out_topic) # kafka only handles string bytes
         self.topic = self.kafka_client.topics[self.out_topic]  
+        print type(self.out_topic), self.out_topic
         
         uf.print_out('''
             Connected with Client.
@@ -58,21 +61,28 @@ class SimulateInteraction(object):
                 full_name = self._generate_random_name()
                 num_channels = randint(1, self._max_num_channels)
                 sub = SubscribeDeal(full_name)
-                subscription = sub.subscribe(num_channels)
+                subscriptions = sub.subscribe(num_channels)
             
                 #   Produce the subscription object to producer
-                prod.produce(subscription)
-                uf.print_out("[SUCCESSFUL] - {} subscribed ==> {}.".format(full_name,
+                print "Testing {}".format(subscriptions)
+                prod.produce(subscriptions)
+                uf.print_out("[SUCCESSFUL] - {} subscribed ==> {}.".format(sub.get_users_name(),
                                                                        sub.get_users_channels()))
                 uf.print_out("[SUCCESSFUL] - {} Users written to producer".format(num))
-                uf.spinning_cursor(2)
+                uf.spinning_cursor(1)
     
     def _generate_random_name(self):
         ''' Generate random full name
             Using open source library from treyhunner
         '''
         return names.get_full_name()
-    
+    def to_str(self, unicode_or_str):
+        ''' Convert unicode to string to write to output '''
+        if isinstance(unicode_or_str, unicode):
+            val = unicode_or_str.encode('utf-8')
+        else:
+            val = unicode_or_str
+        return val
 if __name__ == '__main__':
     sim = SimulateInteraction()
     uf.print_out('[START] - {}....'.format((datetime.now()).strftime("%Y-%m-%dT%H:%M:%S%Z")))
