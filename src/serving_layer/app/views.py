@@ -215,6 +215,19 @@ def get_users_purchasing_timeline():
                               time_formatted(val.purchase_time), 
                               '{}{}'.format(random.choice(comments), split_and_match_categories(val.purchased))])
     return jsonify(data=response_list)
-        
+
+@app.route('/api/most_purchased_in_thirty_seconds')
+def get_most_purchased():
+    ''' Find the most purchased category 
+        in the last thirty seconds to recommend 
+    '''
+    response_list = []
+    stmt = 'SELECT category, count FROM trending_categories_by_time;'
+    response = session_rt.execute(stmt)
+    for val in response:
+        response_list.append(val)
+    jsonresponse = [{'category': x.category, 'count': x.count} for x in response_list]
+    sorted_response = sorted(jsonresponse, key=itemgetter('count'), reverse=True)
+    return sorted_response[0]
     
         

@@ -393,7 +393,7 @@
                     <div class="form-group text-center">
                             <label style="font-weight:300; font-size:36px;">Enter Price and discount range</label>
                                        <br /><br />
-                                       <input type="text" class="form-control" id="priceid" name="emailid" placeholder="142">
+                                       <input type="text" class="form-control" id="priceid" name="priceid" placeholder="$142">
                                        <select class="form-control" name="date">
                                                <option>Below 50% off</option>
                                                <option>50% off</option>
@@ -628,84 +628,84 @@
 
 
 
-	$(function () {
-    $(document).ready(function () {
-        Highcharts.setOptions({
-            global: {
-                useUTC: true
-            }
-        });
-
-        $('#trendGraph').highcharts({
-            chart: {
-                type: 'spline',
-                animation: Highcharts.svg, // don't animate in old IE
-                marginRight: 10,
-                events: {
-                    load: function () {
-
-                        // set up the updating of the chart each second
-                        var series = this.series[0];
-                        setInterval(function () {
-                            var x = (new Date()).getTime(), // current time
-                                y =  totalSold; // Math.random();
-			    console.log(totalSold);
-                            series.addPoint([x, y], true, true);
-                        }, 1000);
-                    }
+        $(function () {
+        $(document).ready(function () {
+            Highcharts.setOptions({
+                global: {
+                    useUTC: true
                 }
-            },
-            title: {
-                text: 'Live trends of total purchases'
-            },
-            xAxis: {
-                type: 'datetime',
-                tickPixelInterval: 150
-            },
-            yAxis: {
-                title: {
-                    text: 'Value'
+            });
+
+            $('#trendGraph').highcharts({
+                chart: {
+                    type: 'spline',
+                    animation: Highcharts.svg, // don't animate in old IE
+                    marginRight: 10,
+                    events: {
+                        load: function () {
+
+                            // set up the updating of the chart each second
+                            var series = this.series[0];
+                            setInterval(function () {
+                                var x = (new Date()).getTime(), // current time
+                                    y =  totalSold; // Math.random();
+                    console.log(totalSold);
+                                series.addPoint([x, y], true, true);
+                            }, 1000);
+                        }
+                    }
                 },
-                plotLines: [{
-                    value: 0,
-                    width: 1,
-                    color: '#808080'
-                }]
-            },
-            tooltip: {
-                formatter: function () {
-                    return '<b>' + this.series.name + '</b><br/>' +
-                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
-                        Highcharts.numberFormat(this.y, 2);
-                }
-            },
-            legend: {
-                enabled: true
-            },
-            exporting: {
-                enabled: false
-            },
-            series: [{
-                name: 'Total Sold',
-                data: (function () {
-                    // generate an array of random data
-                    var data = [],
-                        time = (new Date()).getTime(),
-                        i;
-
-                    for (i = -19; i <= 0; i += 1) {
-                        data.push({
-                            x: time + i * 1000,
-                            y: Math.random()
-                        });
+                title: {
+                    text: '[Total Purchases] - By the second trend'
+                },
+                xAxis: {
+                    type: 'datetime',
+                    tickPixelInterval: 150
+                },
+                yAxis: {
+                    title: {
+                        text: 'Value'
+                    },
+                    plotLines: [{
+                        value: 0,
+                        width: 1,
+                        color: '#808080'
+                    }]
+                },
+                tooltip: {
+                    formatter: function () {
+                        return '<b>' + this.series.name + '</b><br/>' +
+                            Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
+                            Highcharts.numberFormat(this.y, 2);
                     }
-                    return data;
-                }())
-            }]
+                },
+                legend: {
+                    enabled: true
+                },
+                exporting: {
+                    enabled: false
+                },
+                series: [{
+                    name: 'Total Sold',
+                    data: (function () {
+                        // generate an array of random data
+                        var data = [],
+                            time = (new Date()).getTime(),
+                            i;
+
+                        for (i = -19; i <= 0; i += 1) {
+                            data.push({
+                                x: time + i * 1000,
+                                y: totalSold //Math.random()
+                            });
+                        }
+                        return data;
+                    }())
+                }]
+            });
         });
     });
-});
-        </script>
+    </script>
 	<script src="https://code.highcharts.com/highcharts.js"></script>
 	<script src="https://code.highcharts.com/modules/exporting.js"></script>
     </body>
