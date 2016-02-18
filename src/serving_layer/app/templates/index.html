@@ -215,25 +215,30 @@
 					<!-- /section title -->
 					
                     <!-- Table section	-->
-                <table id="trendTable" class="table table-striped display" cellspacing="0" width="100%" >
+	       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
+                <table id="trendTable" class="table table-striped display" cellspacing="0" width="100%">
                         <thead>
                             <tr>
-                                <th>Time</th>
-                                <th>Category</th>
-                                <th>Amount Purchased</th>
+                                <th width="40%">Time</th>
+                                <th width="50%">Category</th>
+                                <th>Sold</th>
                             </tr>
                         </thead>
-			<tbody id='trendsTbBody' style='color: black; font-size: 20px'></tbody>
+			<tbody id='trendsTbBody' style='color: black; font-size: 16px'></tbody>
                         <tfoot>
                             <tr>
-                                <th>Time</th>
-                                <th>Category</th>
-                                <th>Amount Purchased</th>
+                                <th width="40%">Time</th>
+                                <th width="50%">Category</th>
+                                <th>Sold</th>
                             </tr>
                         </tfoot>
                     </table>
-				</div> 		<!-- End row -->
-			</div>   	<!-- End container -->
+	            </div>
+	            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+		      <div id="trendGraph" style="min-width: 320px; height: 450px; margin: 0 auto"></div>
+		    </div>            
+      			</div> <!-- End Row -->
+  		    </div> <!-- End container -->
 		</section>   <!-- End section -->
 		
 
@@ -261,7 +266,7 @@
 					<div class="col-md-3 col-sm-6 col-xs-12 text-center wow fadeInDown" data-wow-duration="500ms" data-wow-delay="200ms">
 						<div class="counters-item">
 							<div>
-							    <span data-speed="2000" data-to="5650">5650</span>
+							    <span id="totalSoldToday" data-speed="2000" data-to="5650">5650</span>
 							</div>
 							<i class="fa fa-check-square fa-3x"></i>
 							<h3>Deals grabbed today</h3>
@@ -562,19 +567,30 @@
                 });                                                                                       
             });
         }
-	
+       var totalSoldToday = 0;
+       var totalSold = 0;
        function trendingByTime() {
 	  $.getJSON('/api/trending_categories_by_time')
 	    .done(function(data) {
 		$('#trendsTbBody').empty();
+			 totalSold = 0;
 			 $.each(data.data, function(i, item) {
 			 row_html = '<tr><td>';
 			 row_html += item[0] + '</td><td>';
 			 row_html += item[1] + '</td><td>';
 			 row_html += item[2] + '</td></tr>';
+			 totalSold += item[2];
 			 $('#trendsTbBody').append(row_html)
-			 });
-	        });
+	        
+	        // Update number of deals sold today
+	        $('#totalSoldToday').empty();
+	        totalSoldToday += totalSold;
+	        if (totalSoldToday >= 1000000000) {
+	            totalSoldToday = 0;
+	        }
+		$('#totalSoldToday').text(totalSoldToday);
+		});
+	      });
        }
         
 //        function usersPurchasesByTime() {
@@ -609,6 +625,86 @@
          setInterval(trendingByTime, 2000);
          setInterval(usersPurchasesByTime, 5000);
         });
+
+
+
+	$(function () {
+    $(document).ready(function () {
+        Highcharts.setOptions({
+            global: {
+                useUTC: true
+            }
+        });
+
+        $('#trendGraph').highcharts({
+            chart: {
+                type: 'spline',
+                animation: Highcharts.svg, // don't animate in old IE
+                marginRight: 10,
+                events: {
+                    load: function () {
+
+                        // set up the updating of the chart each second
+                        var series = this.series[0];
+                        setInterval(function () {
+                            var x = (new Date()).getTime(), // current time
+                                y =  totalSold; // Math.random();
+			    console.log(totalSold);
+                            series.addPoint([x, y], true, true);
+                        }, 1000);
+                    }
+                }
+            },
+            title: {
+                text: 'Live trends of total purchases'
+            },
+            xAxis: {
+                type: 'datetime',
+                tickPixelInterval: 150
+            },
+            yAxis: {
+                title: {
+                    text: 'Value'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                formatter: function () {
+                    return '<b>' + this.series.name + '</b><br/>' +
+                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
+                        Highcharts.numberFormat(this.y, 2);
+                }
+            },
+            legend: {
+                enabled: true
+            },
+            exporting: {
+                enabled: false
+            },
+            series: [{
+                name: 'Total Sold',
+                data: (function () {
+                    // generate an array of random data
+                    var data = [],
+                        time = (new Date()).getTime(),
+                        i;
+
+                    for (i = -19; i <= 0; i += 1) {
+                        data.push({
+                            x: time + i * 1000,
+                            y: Math.random()
+                        });
+                    }
+                    return data;
+                }())
+            }]
+        });
+    });
+});
         </script>
 	<script src="https://code.highcharts.com/highcharts.js"></script>
 	<script src="https://code.highcharts.com/modules/exporting.js"></script>
