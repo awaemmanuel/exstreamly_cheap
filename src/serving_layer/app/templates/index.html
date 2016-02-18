@@ -116,9 +116,9 @@
                         <li><a href="#user_locations">Friends</a></li>
 <!--                        <li><a href="#showcase">Portfolio</a></li>-->
 <!--                        <li><a href="#our-team">Team</a></li>-->
-                        <li><a href="#live">Time Line</a></li>
+                        <li><a href="#live">Reviews Timeline</a></li>
                         <li><a href="http://bit.ly/1PP6ARg" target="_blank">Slides</a></li>
-                        <li><a href="#search">Customer Search</a></li>
+                        <li><a href="#search">Deal Search</a></li>
                     </ul>
                 </nav>
 				<!-- /main nav -->
@@ -277,12 +277,12 @@
 					<!-- third count item -->
 					<div class="col-md-3 col-sm-6 col-xs-12 text-center wow fadeInDown" data-wow-duration="500ms" data-wow-delay="400ms">
 						<div class="counters-item">
-							<div>
-							    <span data-speed="2000" data-to="99">99</span>
-								<span>%</span>
+						    <div>
+							<span id="mostBoughtIn30seconds" data-speed="2000" data-to="99.9">Loading your recommendationsy</span>
+							<span id> </span>
 							</div>
 							<i class="fa fa-thumbs-up fa-3x"></i>
-				            <h3>Positive feedback</h3>
+				            <h3>Recommendations</h3><h4>This category is selling out.</h4>
 							
 						</div>
 					</div>
@@ -356,7 +356,7 @@
                  <!-- /.panel -->
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <i class="fa fa-clock-o fa-fw"></i> Timeline
+                            <i class="fa  fa-fw"></i>Reviews in Realtime
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body" id='newTimeLine' style='color: blue'>
@@ -606,24 +606,39 @@
 //                });  
 //            });
 //        }
-                
+        function mostPurchasedDealInThirtySeconds() {
+	    $.getJSON('/api/most_purchased_in_thirty_seconds')
+	    .done(function(data) {
+	        $('#mostBoughtIn30seconds').empty();
+	        $.each(data.data, function(i, item) {
+	            $('#mostBoughtIn30seconds').text(item.category);
+	        });
+	    });
+	}        
         function usersPurchasesByTime() {
             $.getJSON('/api/users_purchasing_pattern')
             .done(function(data) {
                 $('#newTimeLine').empty();
                 $.each(data.data, function(i, item) {
-                    new_post = '<ul class="timeline" ><li><div class="timeline-badge"><i class="fa fa-check"></i></div><div class="timeline-panel"><div class="timeline-heading"><h4 class="timeline-title">';
+	            if (i % 2 == 0) {
+	               new_post = '<ul class="timeline"><li class="timeline"><div class="timeline-badge"><i class="fa fa-ch\
+eck"></i></div><div class="timeline-panel"><div class="timeline-heading"><h4 class="timeline-title">';
+	            }
+                    else {
+                       new_post = '<ul class="timeline"><li class="timeline-inverted"><div class="timeline-badge"><i class="fa fa-check"></i></div><div class="timeline-panel"><div class="timeline-heading"><h4 class="timeline-title">';
+		    }
                     new_post += item[0] + '</h4><p><small class="text-muted"><i class="fa fa-clock-o"></i>';
                     new_post += item[1] + '</small></p></div><div class="timeline-body"><p>';
                     new_post += item[2] + '</p></div></div></li></ul>';
-                     $('#newTimeLine').prepend(new_post);
+                     $('#newTimeLine').append(new_post);
                 });  
             });
         }
 
         $(function () {
-         setInterval(trendingByTime, 2000);
-         setInterval(usersPurchasesByTime, 5000);
+            setInterval(trendingByTime, 2000);
+            setInterval(usersPurchasesByTime, 5000);
+	    setInterval(mostPurchasedDealInThirtySeconds, 10000);
         });
 
 

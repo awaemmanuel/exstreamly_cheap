@@ -2,6 +2,7 @@ import re
 import random
 from datetime import datetime
 from app import app
+from operator import itemgetter, attrgetter
 from flask import jsonify, render_template 
 from cassandra.cluster import Cluster
 
@@ -226,8 +227,8 @@ def get_most_purchased():
     response = session_rt.execute(stmt)
     for val in response:
         response_list.append(val)
-    jsonresponse = [{'category': x.category, 'count': x.count} for x in response_list]
+    jsonresponse = [{'category': categories_formal_name[x.category], 'count': x.count} for x in response_list]
     sorted_response = sorted(jsonresponse, key=itemgetter('count'), reverse=True)
-    return sorted_response[0]
+    return jsonify(data=sorted_response)
     
         
