@@ -79,9 +79,7 @@ def get_cheapest_product_with_price():
     stmt = 'SELECT category, price, discount_percentage, title from deals.trending_categories_with_price where discount_percentage >= %s and price = %s  ALLOW FILTERING'
     response = session.execute(stmt, parameters=[int(price), float(discount)])
     for val in response:
-        response_list.append(categories_formal_name[val.category], 
-                             '${}'.format(val.price),
-                            val.title])
+        response_list.append([categories_formal_name[val.category],'${}'.format(val.price), val.title])
     jsonresponse = jsonify(data=response_list)
     return render_template("search.html", output=jsonresponse)
     
@@ -185,7 +183,8 @@ def split_and_match_categories(msg):
     '''
     msgs = msg.split(' ')
     new_msg = [categories_formal_name[category] for category in msgs]
-    return ' '.join(new_msg).encode('utf-8')
+    new_msg[-1] = 'and {}'.format(new_msg[-1]) if len(new_msg) > 1 else new_msg[-1]
+    return ', '.join(new_msg).encode('utf-8')
 
 def time_formatted(time_int):
     ''' Format time for display '''
@@ -209,7 +208,7 @@ def get_trending_categories_by_time():
 def get_users_purchasing_timeline():
     ''' Retrieve the purchasing pattern of users in real time '''
     response_list = []
-    stmt = 'SELECT * FROM users_purchasing_pattern limit 15;'
+    stmt = 'SELECT * FROM users_purchasing_pattern limit 5;'
     response = session_rt.execute(stmt)
     for val in response:
         response_list.append([val.name, 

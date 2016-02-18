@@ -118,7 +118,7 @@
 <!--                        <li><a href="#our-team">Team</a></li>-->
                         <li><a href="#live">Time Line</a></li>
                         <li><a href="http://bit.ly/1PP6ARg" target="_blank">Slides</a></li>
-<!--                        <li><a href="#contact-us">Customer Search</a></li>-->
+                        <li><a href="#search">Customer Search</a></li>
                     </ul>
                 </nav>
 				<!-- /main nav -->
@@ -342,23 +342,22 @@
                 <div class="row">
                  
                  <!-- section title -->
-					<div class="title text-center wow fadeIn" data-wow-duration="1500ms" >
-					  <h2>Time <span class="color">Line</span></h2>
-						<div class="border"></div>
-						<h5> Listen to what your friends have to say... </h5>
-					</div>
-					<!-- /section title -->
-                 
-                  <!-- /.panel -->
+			<div class="title text-center wow fadeIn" data-wow-duration="1500ms" >
+			  <h2>Time <span class="color">Line</span></h2>
+				<div class="border"></div>
+				   <h5> Listen to what your friends have to say... </h5>
+				</div>
+			<!-- /section title -->
+                 <!-- /.panel -->
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <i class="fa fa-clock-o fa-fw"></i> Timeline
                         </div>
                         <!-- /.panel-heading -->
-                        <div class="panel-body" id='newTimeLine'>
-                            <ul class="timeline" >
+                        <div class="panel-body" id='newTimeLine' style='color: blue'>
+                           <!--  <ul class="timeline" >
 
-                            </ul>
+                            </ul> -->
                         </div>
                         <!-- /.panel-body -->
                     </div>
@@ -597,10 +596,10 @@
             .done(function(data) {
                 $('#newTimeLine').empty();
                 $.each(data.data, function(i, item) {
-                    new_post = '<li><div class="timeline-badge"><i class="fa fa-check"></i></div><div class="timeline-panel"><div class="timeline-heading"><h4 class="timeline-title">';
+                    new_post = '<ul class="timeline" ><li><div class="timeline-badge"><i class="fa fa-check"></i></div><div class="timeline-panel"><div class="timeline-heading"><h4 class="timeline-title">';
                     new_post += item[0] + '</h4><p><small class="text-muted"><i class="fa fa-clock-o"></i>';
                     new_post += item[1] + '</small></p></div><div class="timeline-body"><p>';
-                    new_post += item[2] + '</p></div></div></li>';
+                    new_post += item[2] + '</p></div></div></li></ul>';
                      $('#newTimeLine').prepend(new_post);
                 });  
             });
@@ -608,8 +607,10 @@
 
         $(function () {
          setInterval(trendingByTime, 2000);
-         setInterval(usersPurchasesByTime, 1000);
+         setInterval(usersPurchasesByTime, 5000);
         });
         </script>
+	<script src="https://code.highcharts.com/highcharts.js"></script>
+	<script src="https://code.highcharts.com/modules/exporting.js"></script>
     </body>
 </html>
