@@ -76,6 +76,8 @@ def get_cheapest_product_with_price():
     ''' Return cheapest products with highest price discount '''
     price = request.form["priceid"]
     discount = request.form["discountid"]
+    category = request.form['category']
+    priority = request.form['priority']
     response_list = []
     stmt = 'SELECT category, price, discount_percentage, title from deals.trending_categories_with_price where discount_percentage >= %s and price = %s  ALLOW FILTERING'
     response = session.execute(stmt, parameters=[int(price), float(discount)])

@@ -399,16 +399,16 @@
 			             <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 col-sm-12">
 				     <h5>Search your favorite categories</h5>
 				
-                                     <form role="form" class="form-horizontal" id="search_form" action"searchop" method="POST">
+                                     <form role="form" class="form-horizontal" id="searchForm" action"/api/trending_categories_with_price" method="POST">
                                        <!-- action is the html template that will return the result to this input query -->
                                 
                                        <div class="form-group text-center">
 					 <input type="text" class="form-control" id="autocomplete2" name="search_ta" placeholder="Search for..." width="100%">
                                        </div> 
-                                       <select class="form-control" name="date">
+                                       <select class="form-control" name="priority">
                                          <option>Select Priority Level</option>
-                                         <option>Price Conscious</option>
-                                         <option>Discount Conscious</option>
+                                         <option value="price">Price Conscious</option>
+                                         <option value="discount">Discount Conscious</option>
                                        </select>
                                        <span class="form-group-btn">
                                          <button class="btn btn-default" type="submit">Go!</button>
@@ -778,22 +778,20 @@ eck"></i></div><div class="timeline-panel"><div class="timeline-heading"><h4 cla
          /* get some values from elements on the page: */
          var $form = $( this ),
              $submit = $form.find( 'button[type="submit"]' ),
-             name_value = $form.find( 'input[name="name"]' ).val(),
-             email_value = $form.find( 'input[name="email"]' ).val(),
-             message_value = $form.find( 'textarea[name="message"]' ).val(),
+             category_value = $form.find( 'input[name="search_ta"]' ).val(),
+             priority_value = $form.find( 'select[name="priority"]' ).val(),
              url = $form.attr('action');
 
          /* Send the data using post */
          var posting = $.post( url, { 
-                           name: name_value, 
-                           email: email_value, 
-                           message: message_value 
+                           category: category_value, 
+                           priority: priority_value
                        });
 
          posting.done(function( data )
          {
              /* Put the results in a div */
-             $( "#contactResponse" ).html(data);
+             $( "#dealsResponse" ).html(data);
 
              /* Change the button text. */
              $submit.text('Sent, Thank you');
