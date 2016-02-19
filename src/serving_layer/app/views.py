@@ -175,7 +175,12 @@ comments = [
     'Rush! Rush!! Rush!!! Find really cheap and trending deals in ',
     'No retreat no surrender, I just got deals in ',
     'Wake up and smell the coffee. I got cheap ',
-    'I have saved a lot. ExStreamly Cheap offers deals in '
+    'I have saved a lot. ExStreamly Cheap offers deals in ',
+    'Evette, you are so right.. Exstreamly cheap is the place to get deals in ',
+    'Insight Data Science fellows, make sure you check out Exstreamlycheap.club. I just cashed deals in ',
+    'David D. Mr Program Director, this platform has deals for you in ',
+    'Shauna A, crab.. sorry mean grab those deals in ',
+    'Dan Dan Dan, hurry before it ends. Grab deals in '
 ]
 
 def split_and_match_categories(msg):
@@ -231,4 +236,8 @@ def get_most_purchased():
     sorted_response = sorted(jsonresponse, key=itemgetter('count'), reverse=True)
     return jsonify(data=sorted_response)
     
-        
+@app.route('/api/category_typeahead')
+def help_autocomplete():
+    response_list = []
+    categories = categories_formal_name.values()
+    return jsonify(categories=categories)
