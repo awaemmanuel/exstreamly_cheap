@@ -84,7 +84,7 @@ def process_users_info(time, rdd_user_info):
 if __name__ == '__main__':
     # Configure spark instance
     sc = SparkContext()
-    ssc = StreamingContext(sc, 5)
+    ssc = StreamingContext(sc, 3)
     
     # Start from beginning and consume all partitions of topic
     start = 0
@@ -99,7 +99,7 @@ if __name__ == '__main__':
     topicPartition3 = TopicAndPartition(topic, partition_4)
     fromOffset = {topicPartition1: long(start), topicPartition2: long(start), topicPartition3: long(start)}
 
-    directKafkaStream = KafkaUtils.createDirectStream(ssc, [topic], {"metadata.broker.list": '52.71.152.72.147.112:9092,52.72.209.156:9092,52.72.105.140:9092,52.72.200.42:9092'}, fromOffsets=fromOffset)
+    directKafkaStream = KafkaUtils.createDirectStream(ssc, [topic], {"metadata.broker.list": '172.31.2.36:9092,172.31.2.46:9092, 172.31.2.45:9092,172.31.2.37:9092'}, fromOffsets=fromOffset)
     
     ''' Read json input
         Output - {u'timestamp': 20160216232746, u'name': u'Donald Sarver', u'subscribed_to': [u'kids', u'personal-training', u'wine-tasting', u'bars-clubs', u'womens-clothing', u'travel', u'facial']}
