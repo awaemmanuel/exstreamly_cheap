@@ -378,72 +378,53 @@
         ======================================== -->
         
         <section id="search" class="bg-one">
-           <div class="container">
+            <div class="container">
                 <div class="row">
-                 
-                 <!-- section title -->
+                     <!-- section title -->
 					<div class="title text-center wow fadeIn" data-wow-duration="1500ms" >
 					  <h2>Customer  <span class="color">Search</span></h2>
 						<div class="border"></div>
 						<h5> Let your price count </h5>
 					</div>
 					<!-- /section title -->
-	 <!--- Tab section -->
-                       <div>
-			 <ul class="nav nav-tabs nav-justified" role="tablist">
-			   <li role="presentation" class="active"><a href="#product" aria-controls="product" role="tab" data-toggle="tab"><h4>Product Search</h4></a></li>
-			   <li role="presentation"><a href="#merchant" aria-controls="merchant" role="tab" data-toggle="tab"><h4>Merchant Search</h4></a></li>
-			 </ul>
-	   
-			 <!-- Tab panes -->
-			 <div class="tab-content">
-			   <div role="tabpanel" class="tab-pane fade in active" id="product">
-			     <h5>Search your favorite categories</h5>
-			      <div class="col-md-6 col-sm-6 col-xs-12 col-sm-12">
-				  <form action"searchop" method="POST">
-				    <!-- action is the html template that will return the result to this input query -->
-		  
-				    <div class="form-group text-center">
+                <div>
+			     <ul class="nav nav-tabs nav-justified" role="tablist">
+			       <li role="presentation" class="active"><a href="#product" aria-controls="product" role="tab" data-toggle="tab"><h4>Product Search</h4></a></li>
+			       <li role="presentation"><a href="#merchant" aria-controls="merchant" role="tab" data-toggle="tab"><h4>Merchant Search</h4></a></li>
+			     </ul>
+               
+                <!-- Tab panes -->
+			     <div class="tab-content">
+			           <div role="tabpanel" class="tab-pane fade in active" id="product">
+			             <h5>Search your favorite categories</h5>
+                            
+                                <form id="search_form" action"searchop" method="POST">
+                                    <!-- action is the html template that will return the result to this input query -->
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 col-sm-12">
+                                    <div class="form-group text-center">
+                                       <input type="text" class="form-control" id="autocomplete2" name="search_ta" placeholder="Search for..." width="100%">
+                                    </div> 
+                                        <select class="form-control" name="date">
+                                            <option>Select Priority Level</option>
+                                            <option>Price Conscious</option>
+                                            <option>Discount Conscious</option>
+                                          </select>
+                                        <span class="form-group-btn">
+                                            <button class="btn btn-default" type="button">Go!</button>
+                                        </span>  
+                                </div>
+                                </form>
+                           
+                         </div>
+                         <div role="tabpanel" class="tab-pane fade" id="merchant">
+                         <h5>Search for your favorite provider</h5>
+                         </div>
+                 </div>
+                </div>
+                
+                </div> <!-- row 
+            </div> <!-- container -->
 
-				      <label style="font-weight:300">Enter Price and discount range</label>
-
-				      <div class="input-group">
-				      <span>
-					<input type="text" class="twitter-typeahead form-control" id="autocomplete2" name="search_ta" placeholder="Now now" width="100%">
-				      </span>
-				      <div class="input-group-btn">
-					<!-- Buttons -->
-					<!-- Single button -->
-					<div class="btn-group">
-					  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action <span class="caret"></span>
-					  </button>
-					  <ul class="dropdown-menu">
-					    <li><a href="#">Price Priority</a></li>
-					    <li role="separator" class="divider"></li>
-					    <li><a href="#">Discount Priority</a></li>
-					  </ul>
-					</div>
-				      </div>
-				      </div>
-				    </div>
-                                      <select class="form-control" name="date">
-                                        <option>Below 50% off</option>
-                                        <option>50% off</option>
-                                        <option>Above 50% off </option>
-                                      </select>
-                                      
-
-                                       <button type="submit" value="Send" name="emailid-container" class="btn btn-default id-submit">Submit</button>
-                               </div>
-                           </form>
-                       </div>
-			   </div>
-			   <div role="tabpanel" class="tab-pane fade" id="merchant">Search for your favorite provider</div>
-			 </div>
-		       </div>
-           
-             </div>
-          </div>
      
         </section>
         
