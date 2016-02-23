@@ -327,19 +327,6 @@
 				</div> 		<!-- End row -->
 			</div>   	<!-- End container -->
 		</section>   <!-- End section -->
-	<!--	<div class="row" style="height:100vh;">
-                <div class="col-md-10 col-md-offset-1 trend-results">
-                    <table class="table" id="trendsTable">
-                      <thead>
-                        <tr id="trendsHeadTr">
-                        </tr>
-                      </thead>
-                      <tbody id="trendsTb">
-                      </tbody>
-                    </table>
-                </div>
-        </div> -->
-	
 				
         <!-- Time Line
         =========================================== -->
@@ -362,10 +349,8 @@
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body" id='newTimeLine' style='min-height: 900px;  max-height: 900px; overflow-y: scroll; color: blue'>
-                           <!--  <ul class="timeline" >
 
-                            </ul> -->
-                        </div>
+                       </div>
                         <!-- /.panel-body -->
                     </div>
                     <!-- /.panel -->
@@ -387,6 +372,7 @@
 						<h5> Let your price count </h5>
 					</div>
 					<!-- /section title -->
+                <!-- Tabs Products and Merchants    -->
                 <div>
 			     <ul class="nav nav-tabs nav-justified" role="tablist">
 			       <li role="presentation" class="active"><a href="#product" aria-controls="product" role="tab" data-toggle="tab"><h4>Product Search</h4></a></li>
@@ -399,7 +385,7 @@
 			             <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 col-sm-12">
 				     <h5>Search your favorite categories</h5>
 				
-                                     <form role="form" class="form-horizontal" id="searchForm" action="/api/trending_categories_with_price" method="POST">
+                        <form role="form" class="form-horizontal" id="searchForm" action="/api/trending_categories_with_price" method="POST">
                                        <!-- action is the html template that will return the result to this input query -->
                                 
                                        <div class="form-group text-center">
@@ -420,63 +406,38 @@
                                          <button class="btn btn-default" type="submit">Go!</button>
                                        </span>  
                                 
-                                     </form>
+                        </form>
 				     </div>
 				    <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12 col-sm-12" style="margin: 35px 0 35px 0px;">
-				      <div id="dealsResponse" style="color: blue">
-					<!-- <div class="panel panel-default">
-                                                <div class="panel-heading">Panel Heading</div>
-                                                <div class="panel-body">Panel Content</div>
-                                              </div>
-					     <div class="panel-group" id="accordion" id="dealsResponse">
-					      <div class="panel panel-default">
-					       <div class="panel panel-default">
-						<div class="panel-heading">
-						  <h4 class="panel-title">
-						    <a data-toggle="collapse" data-parent="#accordion" href="#collapse1">Collapsible Group 1</a>
-						  </h4>
-						</div>
-						<div id="collapse1" class="panel-collapse collapse in">
-						  <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-						    sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-						    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-						</div>
-					      </div>
-					      <div class="panel panel-default">
-						<div class="panel-heading">
-						  <h4 class="panel-title">
-						    <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">Collapsible Group 2</a>
-						  </h4>
-						</div>
-						<div id="collapse2" class="panel-collapse collapse">
-						  <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-						    sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-						    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-						</div>
-					      </div>
-					      <div class="panel panel-default">
-						<div class="panel-heading">
-						  <h4 class="panel-title">
-						    <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">Collapsible Group 3</a>
-						  </h4>
-						</div>
-						<div id="collapse3" class="panel-collapse collapse">
-						  <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-						    sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-						    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-						</div>
-					      </div> 
-					    </div> 
-					  </div> 
-					</div> -->
-				   </div>
-                         <div role="tabpanel" class="tab-pane fade" id="merchant">
-                         <h5>Search for your favorite provider</h5>
-                         </div>
-                 </div>
-                </div>
+				          <div id="dealsResponse" style="color: blue">
+					
+					     
+					       </div> 
+				    </div>
+                     </div>
+                    <div role="tabpanel" class="tab-pane fade" id="merchant">
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 col-sm-12">
+                            <h5>Search for your favorite provider</h5>
+                            <form role="form" class="form-horizontal" id="merchantForm" action="/api/provider_by_category" method="POST">
+                                       <!-- action is the html template that will return the result to this input query -->
+                                
+                                       <div class="form-group text-center">
+					 <input type="text" class="form-control" id="autocomplete2" name="search_ta" placeholder="Start typing..." width="100%">
+                                       </div>
+                            </form>   
+                        </div>
+                         <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12 col-sm-12" style="margin: 35px 0 35px 0px;">
+				              <div id="merchantsResponse" style="color: blue">
+					
+					     
+					           </div> 
+				       </div> <!-- col-lg-8 -->
+                         
+                    </div>
+                 </div> <!-- Tab Content -->
+                </div> <!-- Justified Tabs -->
                 
-                </div> <!-- row 
+                </div> <!-- row -->
             </div> <!-- container -->
 
      
