@@ -418,11 +418,11 @@
                     <div role="tabpanel" class="tab-pane fade" id="merchant">
                         <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 col-sm-12">
                             <h5>Search for your favorite provider</h5>
-                            <form role="form" class="form-horizontal" id="merchantForm" action="/api/provider_by_category" method="POST">
+                            <form role="form" class="form-horizontal" id="merchantForm" name="merchantForm" action="/api/provider_by_category" method="POST">
                                        <!-- action is the html template that will return the result to this input query -->
                                 
                                        <div class="form-group text-center">
-					 <input type="text" class="form-control" id="autocomplete1" name="search_ta" placeholder="Start typing..." width="100%">
+					 <input type="text" class="form-control" id="autocomplete1" name="merchant_ta" placeholder="Start typing your favorite category..." width="100%">
                                        </div>
 				       <span class="form-group-btn">
 					 <button class="btn btn-default" type="submit">Go! Find those providers.</button>
@@ -430,11 +430,9 @@
                             </form>   
                         </div>
                          <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12 col-sm-12" style="margin: 35px 0 35px 0px;">
-				              <div id="merchantsResponse" style="color: blue">
-					
-					     
-					           </div> 
-				       </div> <!-- col-lg-8 -->
+			   <div id="merchantsResponse" style="color: blue">
+			   </div> 
+			 </div> <!-- col-lg-8 -->
                          
                     </div>
                  </div> <!-- Tab Content -->
@@ -797,60 +795,8 @@ eck"></i></div><div class="timeline-panel"><div class="timeline-heading"><h4 cla
 	  }
 	  });	  
 	  
-	  /api/provider_by_category/<category>
-	  /* Collect form information when submitted, Don't reload */
-	  $("#searchForm").submit(function(event) 
-	  {
-	  /* stop form from submitting normally */
-	  event.preventDefault();
-	  
-	  /* get some values from elements on the page: */
-	  var $form = $( this ),
-	  $submit = $form.find( 'button[type="submit"]' ),
-	  categoryVal = $form.find( 'input[name="search_ta"]' ).val(),
-	  priorityVal = $form.find( 'select[name="priority"]' ).val(),
-	  url = $form.attr('action');
 
-	  maxPrice = 0.00
-	  /* Get max price if price is priority */
-	  if (priorityVal == 'price') {
-	      maxPrice = $form.find( 'input[name="maxPrice"]' ).val() 
-	  }
-	  /* Compose full url for request */    
-	  url = url + '/' + categoryVal + '/' + priorityVal + '/' + maxPrice;
-          console.log(url)
-	  /* Send the data using post */
-	  var posting = $.getJSON( url ); //, { 
-	  console.log('Data sent to server via submit');
-	  posting.done(function( data )
-	  {
-	  console.log('Inside DONE!!');
-	  
-	  /* Put the results in a div */
-	  $('#merchantsResponse').empty();
-	  $.each(data.data, function(i, item) {
-	  new_post = '<div class="panel panel-default"><div class="panel-heading">';
-	      new_post += 'Provided by: ' + item[0] + '</div><div class="panel-body">';
-	      new_post += 'Category: ' + item[1] + '<br/><br/>';
-	      new_post += 'Address: ' + item[2] + '<br/>' + item[3]'<br/><br/>';
-	      new_post += 'Lat: ' + item[4] + ', Long: ' + item[5] '<br/><br/>';
-	      new_post += 'Description: ' + item[4] + '<br/><br/>';
-	      new_post += 'Fine Print: ' + item[5] + '</div></div>';
-	  $('#merchantsResponse').append(new_post);
-	  });
-	  /* Change the button text. */
-	  $submit.text('Found providers, Enjoy!');
-	  
-	  /* Disable the button. */
-	  $submit.attr("disabled", false);
-	  
-	  /* Change the button text. */
-	  $submit.text('Search, Again!')
-	  });
-	  console.log('After posting.done');
-	  });
-
-	  /* Collect form information when submitted, Don't reload */
+	  /* [PRODUCT SEARCH] -  Collect form information when submitted, Don't reload */
 	  $("#searchForm").submit(function(event) 
 	  {
 	  /* stop form from submitting normally */
@@ -901,6 +847,58 @@ eck"></i></div><div class="timeline-panel"><div class="timeline-heading"><h4 cla
 	  });
 	  console.log('After posting.done');
 	  });
+	</script>
+	<script>
+	  $("#merchantForm").submit(function(event) {
+	  alert("Submitted");
+	  });
+	  /* [MERCHANT SEARCH] - Collect form information when submitted, Don't reload */
+          $("#merchantForm2").submit(function(event)
+          {
+	  console.log("Inside Merchant Submission");
+          /* stop form from submitting normally */
+          event.preventDefault();
+	  console.log("Prevented Default");
+          /* get some values from elements on the page: */
+          var $form = $( this ),
+          $submit = $form.find( 'button[type="submit"]' ),
+          categoryVal = $form.find( 'input[name="merchant_ta"]' ).val(),
+          url = $form.attr('action');
+	  console.log(categoryVal);
+          /* Compose full url for request */
+          url = url + '/' + categoryVal;
+          console.log(url);
+          /* Send the data using post */
+          var posting = $.getJSON( url );
+          console.log('Data sent to server via submit');
+          posting.done(function( data )
+          {
+          console.log('Inside DONE!!');
+          
+          /* Put the results in a div */
+          $('#merchantsResponse').empty();
+          $.each(data.data, function(i, item) {
+          new_post = '<div class="panel panel-default"><div class="panel-heading">';
+              new_post += 'Provided by: ' + item[0] + '</div><div class="panel-body">';
+              new_post += 'Merchant Information\n';
+              new_post += 'Name: ' + item[8] + '<br/></br>'
+              new_post += 'Address: ' + item[2] + '<br/>' + item[3]'<br/><br/>';
+              new_post += 'Geolocation Info\nLat: ' + item[5] + ', Long: ' + item[7] '<br/><br/>';
+              new_post += 'Deals offered in the  ' + item[10] + ' region. <br/><br/>';
+              new_post += 'How well are we doing selling our ' + item[1] + 'deals off?\nWe've sold ' + item[5] + ' deals already.</div></div>';
+          $('#merchantsResponse').append(new_post);
+          });
+          /* Change the button text. */
+          $submit.text('Found providers, Enjoy!');
+	  
+          /* Disable the button. */
+          $submit.attr("disabled", false);
+	  
+          /* Change the button text. */
+          $submit.text('Search, Again!')
+          });
+          console.log('After posting.done');
+          });
 	</script>
 	<script src="https://code.highcharts.com/highcharts.js"></script>
 	<script src="https://code.highcharts.com/modules/exporting.js"></script>
