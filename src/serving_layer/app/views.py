@@ -100,7 +100,19 @@ def get_cheapest_product_with_price(category, priority, price):
     elif priority == 'price':
         sorted_response = sorted(response_list, key=itemgetter(2), reverse=False)[:10]
     return jsonify(data=sorted_response)
-   
+
+@app.route('/api/provider_by_category/<category>')
+def get_provider_by_category(category):
+    ''' Get the providers of deals categories '''
+    response_list = []
+    stmt = 'select * from provider_by_category where category=%s ALLOW FILTERING;'
+    category = get_category_key_by_value(category)
+    response = session.execute(stmt, parameters=[str(category)])
+    for val in response:
+        response_list.append([val.provider_name, val.category, val.merchant_address, val.merchant_country, val.merchant_latitude, val.merchant_longitude, val.merchant_locality, val.merchant_name, val.merchant_phone_number, val.merchant_region, val.number_sold])
+    sorted_response = sorted(response_list, key=itemgetter(10), reverse=True)
+    return jsonify(data=sorted_response)
+
 def get_category_key_by_value(val):
     ''' Return the category database name '''
     return categories_formal_name.keys()[categories_formal_name.values().index(val)]
