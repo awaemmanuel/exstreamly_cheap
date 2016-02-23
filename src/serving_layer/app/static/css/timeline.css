@@ -179,7 +179,10 @@
         border-left-width: 0;
     }
 }
-
+/* HIDDEN PRICE TEXTBOX */
+.starthidden {
+    display: none;
+}
 /* ONE COLUMN TIMELINE SPECIFIC CSS 
 .message-item {
     margin-bottom: 25px;

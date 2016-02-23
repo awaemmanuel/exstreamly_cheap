@@ -119,8 +119,8 @@
 <!--                        <li><a href="#showcase">Portfolio</a></li>-->
 <!--                        <li><a href="#our-team">Team</a></li>-->
                         <li><a href="#live">Reviews Timeline</a></li>
-                        <li><a href="http://bit.ly/1PP6ARg" target="_blank">Slides</a></li>
-                        <li><a href="#search">Deal Search</a></li>
+			 <li><a href="#search">Deal Search</a></li>
+                        <li><a href="https://github.com/awaemmanuel/exstreamly_cheap" target="_blank">GITHUB - Fork Me!!</a></li>
                     </ul>
                 </nav>
 				<!-- /main nav -->
@@ -399,27 +399,77 @@
 			             <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 col-sm-12">
 				     <h5>Search your favorite categories</h5>
 				
-                                     <form role="form" class="form-horizontal" id="searchForm" action"/api/trending_categories_with_price" method="POST">
+                                     <form role="form" class="form-horizontal" id="searchForm" action="/api/trending_categories_with_price" method="POST">
                                        <!-- action is the html template that will return the result to this input query -->
                                 
                                        <div class="form-group text-center">
-					 <input type="text" class="form-control" id="autocomplete2" name="search_ta" placeholder="Search for..." width="100%">
+					 <input type="text" class="form-control" id="autocomplete2" name="search_ta" placeholder="Start typing..." width="100%">
                                        </div> 
-                                       <select class="form-control" name="priority">
+                                       <select class="form-control" name="priority" id="priorityOpts">
                                          <option>Select Priority Level</option>
                                          <option value="price">Price Conscious</option>
                                          <option value="discount">Discount Conscious</option>
                                        </select>
+				       <div class="input-group" id="maxPrice">
+					 <span class="input-group-addon"><h5> What is that max price? </h5></span>
+					 <span class="input-group-addon">$</span>
+					 <input name="maxPrice" type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+					 <span class="input-group-addon">.00</span>
+				       </div>
                                        <span class="form-group-btn">
                                          <button class="btn btn-default" type="submit">Go!</button>
                                        </span>  
                                 
                                      </form>
 				     </div>
-				    <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 col-sm-12">
-				      <div id="dealsResponse"></div>
-				    </div>
-                                   </div>
+				    <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12 col-sm-12" style="margin: 35px 0 35px 0px;">
+				      <div id="dealsResponse" style="color: blue">
+					<!-- <div class="panel panel-default">
+                                                <div class="panel-heading">Panel Heading</div>
+                                                <div class="panel-body">Panel Content</div>
+                                              </div>
+					     <div class="panel-group" id="accordion" id="dealsResponse">
+					      <div class="panel panel-default">
+					       <div class="panel panel-default">
+						<div class="panel-heading">
+						  <h4 class="panel-title">
+						    <a data-toggle="collapse" data-parent="#accordion" href="#collapse1">Collapsible Group 1</a>
+						  </h4>
+						</div>
+						<div id="collapse1" class="panel-collapse collapse in">
+						  <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+						    sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+						    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+						</div>
+					      </div>
+					      <div class="panel panel-default">
+						<div class="panel-heading">
+						  <h4 class="panel-title">
+						    <a data-toggle="collapse" data-parent="#accordion" href="#collapse2">Collapsible Group 2</a>
+						  </h4>
+						</div>
+						<div id="collapse2" class="panel-collapse collapse">
+						  <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+						    sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+						    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+						</div>
+					      </div>
+					      <div class="panel panel-default">
+						<div class="panel-heading">
+						  <h4 class="panel-title">
+						    <a data-toggle="collapse" data-parent="#accordion" href="#collapse3">Collapsible Group 3</a>
+						  </h4>
+						</div>
+						<div id="collapse3" class="panel-collapse collapse">
+						  <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+						    sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+						    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+						</div>
+					      </div> 
+					    </div> 
+					  </div> 
+					</div> -->
+				   </div>
                          <div role="tabpanel" class="tab-pane fade" id="merchant">
                          <h5>Search for your favorite provider</h5>
                          </div>
@@ -769,38 +819,72 @@ eck"></i></div><div class="timeline-panel"><div class="timeline-heading"><h4 cla
         });
     });
     </script>
-    <script>
-     $("#searchForm").submit(function(event) 
-     {
-         /* stop form from submitting normally */
-         event.preventDefault();
+	<script>
+	  
+	  /* To show the price text box if price is priority */
+	  $("#maxPrice").hide(); // hide on default
+	 
+	  $("#priorityOpts").change(function() {
+	  if($("#priorityOpts").val() == 'price') {
+	      $("#maxPrice").show("slow");
+	  }
+	  else {
+	   $("#maxPrice").hide("slow"); // hide if anything else than price chosen
+	  }
+	  });	  
+	  
+	  /* Collect form information when submitted, Don't reload */
+	  $("#searchForm").submit(function(event) 
+	  {
+	  /* stop form from submitting normally */
+	  event.preventDefault();
+	  
+	  /* get some values from elements on the page: */
+	  var $form = $( this ),
+	  $submit = $form.find( 'button[type="submit"]' ),
+	  categoryVal = $form.find( 'input[name="search_ta"]' ).val(),
+	  priorityVal = $form.find( 'select[name="priority"]' ).val(),
+	  url = $form.attr('action');
 
-         /* get some values from elements on the page: */
-         var $form = $( this ),
-             $submit = $form.find( 'button[type="submit"]' ),
-             category_value = $form.find( 'input[name="search_ta"]' ).val(),
-             priority_value = $form.find( 'select[name="priority"]' ).val(),
-             url = $form.attr('action');
-
-         /* Send the data using post */
-         var posting = $.post( url, { 
-                           category: category_value, 
-                           priority: priority_value
-                       });
-
-         posting.done(function( data )
-         {
-             /* Put the results in a div */
-             $( "#dealsResponse" ).html(data);
-
-             /* Change the button text. */
-             $submit.text('Sent, Thank you');
-
-             /* Disable the button. */
-             $submit.attr("disabled", true);
-         });
-     });
-    </script>
+	  maxPrice = 0.00
+	  /* Get max price if price is priority */
+	  if (priorityVal == 'price') {
+	      maxPrice = $form.find( 'input[name="maxPrice"]' ).val() 
+	  }
+	  /* Compose full url for request */    
+	  url = url + '/' + categoryVal + '/' + priorityVal + '/' + maxPrice;
+          console.log(url)
+	  /* Send the data using post */
+	  var posting = $.getJSON( url ); //, { 
+	  console.log('Data sent to server via submit');
+	  posting.done(function( data )
+	  {
+	  console.log('Inside DONE!!');
+	  
+	  /* Put the results in a div */
+	  $('#dealsResponse').empty();
+	  $.each(data.data, function(i, item) {
+	  new_post = '<div class="panel panel-default"><div class="panel-heading">';
+	      new_post += item[0] + '</div><div class="panel-body">';
+	      new_post += 'Category: ' + item[1] + '<br/><br/>';
+	      new_post += 'Price: ' + item[2] + '<br/><br/>';
+	      new_post += 'Savings: ' + item[3] + '<br/><br/>';
+	      new_post += 'Description: ' + item[4] + '<br/><br/>';
+	      new_post += 'Fine Print: ' + item[5] + '</div></div>';
+	  $('#dealsResponse').append(new_post);
+	  });
+	  /* Change the button text. */
+	  $submit.text('Found deals, Enjoy!');
+	  
+	  /* Disable the button. */
+	  $submit.attr("disabled", false);
+	  
+	  /* Change the button text. */
+	  $submit.text('Search, Again!')
+	  });
+	  console.log('After posting.done');
+	  });
+	</script>
 	<script src="https://code.highcharts.com/highcharts.js"></script>
 	<script src="https://code.highcharts.com/modules/exporting.js"></script>
     </body>
