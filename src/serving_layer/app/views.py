@@ -11,7 +11,7 @@ cluster = Cluster(['172.31.2.39'])
 session = cluster.connect('deals')
 
 # setting up connections to realtime cluster
-cluster_rt = Cluster(['172.31.2.36'])
+cluster_rt = Cluster(['172.31.2.37', '172.31.2.36', '172.31.2.45', '172.31.2.46'])
 session_rt = cluster_rt.connect('deals_streaming')
 
 @app.route('/')
@@ -261,7 +261,7 @@ def get_most_purchased():
         in the last thirty seconds to recommend 
     '''
     response_list = []
-    stmt = 'SELECT category, count FROM trending_categories_by_time;'
+    stmt = 'SELECT category, count FROM trending_categories_by_time limit 20;'
     response = session_rt.execute(stmt)
     for val in response:
         response_list.append(val)

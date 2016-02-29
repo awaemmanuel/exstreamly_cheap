@@ -113,7 +113,7 @@
                 <nav class="collapse navbar-collapse navbar-right" role="Navigation">
                     <ul id="nav" class="nav navbar-nav">
                         <li class="current"><a href="#body">Home</a></li>
-                        <li><a href="#trending">Trending Deals</a></li>
+                        <li><a href="#trending">Realtime Sales Trend</a></li>
                         <li><a href="#counter">Insights</a></li>
                         <li><a href="#user_locations">Friends</a></li>
 <!--                        <li><a href="#showcase">Portfolio</a></li>-->
@@ -157,7 +157,7 @@
 							<div>
 								<h2 class="heading animated fadeInDown">Best Deals</h2>
 								<h3 class="animated fadeInUp">Only time can buy.</h3>
-								<a class="btn btn-green animated fadeInUp" href="#">Get Started</a>
+								<a class="btn btn-green animated fadeInUp" href="#search">Get Started</a>
 							</div>
 						</div>
 						</div>
@@ -172,7 +172,7 @@
 							<div>
 								<h2 class="heading animated fadeInRight">Deals Search and Recommendation...</h2>
 								<h3 class="animated fadeInLeft">...all served in realtime</h3>
-								<a class="btn btn-green animated fadeInUp" href="#">Learn More</a>
+								<a class="btn btn-green animated fadeInUp" href="#trending">Learn More</a>
 							</div>
 						</div>
 						</div>
@@ -403,7 +403,7 @@
 					 <span class="input-group-addon">.00</span>
 				       </div>
                                        <span class="form-group-btn">
-                                         <button class="btn btn-default" type="submit">Go!</button>
+                                         <button class="btn btn-default" type="submit">Search!</button>
                                        </span>  
                                 
                         </form>
@@ -425,7 +425,7 @@
 					 <input type="text" class="form-control" id="autocomplete1" name="merchant_ta" placeholder="Start typing your favorite category..." width="100%">
                                        </div>
 				       <span class="form-group-btn">
-					 <button class="btn btn-default" type="submit">Go! Find those providers.</button>
+					 <button class="btn btn-default" type="submit" name="findProvider">Go! Find those providers.</button>
 				       </span>
                             </form>   
                         </div>
@@ -829,11 +829,10 @@ eck"></i></div><div class="timeline-panel"><div class="timeline-heading"><h4 cla
 	  $.each(data.data, function(i, item) {
 	  new_post = '<div class="panel panel-default"><div class="panel-heading">';
 	      new_post += item[0] + '</div><div class="panel-body">';
-	      new_post += 'Category: ' + item[1] + '<br/><br/>';
-	      new_post += 'Price: ' + item[2] + '<br/><br/>';
-	      new_post += 'Savings: ' + item[3] + '<br/><br/>';
-	      new_post += 'Description: ' + item[4] + '<br/><br/>';
-	      new_post += 'Fine Print: ' + item[5] + '</div></div>';
+	      new_post += '<h4>Price:</h4> ' + item[2] + '<br/><br/>';
+	      new_post += '<h4>Total savings:</h4> ' + item[3] + '<br/><br/>';
+	      new_post += '<h5>Description:</h5> <p>' + item[4] + '</p><br/>';
+	      new_post += '<h5>Fine Print:</h5> <p>' + item[5] + '</p></div></div>';
 	  $('#dealsResponse').append(new_post);
 	  });
 	  /* Change the button text. */
@@ -849,11 +848,11 @@ eck"></i></div><div class="timeline-panel"><div class="timeline-heading"><h4 cla
 	  });
 	</script>
 	<script>
-	  $("#merchantForm").submit(function(event) {
+	  $("#merchantForm2").submit(function(event) {
 	  alert("Submitted");
 	  });
 	  /* [MERCHANT SEARCH] - Collect form information when submitted, Don't reload */
-          $("#merchantForm2").submit(function(event)
+          $("#merchantForm").submit(function(event)
           {
 	  console.log("Inside Merchant Submission");
           /* stop form from submitting normally */
@@ -861,7 +860,7 @@ eck"></i></div><div class="timeline-panel"><div class="timeline-heading"><h4 cla
 	  console.log("Prevented Default");
           /* get some values from elements on the page: */
           var $form = $( this ),
-          $submit = $form.find( 'button[type="submit"]' ),
+          $submit = $form.find( 'button[name="findProvider"]' ),
           categoryVal = $form.find( 'input[name="merchant_ta"]' ).val(),
           url = $form.attr('action');
 	  console.log(categoryVal);
@@ -880,12 +879,12 @@ eck"></i></div><div class="timeline-panel"><div class="timeline-heading"><h4 cla
           $.each(data.data, function(i, item) {
           new_post = '<div class="panel panel-default"><div class="panel-heading">';
               new_post += 'Provided by: ' + item[0] + '</div><div class="panel-body">';
-              new_post += 'Merchant Information\n';
-              new_post += 'Name: ' + item[8] + '<br/></br>'
-              new_post += 'Address: ' + item[2] + '<br/>' + item[3]'<br/><br/>';
-              new_post += 'Geolocation Info\nLat: ' + item[5] + ', Long: ' + item[7] '<br/><br/>';
-              new_post += 'Deals offered in the  ' + item[10] + ' region. <br/><br/>';
-              new_post += 'How well are we doing selling our ' + item[1] + 'deals off?\nWe've sold ' + item[5] + ' deals already.</div></div>';
+              new_post += '<h4>Merchant Information</h4>';
+              new_post += '<h5>Name:</h5> ' + item[7] + '</br>'
+              new_post += '<h5>Address:</h5> ' + item[2] + ', ' + item[3] + '<br/><br/>';
+              new_post += '<h4>Geolocation Info</h4> <b>Lat:</b> ' + item[4] + ', <b>Long:</b> ' + item[5] + '<br/><br/>';
+              new_post += 'Deals offered in the  ' + item[9] + ' region. <br/><br/>';
+              new_post += '<p>How well are we doing selling our ' + item[1] + ' deals?<br/><b>' + item[10] + '</b> sold already.</p></div></div>';
           $('#merchantsResponse').append(new_post);
           });
           /* Change the button text. */
