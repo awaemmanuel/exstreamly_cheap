@@ -1,4 +1,4 @@
-# exstreamly_cheap
+# Introduction to ExStreamly Cheap
 Insight Data Engineering pipeline project. Real time deals aggregation and alerting system.
 
 # Motivation
@@ -12,4 +12,4 @@ Insight Data Engineering pipeline project. Real time deals aggregation and alert
 
 
 # Demo URL
-http://www.slideshare.net/EmmanuelAwa/exstreamlycheap-insight-data-engineering-project
+https://www.slideshare.net/EmmanuelAwa/exstreamlycheap-final-slides
