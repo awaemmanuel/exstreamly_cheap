@@ -13,3 +13,6 @@ Insight Data Engineering pipeline project. Real time deals aggregation and alert
 
 # Demo URL
 https://www.slideshare.net/EmmanuelAwa/exstreamlycheap-final-slides
+
+# Direct Youtube video
+https://www.youtube.com/playlist?list=PL8YCTmxcfHXUxGOlzwaYuTWfxhVqLyWkW
