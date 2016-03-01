@@ -12,7 +12,8 @@ Table of Contents:
 5. [Challenges](README.md#4-challenges)
 6. [Take Away](README.md#5-take-aways)
 7. [Demo and Slides](README.md#6-demo-and-slides)
-8. [Youtube video](README.md#7-direct-youtube-video)
+8. [Youtube video](README.md#8-direct-youtube-video)
+9. [Sample Query Results](README.md#9-sample-query-results)
 
 ## 1. Introduction
 ExStreamly Cheap is a real time scalable deals serving platform. It provides Insights and searching capabilities, maximizing time and profit for end users. 
@@ -30,8 +31,7 @@ During the program, the following queries were successfully constructed and exec
 
   2. Deals search based on price and discount options.
   ![alt text](figures/query_price_discount.png "Deals search based on price and discount.")
-  This will yield a result like this.
-  ![alt text](figures/product_search_with_result.png "Deals search based on price and discount with results.")
+
 
   3. Display of recommendations based on engineered user interaction with respect to trends and sales.
   ![alt text](figures/recommendations.png "Recommendations display")
@@ -40,14 +40,12 @@ During the program, the following queries were successfully constructed and exec
   ![alt text](figures/users_pattern_map.png "Users' purchasing patterns.")
 
   5. Merchant search based on categories
-  ![alt text](figures/merchant_search_with_result.png "Deals search based on price and discount.")
-
 
 ## 4. Engineering Solution
-The pipeline comprises of both batch and realtime pieces. 
+The pipeline comprises of both batch and realtime pieces. ExStreamly Cheap pipeline was designed with the Lambda Architecture in mind.
 
 ### Batch Process
-To boostrap the data pipeline, an asynchronous distributed query engine, (Async DQE) calls the Sqoot API, computes the range of pages to fetch, take into account a time change between the first snapshot and actual data fetch. The fetched data is then marshalled into the pipeline for batch processing.
+At Ingestion, boostraping the data pipeline, an asynchronous distributed query engine, (Async DQE) calls the Sqoot API, computes the range of pages to fetch, take into account a time change between the first snapshot and actual data fetch. The fetched data is then marshalled into the pipeline for batch processing.
 ![alt text](figures/batch_pipeline.png "Batch Processing.")
 The Async Distributed Query Engine (ADQE) is a hybrid distributed querying engine, leveraging kafka's thread safeness and messaging queue, that was implemented to mitigate the pagination challenge of the Sqoot API. As ExStreamly Cheap is a service by category platform, a lot of dependency lies on the accuracy of the specified total number of deals at any given time. Sqoot's API was inconsistent, constantly changing total amounts with each millisecond page refresh.The Async DQE is split into three major components.
   1. [First Stage Producer](src/fetch_data/generate_all_categories.py) that utilizes [Sqoot Data Fetcher](src/fetch/fetch_sqoot_data.py) to interact with the API. Multiple producers - one for each category -  are spun in parallel on tmux sessions as the main interaction with the data source. As each category total is computed, the producers into the first kafka topic       
@@ -58,11 +56,13 @@ This follows the leaky bucket approach.
 ![alt text](figures/async_dqe_architecture.png "Async DQE.")
 
 ### Realtime Process
-The streaming process data source is a data from an engineered process flow.
+The streaming process data source is a data from an engineered process flow. Sqoot API isn't implemented as a firehose. Hence depending on that a source would be micro-batches and not a real time flow.
 ![alt text](figures/realtime_pipeline.png "Realtime Processing.")
 
+### Spark processing (Applies to speed and batch layers)
+After ingestion, the data is persisted in HDFS for the batch pipeline. From HDFS a batch process reads all data from the file system for a batch view pre-computation. For both streaming and batch, the deals data are then converted into Spark RDDs. Using Spark MapReduce, further filtering is done to remove duplicate and unneccessary features from the JSON objects. The RDDs are then converted in dataframes that are easily queriable using Spark SQL. In order to perform range and time series queries in cassandra, care is taken at this stage to construct the columns properly before a final load into cassandra.
 
-
+Queries are served to the user via a web app that was hosted on http://exstreamlycheap.club or via intuitive RESTFUL APIs. The clusters are currently shut down after the project, but the video people shows details of this interactive interface.
 
 ## 5. Challenges
 ## 6. Take Aways
@@ -73,3 +73,12 @@ https://www.slideshare.net/EmmanuelAwa/exstreamlycheap-final-slides
 ## 8. Direct Youtube video
 Please find the demo video alone below.
 https://www.youtube.com/playlist?list=PL8YCTmxcfHXUxGOlzwaYuTWfxhVqLyWkW
+
+## 9. Sample Query Results
+A final product search would yield results like this. This is an example of a discount driven search. A quick observation is seen that the results are in descending discount percentages. As a result of proper cassandra table column indexes (partition key on price and clustering on discount with descending order) and a secondary index on category, I'm able to return such results without any post-query re-arrangement.
+![alt text](figures/product_search_with_result.png "Deals search based on price and discount with results.")
+
+
+Similarly, a merchant search based on categories will yield a result like this.
+  ![alt text](figures/merchant_search_with_result.png "Deals search based on price and discount.")
+Observe that the first merchant returned is the highest selling merchant in that class. Also a result attributed to proper clustering and secondary indexes in cassandra
