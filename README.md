@@ -80,6 +80,15 @@ The following are some of the lessons learned.
 This reason led to implementing Async DQE to try and fetch unique deals asynchronously in parallel, utilizing PyKafka asynchronous producers and balanced consumer implementations. This path was choosen because of the 
 ```LEAKY BUCKET ALGORITHM,  kafka's thread safeness, message queuing and ability to multithread a balanced consumer.``` 
   3. Taking deep dives to tweak these open source code tools, changing methods to solve use cases offered by Native APIs and not yet supported on the wrapper clients. For instance I had started to implement a HASH Partition on Kafka-Python for dynamic topic-to-consumer instance assignment; to avoid flooding a particular hybrid consumer-producer consuming a particular partition. With further research, I found an already existing implementaion on PyKafka.
+ 4. Proper Cassandra Indexing 
+   - Partitioning and clustering during schema design is very important. CQL isn't SQL.
+
+  ``` CREATE TABLE trend_with_price PRIMARY KEY (price, discount)) WITH CLUSTERING ORDER BY (discount DESC); ```
+
+  ``` CREATE INDEX trend_with_price_category_idx ON trend_with_price (category);```
+  
+  Make good use of seconday indexes to make range querying easy.
+   - Kafka Consumption Offsets - Not considering what offset to start reading from, especially for a realtime application, can cause a bottle neck in your application. Make use of the ```auto_commit``` that kafka provides. 
   
 ## 7. Demo and slides
 A well detailed presentation can be found at link below. Please note that it includes the video as well.
