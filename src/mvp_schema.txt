@@ -299,7 +299,12 @@ root
  |-- updated_at: string (nullable = true)
  |-- url: string (nullable = true)
  
-CREATE TABLE trending_categories_with_price (category text, sub_category text, created_at timestamp, updated_at timestamp, expires_at timestamp, description text, fine_print text, price float, discount_percentage float, id bigint, merchant_address text, merchant_country text, merchant_id bigint,merchant_latitude text, merchant_longitude text, merchant_locality text, merchant_name text ,merchant_phone_number text, merchant_region text, number_sold float, online boolean, provider_name text, title text, url text, PRIMARY KEY ((price) category, discount_percentage)) WITH CLUSTERING ORDER BY (discount_percentage DESC);
+CREATE TABLE deals.trending_categories_with_price (
+    price float, discount_percentage float, category text, created_at timestamp, description text, expires_at timestamp, fine_print text, id bigint, merchant_address text, merchant_country text, merchant_id bigint, merchant_latitude text, merchant_locality text, merchant_longitude text, merchant_name text, merchant_phone_number text, merchant_region text, number_sold float, online boolean, provider_name text, sub_category text, title text, updated_at timestamp, url text, PRIMARY KEY (price, discount_percentage, category)
+) WITH CLUSTERING ORDER BY (discount_percentage DESC, category ASC)
+
+
+CREATE INDEX trending_categories_with_price_category_idx ON deals.trending_categories_with_price (category);
 
 CREATE TABLE trending_categories_with_disc (category text, sub_category text, created_at timestamp, updated_at timestamp, expires_at timestamp, description text, fine_print text, price float, discount_percentage float, id bigint, merchant_address text, merchant_country text, merchant_id bigint,merchant_latitude text, merchant_longitude text, merchant_locality text, merchant_name text ,merchant_phone_number text, merchant_region text, number_sold float, online boolean, provider_name text, title text, url text, PRIMARY KEY (discount_percentage, price));
 

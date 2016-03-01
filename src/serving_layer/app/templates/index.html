@@ -39,7 +39,9 @@
         <link rel="stylesheet" href="../static/css/dataTables.css">
         <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />        
 	 <!-- Timeline CSS -->
-	 <link href="../static/css/timeline.css" rel="stylesheet"> 
+	 <link href="../static/css/timeline.css" rel="stylesheet">
+	 <!-- Typeaheadjs.css -->
+	 <link href="../static/css/typeaheadjs.css" rel="stylesheet">
 	 <!-- Custom CSS -->
          <!--  <link href="../static/css/sb-admin-2.css" rel="stylesheet"> -->
 	  
@@ -111,14 +113,14 @@
                 <nav class="collapse navbar-collapse navbar-right" role="Navigation">
                     <ul id="nav" class="nav navbar-nav">
                         <li class="current"><a href="#body">Home</a></li>
-                        <li><a href="#trending">Trending Deals</a></li>
+                        <li><a href="#trending">Realtime Sales Trend</a></li>
                         <li><a href="#counter">Insights</a></li>
                         <li><a href="#user_locations">Friends</a></li>
-                        <li><a href="#showcase">Portfolio</a></li>
-                        <li><a href="#our-team">Team</a></li>
-                        <li><a href="#live">Time Line</a></li>
-                        <li><a href="http://bit.ly/1PP6ARg" target="_blank">Slides</a></li>
-                        <li><a href="#contact-us">Customer Search</a></li>
+<!--                        <li><a href="#showcase">Portfolio</a></li>-->
+<!--                        <li><a href="#our-team">Team</a></li>-->
+                        <li><a href="#live">Reviews Timeline</a></li>
+			 <li><a href="#search">Deal Search</a></li>
+                        <li><a href="https://github.com/awaemmanuel/exstreamly_cheap" target="_blank">GITHUB - Fork Me!!</a></li>
                     </ul>
                 </nav>
 				<!-- /main nav -->
@@ -155,7 +157,7 @@
 							<div>
 								<h2 class="heading animated fadeInDown">Best Deals</h2>
 								<h3 class="animated fadeInUp">Only time can buy.</h3>
-								<a class="btn btn-green animated fadeInUp" href="#">Get Started</a>
+								<a class="btn btn-green animated fadeInUp" href="#search">Get Started</a>
 							</div>
 						</div>
 						</div>
@@ -170,7 +172,7 @@
 							<div>
 								<h2 class="heading animated fadeInRight">Deals Search and Recommendation...</h2>
 								<h3 class="animated fadeInLeft">...all served in realtime</h3>
-								<a class="btn btn-green animated fadeInUp" href="#">Learn More</a>
+								<a class="btn btn-green animated fadeInUp" href="#trending">Learn More</a>
 							</div>
 						</div>
 						</div>
@@ -215,29 +217,33 @@
 					<!-- /section title -->
 					
                     <!-- Table section	-->
-                <table id="trendTable" class="table table-striped display" cellspacing="0" width="80%" >
+	       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12"> 
+                <table id="trendTable" class="table table-striped display" cellspacing="0" width="100%">
                         <thead>
                             <tr>
-                                <th>Time</th>
-                                <th>Category</th>
-                                <th>Amount Purchased</th>
+                                <th width="40%">Time</th>
+                                <th width="50%">Category</th>
+                                <th>Sold</th>
                             </tr>
                         </thead>
-			<tbody id='trendsTbBody' style='color: black; font-size: 20px'></tbody>
+			<tbody id='trendsTbBody' style='color: black; font-size: 16px'></tbody>
                         <tfoot>
                             <tr>
-                                <th>Time</th>
-                                <th>Category</th>
-                                <th>Amount Purchased</th>
+                                <th width="40%">Time</th>
+                                <th width="50%">Category</th>
+                                <th>Sold</th>
                             </tr>
                         </tfoot>
                     </table>
-				</div> 		<!-- End row -->
-			</div>   	<!-- End container -->
+	            </div>
+	            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+		      <div id="trendGraph" style="min-width: 320px; height: 450px; margin: 0 auto"></div>
+		    </div>            
+      			</div> <!-- End Row -->
+  		    </div> <!-- End container -->
 		</section>   <!-- End section -->
 		
-		
-		
+
 		<!--
 		Start Counter Section
 		==================================== -->
@@ -262,7 +268,7 @@
 					<div class="col-md-3 col-sm-6 col-xs-12 text-center wow fadeInDown" data-wow-duration="500ms" data-wow-delay="200ms">
 						<div class="counters-item">
 							<div>
-							    <span data-speed="2000" data-to="5650">5650</span>
+							    <span id="totalSoldToday" data-speed="2000" data-to="5650">5650</span>
 							</div>
 							<i class="fa fa-check-square fa-3x"></i>
 							<h3>Deals grabbed today</h3>
@@ -273,12 +279,12 @@
 					<!-- third count item -->
 					<div class="col-md-3 col-sm-6 col-xs-12 text-center wow fadeInDown" data-wow-duration="500ms" data-wow-delay="400ms">
 						<div class="counters-item">
-							<div>
-							    <span data-speed="2000" data-to="99">99</span>
-								<span>%</span>
+						    <div>
+							<span id="mostBoughtIn30seconds" data-speed="2000" data-to="99.9">Loading your recommendationsy</span>
+							<span id> </span>
 							</div>
 							<i class="fa fa-thumbs-up fa-3x"></i>
-				            <h3>Positive feedback</h3>
+				            <h3>Recommendations</h3><h4>This category is selling out.</h4>
 							
 						</div>
 					</div>
@@ -321,610 +327,37 @@
 				</div> 		<!-- End row -->
 			</div>   	<!-- End container -->
 		</section>   <!-- End section -->
-	<!--	<div class="row" style="height:100vh;">
-                <div class="col-md-10 col-md-offset-1 trend-results">
-                    <table class="table" id="trendsTable">
-                      <thead>
-                        <tr id="trendsHeadTr">
-                        </tr>
-                      </thead>
-                      <tbody id="trendsTb">
-                      </tbody>
-                    </table>
-                </div>
-        </div> -->
-		
-		<!-- Start Portfolio Section
-		=========================================== -->
-		
-		<section id="showcase">
-			<div class="container">
-				<div class="row wow fadeInDown" data-wow-duration="500ms">
-					<div class="col-lg-12">
-					
-						<!-- section title -->
-						<div class="title text-center">
-							<h2>Our <span class="color">Works</span></h2>
-							<div class="border"></div>
-						</div>
-						<!-- /section title -->
-					
-						<!-- portfolio item filtering -->
-						<div class="portfolio-filter clearfix">
-							<ul class="text-center">
-							    <li><a href="javascript:void(0)" class="filter" data-filter="all">All</a></li>
-								<li><a href="javascript:void(0)" class="filter" data-filter=".app">Mobile App</a></li>
-								<li><a href="javascript:void(0)" class="filter" data-filter=".web">Web Design</a></li>
-								<li><a href="javascript:void(0)" class="filter" data-filter=".photoshop">Photoshop</a></li>
-								<li><a href="javascript:void(0)" class="filter" data-filter=".illustrator">Illustrator</a></li>
-							</ul>
-						</div>
-						<!-- /portfolio item filtering -->
-						
-					</div> <!-- /end col-lg-12 -->
-				</div> <!-- end row -->
-			</div>	<!-- end container -->
-	
-			<!-- portfolio items -->
-			<div class="portfolio-item-wrapper wow fadeInUp" data-wow-duration="500ms">
-                <ul id="og-grid" class="og-grid">
 				
-					<!-- single portfolio item -->	
-					<li class="mix app">
-						<a href="javascript:void(0)" data-largesrc="../static/img/portfolio/portx1.jpg" data-title="Azuki bean" data-description="Swiss chard pumpkin bunya nuts maize plantain aubergine napa cabbage soko coriander sweet pepper water spinach winter purslane shallot tigernut lentil beetroot.">
-							<img src="../static/img/portfolio/portx1.jpg" alt="ExstreamlyCheap">
-							<div class="hover-mask">
-								<h3>Azuki beans</h3>
-								<span>
-									<i class="fa fa-plus fa-2x"></i>
-								</span>
-							</div>
-						</a>
-					</li>
-					<!-- /single portfolio item -->
-					
-					<!-- single portfolio item -->
-					<li class="mix web">
-						<a href="javascript:void(0)" data-largesrc="../static/img/portfolio/portx1.jpg" data-title="Veggies sunt bona vobis" data-description="Komatsuna prairie turnip wattle seed artichoke mustard horseradish taro rutabaga ricebean carrot black-eyed pea turnip greens beetroot yarrow watercress kombu.">
-							<img src="../static/img/portfolio/portx1.jpg" alt="ExstreamlyCheap">
-							<div class="hover-mask">
-								<h3>Veggies sunt bona vobis</h3>
-								<span>
-									<i class="fa fa-plus fa-2x"></i>
-								</span>
-							</div>
-						</a>
-					</li>
-					<!-- /single portfolio item -->
-					
-					<!-- single portfolio item -->
-					<li class="mix photoshop">
-						<a href="javascript:void(0)" data-largesrc="../static/img/portfolio/portx1.jpg" data-title="Dandelion horseradish" data-description="Cabbage bamboo shoot broccoli rabe chickpea chard sea lettuce lettuce ricebean artichoke earthnut pea aubergine okra brussels sprout avocado tomato.">
-							<img src="../static/img/portfolio/portx1.jpg" alt="ExstreamlyCheap">
-							<div class="hover-mask">
-								<h3>Dandelion horseradish</h3>
-								<span>
-									<i class="fa fa-plus fa-2x"></i>
-								</span>
-							</div>
-						</a>
-					</li>
-					<!-- /single portfolio item -->
-					
-					<!-- single portfolio item -->
-					<li class="mix illustrator">
-						<a href="javascript:void(0)" data-largesrc="../static/img/portfolio/portx1.jpg" data-title="Dandelion horseradish" data-description="Cabbage bamboo shoot broccoli rabe chickpea chard sea lettuce lettuce ricebean artichoke earthnut pea aubergine okra brussels sprout avocado tomato.">
-							<img src="../static/img/portfolio/portx1.jpg" alt="ExstreamlyCheap">
-							<div class="hover-mask">
-								<h3>Dandelion horseradish</h3>
-								<span>
-									<i class="fa fa-plus fa-2x"></i>
-								</span>
-							</div>
-						</a>
-					</li>
-					<!-- /single portfolio item -->
-					
-					<!-- single portfolio item -->
-					<li class="mix app">
-						<a href="javascript:void(0)" data-largesrc="../static/img/portfolio/portx1.jpg" data-title="Azuki bean" data-description="Swiss chard pumpkin bunya nuts maize plantain aubergine napa cabbage soko coriander sweet pepper water spinach winter purslane shallot tigernut lentil beetroot.">
-							<img src="../static/img/portfolio/portx1.jpg" alt="ExstreamlyCheap">
-							<div class="hover-mask">
-								<h3>Azuki beanings</h3>
-								<span>
-									<i class="fa fa-plus fa-2x"></i>
-								</span>
-							</div>
-						</a>
-					</li>
-					<!-- /single portfolio item -->
-					
-					<!-- single portfolio item -->
-					<li class="mix app">
-						<a href="javascript:void(0)" data-largesrc="../static/img/portfolio/portx1.jpg" data-title="Veggies sunt bona vobis" data-description="Komatsuna prairie turnip wattle seed artichoke mustard horseradish taro rutabaga ricebean carrot black-eyed pea turnip greens beetroot yarrow watercress kombu.">
-							<img src="../static/img/portfolio/portx1.jpg" alt="ExstreamlyCheap">
-							<div class="hover-mask">
-								<h3>Veggies sunt bona vobis</h3>
-								<span>
-									<i class="fa fa-plus fa-2x"></i>
-								</span>
-							</div>	
-						</a>
-					</li>
-					<!-- /single portfolio item -->
-					
-					<!-- single portfolio item -->
-					<li class="mix web">
-						<a href="javascript:void(0)" data-largesrc="../static/img/portfolio/portx1.jpg" data-title="Dandelion horseradish" data-description="Cabbage bamboo shoot broccoli rabe chickpea chard sea lettuce lettuce ricebean artichoke earthnut pea aubergine okra brussels sprout avocado tomato.">
-							<img src="../static/img/portfolio/portx1.jpg" alt="ExstreamlyCheap">
-							<div class="hover-mask">
-								<h3>Dandelion horseradish</h3>
-								<span>
-									<i class="fa fa-plus fa-2x"></i>
-								</span>
-							</div>	
-						</a>
-					</li>
-					<!-- /single portfolio item -->
-					
-					<!-- single portfolio item -->
-					<li class="mix photoshop">
-						<a href="javascript:void(0)" data-largesrc="../static/img/portfolio/portx1.jpg" data-title="Azuki bean" data-description="Swiss chard pumpkin bunya nuts maize plantain aubergine napa cabbage soko coriander sweet pepper water spinach winter purslane shallot tigernut lentil beetroot.">
-							<img src="../static/img/portfolio/portx1.jpg" alt="ExstreamlyCheap">
-							<div class="hover-mask">
-								<h3>Azuki bean</h3>
-								<span>
-									<i class="fa fa-plus fa-2x"></i>
-								</span>
-							</div>
-						</a>
-					</li>
-					<!-- /single portfolio item -->
-					
-					<!-- single portfolio item -->
-					<li class="mix photoshop">
-						<a href="javascript:void(0)" data-largesrc="../static/img/portfolio/portx1.jpg" data-title="Veggies sunt bona vobis" data-description="Komatsuna prairie turnip wattle seed artichoke mustard horseradish taro rutabaga ricebean carrot black-eyed pea turnip greens beetroot yarrow watercress kombu.">
-							<img src="../static/img/portfolio/portx1.jpg" alt="ExstreamlyCheap">
-							<div class="hover-mask">
-								<h3>Veggies sunt bona vobis</h3>
-								<span>
-									<i class="fa fa-plus fa-2x"></i>
-								</span>
-							</div>
-						</a>
-					</li>
-					<!-- /single portfolio item -->
-					
-					<!-- single portfolio item -->
-					<li class="mix illustrator">
-						<a href="javascript:void(0)" data-largesrc="../static/img/portfolio/portx1.jpg" data-title="Veggies sunt bona vobis" data-description="Komatsuna prairie turnip wattle seed artichoke mustard horseradish taro rutabaga ricebean carrot black-eyed pea turnip greens beetroot yarrow watercress kombu.">
-							<img src="../static/img/portfolio/portx1.jpg" alt="ExstreamlyCheap">
-							<div class="hover-mask">
-								<h3>Veggies sunt bona vobis</h3>
-								<span>
-									<i class="fa fa-plus fa-2x"></i>
-								</span>
-							</div>	
-						</a>
-					</li>
-					<!-- /single portfolio item -->
-					
-					<!-- single portfolio item -->
-					<li class="mix web">
-						<a href="javascript:void(0)" data-largesrc="../static/img/portfolio/portx1.jpg" data-title="Dandelion horseradish" data-description="Cabbage bamboo shoot broccoli rabe chickpea chard sea lettuce lettuce ricebean artichoke earthnut pea aubergine okra brussels sprout avocado tomato.">
-							<img src="../static/img/portfolio/portx1.jpg" alt="ExstreamlyCheap">
-							<div class="hover-mask">
-								<h3>Dandelion horseradish</h3>
-								<span>
-									<i class="fa fa-plus fa-2x"></i>
-								</span>
-							</div>
-						</a>
-					</li>
-					<!-- /single portfolio item -->
-					
-					<!-- single portfolio item -->
-					<li class="mix app">
-						<a href="javascript:void(0)" data-largesrc="../static/img/portfolio/portx1.jpg" data-title="Azuki bean" data-description="Swiss chard pumpkin bunya nuts maize plantain aubergine napa cabbage soko coriander sweet pepper water spinach winter purslane shallot tigernut lentil beetroot.">
-							<img src="../static/img/portfolio/portx1.jpg" alt="ExstreamlyCheap">
-							<div class="hover-mask">
-								<h3>Azuki bean</h3>
-								<span>
-									<i class="fa fa-plus fa-2x"></i>
-								</span>
-							</div>
-						</a>
-					</li>
-					<!-- /single portfolio item -->
-					
-				</ul> <!-- end og grid -->
-			</div>  <!-- portfolio items wrapper -->
-			
-		</section>   <!-- End section -->
-		
-		
-		<!-- Start Team Skills
-		=========================================== -->
-		
-		<section id="team-skills" class="parallax-section">
-			<div class="container">
-				<div class="row wow fadeInDown" data-wow-duration="500ms">
-				
-					<!-- section title -->
-					<div class="title text-center">
-						<h2>Our <span class="color">Skills</span></h2>
-						<div class="border"></div>
-					</div>
-					<!-- /section title -->
-					
-					<!-- skill set -->
-					<div class="col-md-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="500ms">
-						<div class="skill-chart text-center">
-							<span class="chart" data-percent="80">
-								<span class="percent"></span>
-							</span>
-							<h3><i class="fa fa-wordpress"></i> Wordpress</h3>
-							<p>Lorem ipsum has erroribus design color vituper bonorum depend you usedcom.bonorum dependan be used.</p>
-						</div>
-					</div>
-					<!-- end skill set -->
-					
-					<!-- skill set -->
-					<div class="col-md-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="500ms" data-wow-delay="200ms">
-						<div class="skill-chart text-center">
-							<span class="chart" data-percent="90">
-								<span class="percent">86</span>
-							</span>
-							<h3><i class="fa fa-html5"></i> HTML 5</h3>
-							<p>Lorem ipsum has erroribus design color vituper bonorum depend you usedcom.bonorum dependan be used.</p>
-						</div>
-					</div>
-					<!-- end skill set -->
-					
-					<!-- skill set -->
-					<div class="col-md-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="500ms" data-wow-delay="400ms">
-						<div class="skill-chart text-center">
-							<span class="chart" data-percent="85">
-								<span class="percent"></span>
-							</span>
-							<h3><i class="fa fa-android"></i> Android</h3>
-							<p>Lorem ipsum has erroribus design color vituper bonorum depend you usedcom.bonorum dependan be used.</p>
-						</div>
-					</div>
-					<!-- end skill set -->
-					
-					<!-- skill set -->
-					<div class="col-md-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="500ms" data-wow-delay="600ms">
-						<div class="skill-chart text-center">
-							<span class="chart" data-percent="70">
-								<span class="percent"></span>
-							</span>
-							<h3><i class="fa fa-apple"></i> IOS</h3>
-							<p>Lorem ipsum has erroribus design color vituper bonorum depend you usedcom.bonorum dependan be used.</p>
-						</div>
-					</div>
-					<!-- end skill set -->
-					
-				</div>  		<!-- End row -->
-			</div>   	<!-- End container -->
-		</section>   <!-- End section -->
-		
-		<!-- Start Our Team
-		=========================================== -->
-		
-		<section id="our-team">
-			<div class="container">
-				<div class="row">
-				
-					<!-- section title -->
-					<div class="title text-center wow fadeInUp" data-wow-duration="500ms">
-						<h2>Our <span class="color">Team</span></h2>
-						<div class="border"></div>
-					</div>
-					<!-- /section title -->
-					
-					<!-- team member -->
-					<div class="col-md-3 col-sm-6 wow fadeInDown" data-wow-duration="500ms">
-                       <article class="team-mate">
-							<div class="member-photo">
-								<!-- member photo -->
-								<img class="img-responsive" src="../static/img/team/member-1.jpg" alt="ExstreamlyCheap">
-								<!-- /member photo -->
-								
-								<!-- member social profile -->
-								<div class="mask">
-									<ul class="clearfix">
-										<li><a href="#"><i class="fa fa-facebook"></i></a></li>
-										<li><a href="#"><i class="fa fa-twitter"></i></a></li>
-										<li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-										<li><a href="#"><i class="fa fa-dribbble"></i></a></li>
-									</ul>
-								</div>
-								<!-- /member social profile -->
-							</div>
-							
-							<!-- member name & designation -->
-							<div class="member-title">
-								<h3>Abul Mal Muhit</h3>
-								<span>CEO/Founder</span>
-							</div>
-							<!-- /member name & designation -->
-							
-							<!-- about member -->
-                           <div class="member-info">
-                               <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur necessitatibus ullam, culpa odio.</p>
-                           </div>
-						   <!-- /about member -->
-						   
-                       </article>
-                    </div>
-					<!-- end team member -->
-					
-					<!-- team member -->
-					<div class="col-md-3 col-sm-6 wow fadeInDown" data-wow-duration="500ms" data-wow-delay="200ms">
-                       <article class="team-mate">
-							<div class="member-photo">
-								<!-- member photo -->
-								<img class="img-responsive" src="../static/img/team/member-1.jpg" alt="ExstreamlyCheap">
-								<!-- /member photo -->
-								
-								<!-- member social profile -->
-								<div class="mask">
-									<ul class="clearfix">
-										<li><a href="#"><i class="fa fa-facebook"></i></a></li>
-										<li><a href="#"><i class="fa fa-twitter"></i></a></li>
-										<li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-										<li><a href="#"><i class="fa fa-dribbble"></i></a></li>
-									</ul>
-								</div>
-								<!-- /member social profile -->
-							</div>
-							
-							<!-- member name & designation -->
-							<div class="member-title">
-								<h3>Frank Miller</h3>
-								<span>Manager</span>
-							</div>
-							<!-- /member name & designation -->
-							
-							<!-- about member -->
-                           <div class="member-info">
-                               <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur necessitatibus ullam, culpa odio.</p>
-                           </div>
-						   <!-- /about member -->
-						</article>
-                    </div>
-					<!-- end team member -->
-					
-					<!-- team member -->
-					<div class="col-md-3 col-sm-6 wow fadeInDown" data-wow-duration="500ms" data-wow-delay="400ms">
-                       <article class="team-mate">
-							<div class="member-photo">
-								<!-- member photo -->
-								<img class="img-responsive" src="../static/img/team/member-1.jpg" alt="ExstreamlyCheap">
-								<!-- /member photo -->
-								
-								<!-- member social profile -->
-								<div class="mask">
-									<ul class="clearfix">
-										<li><a href="#"><i class="fa fa-facebook"></i></a></li>
-										<li><a href="#"><i class="fa fa-twitter"></i></a></li>
-										<li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-										<li><a href="#"><i class="fa fa-dribbble"></i></a></li>
-									</ul>
-								</div>
-								<!-- /member social profile -->
-							</div>
-							
-							<!-- member name & designation -->
-							<div class="member-title">
-								<h3>Michael Jonson</h3>
-								<span>Web Developer</span>
-							</div>
-							<!-- /member name & designation -->
-							
-							<!-- about member -->
-                           <div class="member-info">
-                               <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur necessitatibus ullam, culpa odio.</p>
-                           </div>
-						   <!-- /about member -->
-                       </article>
-                    </div>
-					<!-- end team member -->
-					
-					<!-- team member -->
-					<div class="col-md-3 col-sm-6 wow fadeInDown" data-wow-duration="500ms" data-wow-delay="600ms">
-                       <article class="team-mate kill-margin-bottom">
-							<div class="member-photo">
-								<!-- member photo -->
-								<img class="img-responsive" src="../static/img/team/member-1.jpg" alt="ExstreamlyCheap">
-								<!-- /member photo -->
-								
-								<!-- member social profile -->
-								<div class="mask">
-									<ul class="clearfix">
-										<li><a href="#"><i class="fa fa-facebook"></i></a></li>
-										<li><a href="#"><i class="fa fa-twitter"></i></a></li>
-										<li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-										<li><a href="#"><i class="fa fa-dribbble"></i></a></li>
-									</ul>
-								</div>
-								<!-- /member social profile -->
-							</div>
-							
-							<!-- member name & designation -->
-							<div class="member-title">
-								<h3>Mo. Kha. Alamgir</h3>
-								<span>SEO Specialist</span>
-							</div>
-							<!-- /member name & designation -->
-							
-							<!-- about member -->
-                           <div class="member-info">
-                               <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur necessitatibus ullam, culpa odio.</p>
-                           </div>
-						   <!-- /about member -->
-                       </article>
-                    </div>
-					<!-- end team member -->
-					
-				</div>  	<!-- End row -->
-			</div>   	<!-- End container -->
-		</section>   <!-- End section -->
-		
-		
-		<!-- Start Twitter Feed
-		=========================================== -->
-		
-		<section id="twitter-feed" class="parallax-section">
-			<div class="container">
-				<div class="row">
-					<div class="col-lg-12 text-center">
-					
-						<!-- twitter bird -->
-						<div class="twitter-bird wow fadeInDown" data-wow-duration="500ms">
-							<span>
-								<i class="fa fa-twitter fa-4x"></i>
-							</span>
-						</div>
-						<!-- /twitter bird -->
-						
-						<!-- fetching tweet -->
-						<div class="tweet wow fadeIn" data-wow-duration="2000ms"></div>
-						<!-- /fetching tweet -->
-						
-						<!-- follow us button -->
-						<a href="https://twitter.com/amimorshed" title="Follow Us" target="_blank" class="btn btn-transparent wow fadeInUp" data-wow-duration="500ms">Follow Us</a>						
-						<!-- /follow us button -->
-						
-					</div>
-				</div>       <!-- End row -->
-			</div>   	<!-- End container -->
-		</section>   <!-- End section -->
-		
-		<!-- Time Line
-		=========================================== -->
-		
-		<section id="live" class="bg-one">
-			<div class="container">
-				<div class="row">
-				  <!-- /.panel -->
+        <!-- Time Line
+        =========================================== -->
+
+        <section id="live" class="bg-one">
+            <div class="container">
+                <div class="row">
+                 
+                 <!-- section title -->
+			<div class="title text-center wow fadeIn" data-wow-duration="1500ms" >
+			  <h2>Time <span class="color">Line</span></h2>
+				<div class="border"></div>
+				   <h5> Listen to what your friends have to say... </h5>
+				</div>
+			<!-- /section title -->
+                 <!-- /.panel -->
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <i class="fa fa-clock-o fa-fw"></i> Timeline
+                            <i class="fa  fa-fw"></i>Reviews in Realtime
                         </div>
                         <!-- /.panel-heading -->
-                        <div class="panel-body">
-                            <ul class="timeline" id='newTimeLine'>
-                                <li>
-                                    <div class="timeline-badge"><i class="fa fa-check"></i>
-                                    </div>
-                                    <div class="timeline-panel">
-                                        <div class="timeline-heading">
-                                            <h4 class="timeline-title">Lorem ipsum dolor</h4>
-                                            <p><small class="text-muted"><i class="fa fa-clock-o"></i> 11 hours ago via Twitter</small>
-                                            </p>
-                                        </div>
-                                        <div class="timeline-body">
-                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Libero laboriosam dolor perspiciatis omnis exercitationem. Beatae, officia pariatur? Est cum veniam excepturi. Maiores praesentium, porro voluptas suscipit facere rem dicta, debitis.</p>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="timeline-inverted">
-                                    <div class="timeline-badge warning"><i class="fa fa-credit-card"></i>
-                                    </div>
-                                    <div class="timeline-panel">
-                                        <div class="timeline-heading">
-                                            <h4 class="timeline-title">Lorem ipsum dolor</h4>
-                                        </div>
-                                        <div class="timeline-body">
-                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Autem dolorem quibusdam, tenetur commodi provident cumque magni voluptatem libero, quis rerum. Fugiat esse debitis optio, tempore. Animi officiis alias, officia repellendus.</p>
-                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Laudantium maiores odit qui est tempora eos, nostrum provident explicabo dignissimos debitis vel! Adipisci eius voluptates, ad aut recusandae minus eaque facere.</p>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="timeline-badge danger"><i class="fa fa-bomb"></i>
-                                    </div>
-                                    <div class="timeline-panel">
-                                        <div class="timeline-heading">
-                                            <h4 class="timeline-title">Lorem ipsum dolor</h4>
-                                        </div>
-                                        <div class="timeline-body">
-                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Repellendus numquam facilis enim eaque, tenetur nam id qui vel velit similique nihil iure molestias aliquam, voluptatem totam quaerat, magni commodi quisquam.</p>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="timeline-inverted">
-                                    <div class="timeline-panel">
-                                        <div class="timeline-heading">
-                                            <h4 class="timeline-title">Lorem ipsum dolor</h4>
-                                        </div>
-                                        <div class="timeline-body">
-                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Voluptates est quaerat asperiores sapiente, eligendi, nihil. Itaque quos, alias sapiente rerum quas odit! Aperiam officiis quidem delectus libero, omnis ut debitis!</p>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="timeline-badge info"><i class="fa fa-save"></i>
-                                    </div>
-                                    <div class="timeline-panel">
-                                        <div class="timeline-heading">
-                                            <h4 class="timeline-title">Lorem ipsum dolor</h4>
-                                        </div>
-                                        <div class="timeline-body">
-                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nobis minus modi quam ipsum alias at est molestiae excepturi delectus nesciunt, quibusdam debitis amet, beatae consequuntur impedit nulla qui! Laborum, atque.</p>
-                                            <hr>
-                                            <div class="btn-group">
-                                                <button type="button" class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown">
-                                                    <i class="fa fa-gear"></i>  <span class="caret"></span>
-                                                </button>
-                                                <ul class="dropdown-menu" role="menu">
-                                                    <li><a href="#">Action</a>
-                                                    </li>
-                                                    <li><a href="#">Another action</a>
-                                                    </li>
-                                                    <li><a href="#">Something else here</a>
-                                                    </li>
-                                                    <li class="divider"></li>
-                                                    <li><a href="#">Separated link</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="timeline-panel">
-                                        <div class="timeline-heading">
-                                            <h4 class="timeline-title">Lorem ipsum dolor</h4>
-                                        </div>
-                                        <div class="timeline-body">
-                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sequi fuga odio quibusdam. Iure expedita, incidunt unde quis nam! Quod, quisquam. Officia quam qui adipisci quas consequuntur nostrum sequi. Consequuntur, commodi.</p>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="timeline-inverted">
-                                    <div class="timeline-badge success"><i class="fa fa-graduation-cap"></i>
-                                    </div>
-                                    <div class="timeline-panel">
-                                        <div class="timeline-heading">
-                                            <h4 class="timeline-title">Lorem ipsum dolor</h4>
-                                        </div>
-                                        <div class="timeline-body">
-                                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deserunt obcaecati, quaerat tempore officia voluptas debitis consectetur culpa amet, accusamus dolorum fugiat, animi dicta aperiam, enim incidunt quisquam maxime neque eaque.</p>
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
+                        <div class="panel-body" id='newTimeLine' style='min-height: 900px;  max-height: 900px; overflow-y: scroll; color: blue'>
+
+                       </div>
                         <!-- /.panel-body -->
                     </div>
                     <!-- /.panel -->
                 </div>
 
-				</div>
-<!--            <div class="container">
+            </div>
+        </section>
                 <div class="row">
                   <h2>Time Line</h2>
                 </div>
@@ -1026,7 +459,6 @@
                         <div class="avatar pull-left">
                           <a href="./index.php?qa=user&amp;qa_1=juggornot"><img src=
                           "https://ssl.gstatic.com/accounts/ui/avatar_2x.png" /></a>
-                        </div>
 
                         <div class="user-detail">
                           <h5 class="handle">juggornot</h5>
@@ -1209,311 +641,101 @@
                   </div>
                 </div>
               </div>	-->		
-		</section>   <!-- End section -->
 		
-		
-		<!-- Start Testimonial
-		=========================================== -->
-		
-	<!--	<section id="testimonial" class="parallax-section">
-			<div class="container">
-				<div class="row">				
-					<div class="col-lg-6">
-					
-						<!-- section title -->
-						<div class="sub-title text-center wow fadeInDown" data-wow-duration="500ms">
-							<h3>What People Say About Us</h3>
-						</div>
-						<!-- /section title -->
-
-						<!-- testimonial wrapper -->
-						<div id="testimonials" class="wow fadeInUp" data-wow-duration="500ms" data-wow-delay="100ms">
-						
-							<!-- testimonial single -->
-							<div class="item text-center">
-								
-								<!-- client photo -->
-								<div class="client-thumb">
-									<img src="../static/img/team/client.jpg" class="img-responsive" alt="ExstreamlyCheap">
-								</div>
-								<!-- /client photo -->
-								
-								<!-- client info -->
-								<div class="client-info">
-									<div class="client-meta">
-										<h3>Abul Mal Muhit</h3>
-										<span>Dec 26, 2014</span>
-									</div>
-									<div class="client-comment">
-										<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cumque, ex, cupiditate, error, suscipit saepe sed ea consequuntur inventore sequi sit illo.</p>
-										<ul class="social-profile">
-											<li><a href="#"><i class="fa fa-facebook-square fa-lg"></i></a></li>
-											<li><a href="#"><i class="fa fa-twitter-square fa-lg"></i></a></li>
-											<li><a href="#"><i class="fa fa-linkedin-square fa-lg"></i></a></li>
-										</ul>
-									</div>
-								</div>
-								<!-- /client info -->
-							</div>
-							<!-- /testimonial single -->
-						
-							<!-- testimonial single -->
-							<div class="item text-center">
-								
-								<!-- client photo -->
-								<div class="client-thumb">
-									<img src="../static/img/team/client.jpg" class="img-responsive" alt="ExstreamlyCheap">
-								</div>
-								<!-- /client photo -->
-								
-								<!-- client info -->
-								<div class="client-info">
-									<div class="client-meta">
-										<h3>Abul Mal Muhit</h3>
-										<span>Dec 26, 2014</span>
-									</div>
-									<div class="client-comment">
-										<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cumque, ex, cupiditate, error, suscipit saepe sed ea consequuntur inventore sequi sit illo.</p>
-										<ul class="social-profile">
-											<li><a href="#"><i class="fa fa-facebook-square fa-lg"></i></a></li>
-											<li><a href="#"><i class="fa fa-twitter-square fa-lg"></i></a></li>
-											<li><a href="#"><i class="fa fa-linkedin-square fa-lg"></i></a></li>
-										</ul>
-									</div>
-								</div>
-								<!-- /client info -->
-							</div>
-							<!-- /testimonial single -->
-						
-							<!-- testimonial single -->
-							<div class="item text-center">
-								
-								<!-- client photo -->
-								<div class="client-thumb">
-									<img src="../static/img/team/client.jpg" class="img-responsive" alt="ExstreamlyCheap">
-								</div>
-								<!-- /client photo -->
-								
-								<!-- client info -->
-								<div class="client-info">
-									<div class="client-meta">
-										<h3>Abul Mal Muhit</h3>
-										<span>Dec 26, 2014</span>
-									</div>
-									<div class="client-comment">
-										<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cumque, ex, cupiditate, error, suscipit saepe sed ea consequuntur inventore sequi sit illo.</p>
-										<ul class="social-profile">
-											<li><a href="#"><i class="fa fa-facebook-square fa-lg"></i></a></li>
-											<li><a href="#"><i class="fa fa-twitter-square fa-lg"></i></a></li>
-											<li><a href="#"><i class="fa fa-linkedin-square fa-lg"></i></a></li>
-										</ul>
-									</div>
-								</div>
-								<!-- /client info -->
-							</div>
-							<!-- /testimonial single -->
-							
-						</div>		<!-- end testimonial wrapper -->
-					</div> 		<!-- end col lg 12 -->
-				</div>	    <!-- End row -->
-			</div>       <!-- End container -->
-		</section>    <!-- End Section -->
-		
-		
-		<!--
-		Start Blog Section
-		=========================================== -->
-				
-	<!--	<section id="blog" class="bg-one">
-			<div class="container">
-				<div class="row">
-
-					<!-- section title -->
-					<div class="title text-center wow fadeInDown">
-						<h2> Latest <span class="color">Posts</span></h2>
+    <!-- End of Timeline
+        ======================================== -->
+        
+        <section id="search" class="bg-one">
+            <div class="container">
+                <div class="row">
+                     <!-- section title -->
+					<div class="title text-center wow fadeIn" data-wow-duration="1500ms" >
+					  <h2>Customer  <span class="color">Search</span></h2>
 						<div class="border"></div>
+						<h5> Let your price count </h5>
 					</div>
 					<!-- /section title -->
-
-					<div class="clearfix">
-					
-						<!-- single blog post -->
-						<article class="col-md-3 col-sm-6 col-xs-12 clearfix wow fadeInUp" data-wow-duration="500ms">
-							<div class="note">
-								<div class="media-wrapper">
-									<img src="../static/img/blog/amazing-caves-coverimage.jpg" alt="amazing caves coverimage" class="img-responsive">
-								</div>
-								
-								<div class="excerpt">
-									<h3>Simple Image Post</h3>
-									<p>Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non skateboard dolor brunch.</p>
-									<a class="btn btn-transparent" href="single-post.html">Read more</a>
-								</div>
-							</div>						
-						</article>
-						<!-- /single blog post -->
-						
-						<!-- single blog post -->
-						<article class="col-md-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="500ms" data-wow-delay="200ms">
-							<div class="note">
-								<div id="gallery-post" class="media-wrapper">
-									<div class="item">
-										<img src="../static/img/blog/amazing-caves-coverimage.jpg" alt="amazing caves coverimage" class="img-responsive">
-									</div>
-									<div class="item">
-										<img src="../static/img/blog/bicycle.jpg" alt="Flying bicycle" class="img-responsive">
-									</div>
-									<div class="item">
-										<img src="../static/img/blog/3D-beach-art.jpg" alt="3D Beach Art | ExstreamlyCheap" class="img-responsive">
-									</div>
-								</div>
-								
-								<div class="excerpt">
-									<h3>Simple Slider Post</h3>
-									<p>Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non skateboard dolor brunch.</p>
-									<a class="btn btn-transparent" href="single-post.html">Read more</a>
-								</div>
-							</div>						
-						</article>
-						<!-- end single blog post -->
-						
-						<!-- single blog post -->
-						<article class="col-md-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="500ms" data-wow-delay="400ms">
-							<div class="note">
-								<div class="media-wrapper">
-									<img src="../static/img/blog/amazing-caves-coverimage.jpg" alt="amazing caves coverimage" class="img-responsive">
-								</div>
-								
-								<div class="excerpt">
-									<h3>Simple Image Post</h3>
-									<p>Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non skateboard dolor brunch.</p>
-									<a class="btn btn-transparent" href="single-post.html">Read more</a>
-								</div>
-							</div>						
-						</article>
-						<!-- end single blog post -->
-						
-						<!-- single blog post -->
-						<article class="col-md-3 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="500ms" data-wow-delay="600ms">
-							<div class="note kill-margin-bottom">
-								<div class="media-wrapper">
-									<img src="../static/img/blog/amazing-caves-coverimage.jpg" alt="amazing caves coverimage" class="img-responsive">
-								</div>
-								<div class="excerpt">
-									<h3>Simple Image Post</h3>
-									<p>Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non skateboard dolor brunch.</p>
-									<a class="btn btn-transparent" href="single-post.html">Read more</a>
-								</div>
-							</div>						
-						</article>
-						<!-- end single blog post -->
-					</div>
-
-					<div class="all-post text-center">
-						<a class="btn btn-transparent" href="blog.html">View All Post</a>
-					</div>
-
-				</div> <!-- end row -->
-			</div> <!-- end container -->
-		</section> <!-- end section -->
-		
-		<!-- Srart Contact Us
-		=========================================== -->		
-	<!--	<section id="contact-us">
-			<div class="container">
-				<div class="row">
-					
-					<!-- section title -->
-					<div class="title text-center wow fadeIn" data-wow-duration="500ms">
-						<h2>Get In <span class="color">Touch</span></h2>
-						<div class="border"></div>
-					</div>
-					<!-- /section title -->
-					
-					<!-- Contact Details -->
-					<div class="contact-info col-md-6 wow fadeInUp" data-wow-duration="500ms">
-						<h3>Contact Details</h3>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsam, vero, provident, eum eligendi blanditiis ex explicabo vitae nostrum facilis asperiores dolorem illo officiis ratione vel fugiat dicta laboriosam labore adipisci.</p>
-						<div class="contact-details">
-							<div class="con-info clearfix">
-								<i class="fa fa-home fa-lg"></i>
-								<span>Khaja Road, Bayzid, Chittagong, Bangladesh</span>
-							</div>
-							
-							<div class="con-info clearfix">
-								<i class="fa fa-phone fa-lg"></i>
-								<span>Phone: +880-31-000-000</span>
-							</div>
-							
-							<div class="con-info clearfix">
-								<i class="fa fa-fax fa-lg"></i>
-								<span>Fax: +880-31-000-000</span>
-							</div>
-							
-							<div class="con-info clearfix">
-								<i class="fa fa-envelope fa-lg"></i>
-								<span>Email: admin@exstreamlycheap.club</span>
-							</div>
-						</div>
-					</div>
-					<!-- / End Contact Details -->
-						
-					<!-- Contact Form -->
-					<div class="contact-form col-md-6 wow fadeInUp" data-wow-duration="500ms" data-wow-delay="300ms">
-						<form id="contact-form" method="post" action="sendmail.php" role="form">
-						
-							<div class="form-group">
-								<input type="text" placeholder="Your Name" class="form-control" name="name" id="name">
-							</div>
-							
-							<div class="form-group">
-								<input type="email" placeholder="Your Email" class="form-control" name="email" id="email">
-							</div>
-							
-							<div class="form-group">
-								<input type="text" placeholder="Subject" class="form-control" name="subject" id="subject">
-							</div>
-							
-							<div class="form-group">
-								<textarea rows="6" placeholder="Message" class="form-control" name="message" id="message"></textarea>	
-							</div>
-							
-							<div id="mail-success" class="success">
-								Thank you. The Mailman is on His Way :)
-							</div>
-							
-							<div id="mail-fail" class="error">
-								Sorry, don't know what happened. Try later :(
-							</div>
-							
-							<div id="cf-submit">
-								<input type="submit" id="contact-submit" class="btn btn-transparent" value="Submit">
-							</div>						
-							
-						</form>
-					</div>
-					<!-- ./End Contact Form -->
+                <!-- Tabs Products and Merchants    -->
+                <div>
+			     <ul class="nav nav-tabs nav-justified" role="tablist">
+			       <li role="presentation" class="active"><a href="#product" aria-controls="product" role="tab" data-toggle="tab"><h4>Product Search</h4></a></li>
+			       <li role="presentation"><a href="#merchant" aria-controls="merchant" role="tab" data-toggle="tab"><h4>Merchant Search</h4></a></li>
+			     </ul>
+               
+                <!-- Tab panes -->
+			     <div class="tab-content">
+			           <div role="tabpanel" class="tab-pane fade in active" id="product">
+			             <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 col-sm-12">
+				     <h5>Search your favorite categories</h5>
 				
-				</div> <!-- end row -->
-			</div> <!-- end container -->
-			
-			<!-- Google Map -->
-			<div class="google-map wow fadeInDown" data-wow-duration="500ms">
-				<div id="map-canvas"></div>
-			</div>	
-			<!-- /Google Map -->
-			
-		</section> <!-- end section -->
-		
-		<!-- end Contact Area
-		========================================== -->
-		
+                        <form role="form" class="form-horizontal" id="searchForm" action="/api/trending_categories_with_price" method="POST">
+                                       <!-- action is the html template that will return the result to this input query -->
+                                
+                                       <div class="form-group text-center">
+					 <input type="text" class="form-control" id="autocomplete2" name="search_ta" placeholder="Start typing..." width="100%">
+                                       </div> 
+                                       <select class="form-control" name="priority" id="priorityOpts">
+                                         <option>Select Priority Level</option>
+                                         <option value="price">Price Conscious</option>
+                                         <option value="discount">Discount Conscious</option>
+                                       </select>
+				       <div class="input-group" id="maxPrice">
+					 <span class="input-group-addon"><h5> What is that max price? </h5></span>
+					 <span class="input-group-addon">$</span>
+					 <input name="maxPrice" type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+					 <span class="input-group-addon">.00</span>
+				       </div>
+                                       <span class="form-group-btn">
+                                         <button class="btn btn-default" type="submit">Search!</button>
+                                       </span>  
+                                
+                        </form>
+				     </div>
+				    <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12 col-sm-12" style="margin: 35px 0 35px 0px;">
+				          <div id="dealsResponse" style="color: blue">
+					
+					     
+					       </div> 
+				    </div>
+                     </div> <!-- End of product Div -->
+                    <div role="tabpanel" class="tab-pane fade" id="merchant">
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 col-sm-12">
+                            <h5>Search for your favorite provider</h5>
+                            <form role="form" class="form-horizontal" id="merchantForm" name="merchantForm" action="/api/provider_by_category" method="POST">
+                                       <!-- action is the html template that will return the result to this input query -->
+                                
+                                       <div class="form-group text-center">
+					 <input type="text" class="form-control" id="autocomplete1" name="merchant_ta" placeholder="Start typing your favorite category..." width="100%">
+                                       </div>
+				       <span class="form-group-btn">
+					 <button class="btn btn-default" type="submit" name="findProvider">Go! Find those providers.</button>
+				       </span>
+                            </form>   
+                        </div>
+                         <div class="col-lg-8 col-md-8 col-sm-6 col-xs-12 col-sm-12" style="margin: 35px 0 35px 0px;">
+			   <div id="merchantsResponse" style="color: blue">
+			   </div> 
+			 </div> <!-- col-lg-8 -->
+                         
+                    </div> <!-- End of Merchant Tab -->
+                 </div> <!-- Tab Content -->
+                </div> <!-- Justified Tabs -->
+                
+                </div> <!-- row -->
+            </div> <!-- container -->
+
+     
+        </section>
+        
+         <!--  Footer
+        ===========================================	-->
 		<footer id="footer" class="bg-one">
 			<div class="container">
 			    <div class="row wow fadeInUp" data-wow-duration="500ms">
 					<div class="col-lg-12">
 						
 						<!-- Footer Social Links -->
+<!--
 						<div class="social-icon">
 							<ul>
 								<li><a href="#"><i class="fa fa-facebook"></i></a></li>
@@ -1525,6 +747,7 @@
 								<li><a href="#"><i class="fa fa-pinterest"></i></a></li>
 							</ul>
 						</div>
+-->
 						<!--/. End Footer Social Links -->
 
 						<!-- copyright -->
@@ -1534,7 +757,7 @@
 							</a>
 							<br />
 							
-							<p>Design And Developed by <a href="http://www.themefisher.com"> Themefisher Team</a>. Copyright &copy; 2015. All Rights Reserved.</p>
+							<p>Design And Developed by <a href="http://www.exstreamlycheap.club"> ExStreamly Cheap Team</a>. Copyright &copy; 2015. All Rights Reserved.</p>
 						</div>
 						<!-- /copyright -->
 						
@@ -1558,6 +781,8 @@
 		
 		<!-- Main jQuery -->
 		<script src="../static/js/jquery-1.11.0.min.js"></script>
+		<link href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/ui-darkness/jquery-ui.min.css" rel="stylesheet">
+		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
 		<!-- Bootstrap 3.1 -->
 		<script src="../static/js/bootstrap.min.js"></script>
 		<!-- Slitslider -->
@@ -1595,9 +820,11 @@
 		<script src="../static/js/grid.js"></script>
 		<!-- Custom js -->
 		<script src="../static/js/custom.js"></script>
-        <scrip src="../static/js/dataTables.js"></scrip>
-        <script type="text/javascript" src="https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"></script>
-        <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+		<!-- Typeahead.js -->
+		<script src="http://cdn.jsdelivr.net/typeahead.js/0.9.3/typeahead.min.js"></script>
+		<script src="../static/js/dataTables.js"></script>
+		<script type="text/javascript" src="https://cdn.datatables.net/1.10.10/js/jquery.dataTables.min.js"></script>
+		<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
         <script>
         $(document).ready(function(){
                 $('#trendTable').DataTable( {
@@ -1605,11 +832,33 @@
 	              "searching": false
       	          });
           });
-            
+	
+	// Typeahead 
+	$("#search_ta").typeahead(
+	{
+	    hint: true,
+	    highlight: true,
+	    minLength: 2,
+	    name: 'categories',
+
+	     local: ["Beauty & Health","City Tours","Fitness","Golf","Movies, Music, & Games","Manicure & Pedicure","Wine Tasting","Restaurants","Sporting Events","Fashion Accessories","Outdoor Adventures","Teeth Whitening","College","Makeup","Skiing","Dermatology","Spa","Tools & Hardware","Office Supplies","Museums","Hair Removal","Yoga","Women's Clothing","Special Interest","Retail & Services","Crafts & Hobbies","Men's Fashion","Boot Camp","Jewish","Personal Training","Home Goods","Men's Clothing","Pets","Bridal","Skydiving","Gym","Activities & Events","Toys","Product","Home Services","Comedy Clubs","Gay","Food & Alcohol","Fitness Classes","Automotive","Dental","Fitness","Bars & Clubs","Gift Ideas","Life Skills Classes","Pilates","Dining & Nightlife","Adult Products","Facial","Baby","Electronics","Food & Grocery","Kitchen","Hair Salon","Kids","Theater","Treats","Photography Services","Chiropractic","Mobile Devices & Accessories","Health & Beauty","Luggage & Baggage","Automotive Services","Kosher","Martial Arts","Women's Fashion","Bowling","Tanning","Eye & Vision","Audio & Accessories","Travel","Concerts","Massage","Dance Classes"]
+	     
+         });
+       
+	var data = ["Beauty & Health","City Tours","Fitness","Golf","Movies, Music, & Games","Manicure & Pedicure","Wine Tasting\
+","Restaurants","Sporting Events","Fashion Accessories","Outdoor Adventures","Teeth Whitening","College","Makeup","Skiing","Dermatology","Spa","Tools & Hardware","Office Supplies","Museums","Hair Removal","Yoga","Women's Clothing","Special Interest","Retail & Services","Crafts & Hobbies","Men's Fashion","Boot Camp","Jewish","Personal Training","Home Goods","Men's Clothing","Pets","Bridal","Skydiving","Gym","Activities & Events","Toys","Product","Home Services","Comedy Clubs","Gay","Food & Alcohol","Fitness Classes","Automotive","Dental","Fitness","Bars & Clubs","Gift Ideas","Life Skills Classes","Pilates","Dining & Nightlife","Adult Products","Facial","Baby","Electronics","Food & Grocery","Kitchen","Hair Salon","Kids","Theater","Treats","Photography Services","Chiropractic","Mobile Devices & Accessories","Health & Beauty","Luggage & Baggage","Automotive Services","Kosher","Martial Arts","Women's Fashion","Bowling","Tanning","Eye & Vision","Audio & Accessories","Travel","Concerts","Massage","Dance Classes"]
+	$(function() {
+	$("#autocomplete1").autocomplete({
+	source: data
+	});
+	$("#autocomplete2").autocomplete({
+	source: data
+	}).autocomplete("widget").addClass("fixed-height");
+	});
        var map = L.map('leaflet_map').setView([40.746581, -74.001997], 5);
 
 		L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw', {
-			maxZoom: 18,
+			maxZoom: 12,
 			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
 				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
 				'Imagery © <a href="http://mapbox.com">Mapbox</a>',
@@ -1661,23 +910,159 @@
                 });                                                                                       
             });
         }
-	
+       var totalSoldToday = 0;
+       var totalSold = 0;
        function trendingByTime() {
 	  $.getJSON('/api/trending_categories_by_time')
 	    .done(function(data) {
 		$('#trendsTbBody').empty();
+			 totalSold = 0;
 			 $.each(data.data, function(i, item) {
 			 row_html = '<tr><td>';
 			 row_html += item[0] + '</td><td>';
 			 row_html += item[1] + '</td><td>';
 			 row_html += item[2] + '</td></tr>';
+			 totalSold += item[2];
 			 $('#trendsTbBody').append(row_html)
-			 });
-	        });
+	        
+	        // Update number of deals sold today
+	        $('#totalSoldToday').empty();
+	        totalSoldToday += totalSold;
+	        if (totalSoldToday >= 1000000000) {
+	            totalSoldToday = 0;
+	        }
+		$('#totalSoldToday').text(totalSoldToday);
+		});
+	      });
        }
+        
+//        function usersPurchasesByTime() {
+//            $.getJSON('/api/users_purchasing_pattern')
+//            .done(function(data) {
+////                $('#newTimeLine').empty();
+//                $.each(data.data, function(i, item) {
+//                    new_post = '<li>';
+//	            new_post += item[0] + ' ';
+//                    new_post += item[1] + ' ';
+//                    new_post += item[2] + '</li>';
+//                     $('#newTimeLine ul').append(new_post);
+//                });  
+//            });
+//        }
+        function mostPurchasedDealInThirtySeconds() {
+	    $.getJSON('/api/most_purchased_in_thirty_seconds')
+	    .done(function(data) {
+	        $('#mostBoughtIn30seconds').empty();
+	        $.each(data.data, function(i, item) {
+	            $('#mostBoughtIn30seconds').text(item.category);
+	        });
+	    });
+	}        
+        function usersPurchasesByTime() {
+            $.getJSON('/api/users_purchasing_pattern')
+            .done(function(data) {
+                $('#newTimeLine').empty();
+                $.each(data.data, function(i, item) {
+	            if (i % 2 == 0) {
+	               new_post = '<ul class="timeline"><li class="timeline"><div class="timeline-badge"><i class="fa fa-ch\
+eck"></i></div><div class="timeline-panel"><div class="timeline-heading"><h4 class="timeline-title">';
+	            }
+                    else {
+                       new_post = '<ul class="timeline"><li class="timeline-inverted"><div class="timeline-badge"><i class="fa fa-check"></i></div><div class="timeline-panel"><div class="timeline-heading"><h4 class="timeline-title">';
+		    }
+                    new_post += item[0] + '</h4><p><small class="text-muted"><i class="fa fa-clock-o"></i>';
+                    new_post += item[1] + '</small></p></div><div class="timeline-body"><p>';
+                    new_post += item[2] + '</p></div></div></li></ul>';
+                     $('#newTimeLine').append(new_post);
+                });  
+            });
+        }
+
         $(function () {
-         setInterval(trendingByTime, 2000);
+            setInterval(trendingByTime, 2000);
+            setInterval(usersPurchasesByTime, 5000);
+	    setInterval(mostPurchasedDealInThirtySeconds, 10000);
         });
+
+
+
+        $(function () {
+        $(document).ready(function () {
+            Highcharts.setOptions({
+                global: {
+                    useUTC: true
+                }
+            });
+
+            $('#trendGraph').highcharts({
+                chart: {
+                    type: 'spline',
+                    animation: Highcharts.svg, // don't animate in old IE
+                    marginRight: 10,
+                    events: {
+                        load: function () {
+
+                            // set up the updating of the chart each second
+                            var series = this.series[0];
+                            setInterval(function () {
+                                var x = (new Date()).getTime(), // current time
+                                    y =  totalSold; // Math.random();
+                    console.log(totalSold);
+                                series.addPoint([x, y], true, true);
+                            }, 1000);
+                        }
+                    }
+                },
+                title: {
+                    text: '[Total Purchases] - By the second trend'
+                },
+                xAxis: {
+                    type: 'datetime',
+                    tickPixelInterval: 150
+                },
+                yAxis: {
+                    title: {
+                        text: 'Value'
+                    },
+                    plotLines: [{
+                        value: 0,
+                        width: 1,
+                        color: '#808080'
+                    }]
+                },
+                tooltip: {
+                    formatter: function () {
+                        return '<b>' + this.series.name + '</b><br/>' +
+                            Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
+                            Highcharts.numberFormat(this.y, 2);
+                    }
+                },
+                legend: {
+                    enabled: true
+                },
+                exporting: {
+                    enabled: false
+                },
+                series: [{
+                    name: 'Total Sold',
+                    data: (function () {
+                        // generate an array of random data
+                        var data = [],
+                            time = (new Date()).getTime(),
+                            i;
+
+                        for (i = -19; i <= 0; i += 1) {
+                            data.push({
+                                x: time + i * 1000,
+                                y: totalSold //Math.random()
+                            });
+                        }
+                        return data;
+                    }())
+                }]
+            });
+        });
+    });
         
         function usersPurchasesByTime() {
             $.getJSON('/api/users_purchasing_pattern')
@@ -1693,6 +1078,126 @@
                 });  
             });
         }
-        </script>
+    </script>
+	<script>
+	  
+	  /* To show the price text box if price is priority */
+	  $("#maxPrice").hide(); // hide on default
+	 
+	  $("#priorityOpts").change(function() {
+	  if($("#priorityOpts").val() == 'price') {
+	      $("#maxPrice").show("slow");
+	  }
+	  else {
+	   $("#maxPrice").hide("slow"); // hide if anything else than price chosen
+	  }
+	  });	  
+	  
+
+	  /* [PRODUCT SEARCH] -  Collect form information when submitted, Don't reload */
+	  $("#searchForm").submit(function(event) 
+	  {
+	  /* stop form from submitting normally */
+	  event.preventDefault();
+	  
+	  /* get some values from elements on the page: */
+	  var $form = $( this ),
+	  $submit = $form.find( 'button[type="submit"]' ),
+	  categoryVal = $form.find( 'input[name="search_ta"]' ).val(),
+	  priorityVal = $form.find( 'select[name="priority"]' ).val(),
+	  url = $form.attr('action');
+
+	  maxPrice = 0.00
+	  /* Get max price if price is priority */
+	  if (priorityVal == 'price') {
+	      maxPrice = $form.find( 'input[name="maxPrice"]' ).val() 
+	  }
+	  /* Compose full url for request */    
+	  url = url + '/' + categoryVal + '/' + priorityVal + '/' + maxPrice;
+          console.log(url)
+	  /* Send the data using post */
+	  var posting = $.getJSON( url ); //, { 
+	  console.log('Data sent to server via submit');
+	  posting.done(function( data )
+	  {
+	  console.log('Inside DONE!!');
+	  
+	  /* Put the results in a div */
+	  $('#dealsResponse').empty();
+	  $.each(data.data, function(i, item) {
+	  new_post = '<div class="panel panel-default"><div class="panel-heading">';
+	      new_post += item[0] + '</div><div class="panel-body">';
+	      new_post += '<h4>Price:</h4> ' + item[2] + '<br/><br/>';
+	      new_post += '<h4>Total savings:</h4> ' + item[3] + '<br/><br/>';
+	      new_post += '<h5>Description:</h5> <p>' + item[4] + '</p><br/>';
+	      new_post += '<h5>Fine Print:</h5> <p>' + item[5] + '</p></div></div>';
+	  $('#dealsResponse').append(new_post);
+	  });
+	  /* Change the button text. */
+	  $submit.text('Found deals, Enjoy!');
+	  
+	  /* Disable the button. */
+	  $submit.attr("disabled", false);
+	  
+	  /* Change the button text. */
+	  $submit.text('Search, Again!')
+	  });
+	  console.log('After posting.done');
+	  });
+	</script>
+	<script>
+	  $("#merchantForm2").submit(function(event) {
+	  alert("Submitted");
+	  });
+	  /* [MERCHANT SEARCH] - Collect form information when submitted, Don't reload */
+          $("#merchantForm").submit(function(event)
+          {
+	  console.log("Inside Merchant Submission");
+          /* stop form from submitting normally */
+          event.preventDefault();
+	  console.log("Prevented Default");
+          /* get some values from elements on the page: */
+          var $form = $( this ),
+          $submit = $form.find( 'button[name="findProvider"]' ),
+          categoryVal = $form.find( 'input[name="merchant_ta"]' ).val(),
+          url = $form.attr('action');
+	  console.log(categoryVal);
+          /* Compose full url for request */
+          url = url + '/' + categoryVal;
+          console.log(url);
+          /* Send the data using post */
+          var posting = $.getJSON( url );
+          console.log('Data sent to server via submit');
+          posting.done(function( data )
+          {
+          console.log('Inside DONE!!');
+          
+          /* Put the results in a div */
+          $('#merchantsResponse').empty();
+          $.each(data.data, function(i, item) {
+          new_post = '<div class="panel panel-default"><div class="panel-heading">';
+              new_post += 'Provided by: ' + item[0] + '</div><div class="panel-body">';
+              new_post += '<h4>Merchant Information</h4>';
+              new_post += '<h5>Name:</h5> ' + item[7] + '</br>'
+              new_post += '<h5>Address:</h5> ' + item[2] + ', ' + item[3] + '<br/><br/>';
+              new_post += '<h4>Geolocation Info</h4> <b>Lat:</b> ' + item[4] + ', <b>Long:</b> ' + item[5] + '<br/><br/>';
+              new_post += 'Deals offered in the  ' + item[9] + ' region. <br/><br/>';
+              new_post += '<p>How well are we doing selling our ' + item[1] + ' deals?<br/><b>' + item[10] + '</b> sold already.</p></div></div>';
+          $('#merchantsResponse').append(new_post);
+          });
+          /* Change the button text. */
+          $submit.text('Found providers, Enjoy!');
+	  
+          /* Disable the button. */
+          $submit.attr("disabled", false);
+	  
+          /* Change the button text. */
+          $submit.text('Search, Again!')
+          });
+          console.log('After posting.done');
+          });
+	</script>
+	<script src="https://code.highcharts.com/highcharts.js"></script>
+	<script src="https://code.highcharts.com/modules/exporting.js"></script>
     </body>
 </html>

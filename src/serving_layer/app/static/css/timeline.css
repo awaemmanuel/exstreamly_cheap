@@ -2,6 +2,7 @@
     position: relative;
     padding: 20px 0 20px;
     list-style: none;
+    position: relative;
 }
 
 .timeline:before {
@@ -178,7 +179,10 @@
         border-left-width: 0;
     }
 }
-
+/* HIDDEN PRICE TEXTBOX */
+.starthidden {
+    display: none;
+}
 /* ONE COLUMN TIMELINE SPECIFIC CSS 
 .message-item {
     margin-bottom: 25px;
