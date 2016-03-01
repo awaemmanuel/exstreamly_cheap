@@ -57,8 +57,7 @@ def process_trends(time, rdd):
         
         #category_counts_df = sqlContext.sql('select *  from trending_categories_by_time')
         category_counts_df.show()
-        
-        new_df.show()
+   
         category_counts_df.write.format("org.apache.spark.sql.cassandra").options(table="trending_categories_by_time",keyspace="deals_streaming").save(mode="append")
         print "Appended to table trending_categories_by_time: {}".format(datetime.now().strftime('%Y-%m-%d %H%M%S'))
     except:
@@ -105,7 +104,7 @@ if __name__ == '__main__':
     topicPartition3 = TopicAndPartition(topic, partition_4)
     fromOffset = {topicPartition1: long(start), topicPartition2: long(start), topicPartition3: long(start)}
 
-    directKafkaStream = KafkaUtils.createDirectStream(ssc, [topic], {"metadata.broker.list": '172.31.2.36:9092'})#, fromOffsets=fromOffset)
+    directKafkaStream = KafkaUtils.createDirectStream(ssc, [topic], {"metadata.broker.list": '172.31.2.36:9092'})
     
     ''' Read json input
         Output - {u'timestamp': 20160216232746, u'name': u'Donald Sarver', u'subscribed_to': [u'kids', u'personal-training', u'wine-tasting', u'bars-clubs', u'womens-clothing', u'travel', u'facial']}
