@@ -46,7 +46,8 @@ def process_trends(time, rdd):
         # Convert RDD[String] to RDD[Row] to DataFrame
         rowRdd = rdd.map(lambda c: Row(category=c, ts=int(datetime.now().strftime('%Y%m%d%H%M%S'))))
         categories_df = sqlContext.createDataFrame(rowRdd)
-        
+        #categories_df.show()
+
         # Register as table
         categories_df.registerTempTable('trending_categories_by_time')
 
@@ -84,7 +85,7 @@ def process_users_info(time, rdd_user_info):
 if __name__ == '__main__':
     # Configure spark instance
     sc = SparkContext()
-    ssc = StreamingContext(sc, 5)
+    ssc = StreamingContext(sc, 3)
     
     # Start from beginning and consume all partitions of topic
     start = 0
@@ -99,7 +100,7 @@ if __name__ == '__main__':
     topicPartition3 = TopicAndPartition(topic, partition_4)
     fromOffset = {topicPartition1: long(start), topicPartition2: long(start), topicPartition3: long(start)}
 
-    directKafkaStream = KafkaUtils.createDirectStream(ssc, [topic], {"metadata.broker.list": '52.71.152.72.147.112:9092,52.72.209.156:9092,52.72.105.140:9092,52.72.200.42:9092'}, fromOffsets=fromOffset)
+    directKafkaStream = KafkaUtils.createDirectStream(ssc, [topic], {"metadata.broker.list": '172.31.2.36:9092'})#, fromOffsets=fromOffset)
     
     ''' Read json input
         Output - {u'timestamp': 20160216232746, u'name': u'Donald Sarver', u'subscribed_to': [u'kids', u'personal-training', u'wine-tasting', u'bars-clubs', u'womens-clothing', u'travel', u'facial']}
@@ -110,7 +111,7 @@ if __name__ == '__main__':
               Output of format - 'facial automotive-services boot-camp pets city-tours yoga'
     '''
     categories = json_lines.map(lambda msg: retrieve_subscriptions(msg)).filter(lambda x: len(x) > 0)
-    
+       
     # Send user and subscriptions information to DB using timestamp
     users_info = json_lines.foreachRDD(process_users_info)
     
