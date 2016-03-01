@@ -65,7 +65,20 @@ After ingestion, the data is persisted in HDFS for the batch pipeline. From HDFS
 Queries are served to the user via a web app that was hosted on http://exstreamlycheap.club or via intuitive RESTFUL APIs. The clusters are currently shut down after the project, but the video people shows details of this interactive interface.
 
 ## 5. Challenges
+A lot challenges were meant a long the way. A few outstanding ones are completely outlined on the figure below.
+
+![alt text](figures/challenges.png "Project Challenges.")
+
 ## 6. Take Aways
+The following are some of the lessons learned.
+  1. There are ubiquitous engineering intricacies that go into designing a robust data pipeline. Careful consideration need to be given to release versions, bugs reported, features already supported by client libraries and documentation (most important in my opinion). A choice between your favorite programming language, which may not be the tool's native implementation, vs the native language implementation is very key. If a native language is chosen, then you may need to learn a new language like SCALA.
+  
+  2. The best/optimal design architecture for the Asynchronous Distributed Querying Engine (Async DQE) was a bit challenging. Design tradeoffs had to made to ensure uniqueness of deals. Crawling the API synchronously led to duplicate and expired deals. 
+  ![alt text](figures/pagination_issue.png "Sqoot Pagination challenge.")
+This reason led to implementing Async DQE to try and fetch unique deals asynchronously in parallel, utilizing PyKafka asynchronous producers and balanced consumer implementations. This path was choosen because of the 
+```LEAKY BUCKET ALGORITHM,  kafka's thread safeness, message queuing and ability to multithread a balanced consumer.``` 
+  3. Taking deep dives to tweak these open source code tools, changing methods to solve use cases offered by Native APIs and not yet supported on the wrapper clients. For instance I had started to implement a HASH Partition on Kafka-Python for dynamic topic-to-consumer instance assignment; to avoid flooding a particular hybrid consumer-producer consuming a particular partition. With further research, I found an already existing implementaion on PyKafka.
+  
 ## 7. Demo and slides
 A well detailed presentation can be found at link below. Please note that it includes the video as well.
 https://www.slideshare.net/EmmanuelAwa/exstreamlycheap-final-slides
