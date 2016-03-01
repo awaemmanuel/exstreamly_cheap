@@ -27,26 +27,17 @@ def evaluate_and_purify(msg):
     '''
     print "Inside evaluate and purify"
     msg = to_unicode(msg)
-    print "Converted to unicode... "
     try:
-        print "Inside Try block\n"
-        #msg = to_unicode(msg)
-        msg = eval(msg)#.encode('utf-8'))
+        msg = eval(msg)
     except SyntaxError:
-        print "Inside Exception\n"
         raise
     except NameError:
-        print "Inside NameError"
-        #msg = json.loads(msg)
-        print type(msg)
+        pass
     if isinstance(msg, OrderedDict):
-        print "Inside isinstance\n"
         msg = dict(msg)
-    elif not isinstance(msg, dict) and is_json(msg):
-        print "Inside Json checker"
+    elif not isinstance(msg, dict) and is_json(msg)
         msg = json.loads(msg)
     elif isinstance(msg, str):
-        print "Inside Str checker"
         msg = msg.rstrip('\n')
         msg = eval(msg)
         if isinstance(msg, dict) or isinstance(msg, OrderedDict):
@@ -60,7 +51,7 @@ def evaluate_and_purify(msg):
     else:
         raise("Unknown Format {} {}".format(type(msg), msg))
     print type(msg)    
-    #return msg
+        
     cleaned = clean_data(msg) # Remove html tags from deals description
     return cleaned
 
@@ -90,7 +81,6 @@ def clean_data(msg):
         clean_fineprint = strip_html_tags(msg['fine_print'])
         msg['description'] = clean_description
         msg['fine_print'] = clean_fineprint
-        #msg['id'] = int(msg['id'])
         msg['price'] = float(msg['price']) if msg['price'] else 0.0
         msg['discount_percentage'] = float(msg['discount_percentage']) if msg['discount_percentage'] else 0.0
         msg['merchant_longitude'] = str(msg['merchant_longitude']) if msg['merchant_longitude'] else '0.0'
@@ -153,15 +143,7 @@ if __name__ == '__main__':
     
     # Create external dataset
     distFile = sc.textFile(base_uri)
-    #print_stats(distFile)
-    #new_df = distFile
-    #new_df = new_df.toDF()
-    #new_df.printSchema()
-    #distFile = distFile.flatMap(evaluate_and_purify).toDF()
     distFile = distFile.map(evaluate_and_purify)
-    #new_table = distFile.map(lambda p: Row(subcategory=p['sub_category'], category=p['category']))
-    #new_table = distFile.map(lambda p: Row(sub_category=p['sub_category'], category=p['category'], updated_at=p['updated_at'], fine_print=p['fine_print'], id=int(p['id']), merchant_postal_code=p['merchant_postal_code'], title=p['title'], price=p['price'], discount_percentage=p['discount_percentage'], merchant_longitude=p['merchant_longitude'], merchant_latitude=p['merchant_latitude'], number_sold=p['number_sold'], merchant_id=p['merchant_id']))
-    #new_table = distFile.map(lambda p: Row(sub_category=p['sub_category'], category=p['category'], updated_at=p['updated_at'], id=int(p['id']), merchant_postal_code=p['merchant_postal_code'], title=p['title'], price=p['price'], discount_percentage=p['discount_percentage'], merchant_name=p['merchant_name'], merchant_address=p['merchant_address'], merchant_locality=p['merchant_locality'], merchant_region=p['merchant_region'], merchant_country=p['merchant_country'], merchant_longitude=p['merchant_phone_number'], merchant_latitude=p['merchant_latitude'], number_sold=p['number_sold'], merchant_id=p['merchant_id'], description=p['description'], fine_print=p['fine_print'], url=p['url'], online=p['online']))
     new_table = distFile.map(lambda p: Row(id=int(p['id']), title=p['title'], category=p['category'], sub_category=p['sub_category'], description=p['description'], fine_print=p['fine_print'], price=p['price'], discount_percentage=p['discount_percentage'], created_at=p['created_at'], updated_at=p['updated_at'], expires_at=p['expires_at'], number_sold=p['number_sold'], url=p['url'], online=p['online'], provider_name=p['provider_name'], merchant_id=p['merchant_id'], merchant_name=p['merchant_name'], merchant_address=p['merchant_address'], merchant_locality=p['merchant_locality'], merchant_region=p['merchant_region'], merchant_country=p['merchant_country'], merchant_phone_number=p['merchant_phone_number'], merchant_longitude=p['merchant_longitude'], merchant_latitude=p['merchant_latitude']))
     schemaDeals = sqlContext.inferSchema(new_table)#, samplingRatio=None)
     schemaDeals.registerTempTable("Deals")
@@ -171,22 +153,8 @@ if __name__ == '__main__':
     
     ## Drop Null Values
     sample.dropna()
-    #sample.collect()
-    
-    #sample.printSchema()
-    #sample.show()
-    #num_deals
     time_now = int(datetime.now().strftime('%Y%m%d%H%M'))
-    #total_deals = sample.map(lambda r: Row(ts=time_now, total_num_deals=r[0]))
-    #schemaTotalDeals = total_deals.toDF()#.inferSchema(total_deals)
-    #total_deals_df = total_deals.toDF(['column', 'value'])
-    #total_deals.collect()
     
-    #schemaTotalDeals.printSchema()
-    #schemaTotalDeals.show()
-    #total_deals = sample
-    #total_deals = total_deals.map(lambda r: Row(ts=str(uuid.uuid1()), total_num_deals=r))
-    #schemaTotalDeals.write.format('org.apache.spark.sql.cassandra').options(table='num_deals', keyspace='deals').save(mode='append')
     ## Write the trending categories by price into database
     sample.write.format('org.apache.spark.sql.cassandra').options(table='trending_categories_with_price', keyspace='deals').save(mode='append')
 
@@ -195,5 +163,5 @@ if __name__ == '__main__':
 
     ## Write to the provider_by_category table
     sqlContext.sql('select category, provider_name, merchant_address, merchant_country, merchant_id, merchant_latitude, merchant_locality,merchant_longitude,merchant_name,merchant_phone_number,merchant_region,number_sold from Deals').write.format('org.apache.spark.sql.cassandra').options(table='provider_by_category', keyspace='deals').save(mode='append')
-    #print "Finished at..... {}".format(time.strftime('%Y%m%dH%M%S'))
+    
     print "Finished at..... {}".format(time.strftime('%H:%M:%S'))

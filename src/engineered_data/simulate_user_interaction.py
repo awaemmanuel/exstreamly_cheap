@@ -48,9 +48,9 @@ class SimulateInteraction(object):
         print type(self.out_topic), self.out_topic
         
         uf.print_out('''
-            Connected with Client.
-            Getting ready to produce messages to topic {}. Press Ctrl-C to interrupt. 
-            '''.format(self.topic.name))
+            Connected with Client on {}.
+Getting ready to produce messages to topic {}. Press Ctrl-C to interrupt. 
+            '''.format(self.kafka_client, self.topic.name))
         self.msg_cnt = 0
         
         
@@ -69,8 +69,7 @@ class SimulateInteraction(object):
                 uf.print_out("[SUCCESSFUL] - {} subscribed ==> {}.".format(sub.get_users_name(),
                                                                        sub.get_users_channels()))
                 uf.print_out("[SUCCESSFUL] - {} Users written to producer".format(num))
-                uf.spinning_cursor(1)
-    
+
     def _generate_random_name(self):
         ''' Generate random full name
             Using open source library from treyhunner

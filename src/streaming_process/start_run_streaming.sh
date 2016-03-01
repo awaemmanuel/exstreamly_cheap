@@ -25,5 +25,5 @@ tmux send-keys -t $SESSION_NAME:$ID_1 'python ../engineered_data/simulate_user_i
 # Tmux window for the spark process
 ### Run the bash process using the pyspark-cassandra connector on the spark master 
 tmux new-window -t $ID_2
-tmux send-keys -t $SESSION_NAME:$ID_2 'spark-submit --jars ../libs/sample-assembly-1.0.jar --packages TargetHolding/pyspark-cassandra:0.24 stream_user_interaction.py' C-m
+tmux send-keys -t $SESSION_NAME:$ID_2 'spark-submit --master spark://ip-172-31-2-36:7077  --conf spark.cassandra.connection.host=172.31.2.36 --jars ../libs/sample-assembly-1.0.jar --packages TargetHolding/pyspark-cassandra:0.2.4 stream_user_interaction.py > extract.txt' C-m
 
