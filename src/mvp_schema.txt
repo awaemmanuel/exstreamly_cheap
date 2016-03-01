@@ -299,16 +299,22 @@ root
  |-- updated_at: string (nullable = true)
  |-- url: string (nullable = true)
  
-CREATE TABLE trending_categories_with_price (category text, sub_category text, created_at timestamp, updated_at timestamp, expires_at timestamp, description text, fine_print text, price float, discount_percentage float, id bigint, merchant_address text, merchant_country text, merchant_id bigint,merchant_latitude text, merchant_longitude text, merchant_locality text, merchant_name text ,merchant_phone_number text, merchant_region text, number_sold float, online boolean, provider_name text, title text, url text, PRIMARY KEY ((price) category, discount_percentage)) WITH CLUSTERING ORDER BY (discount_percentage DESC) ;
+CREATE TABLE trending_categories_with_price (category text, sub_category text, created_at timestamp, updated_at timestamp, expires_at timestamp, description text, fine_print text, price float, discount_percentage float, id bigint, merchant_address text, merchant_country text, merchant_id bigint,merchant_latitude text, merchant_longitude text, merchant_locality text, merchant_name text ,merchant_phone_number text, merchant_region text, number_sold float, online boolean, provider_name text, title text, url text, PRIMARY KEY ((price) category, discount_percentage)) WITH CLUSTERING ORDER BY (discount_percentage DESC);
 
 CREATE TABLE trending_categories_with_disc (category text, sub_category text, created_at timestamp, updated_at timestamp, expires_at timestamp, description text, fine_print text, price float, discount_percentage float, id bigint, merchant_address text, merchant_country text, merchant_id bigint,merchant_latitude text, merchant_longitude text, merchant_locality text, merchant_name text ,merchant_phone_number text, merchant_region text, number_sold float, online boolean, provider_name text, title text, url text, PRIMARY KEY (discount_percentage, price));
 
-DROP TABLE provider_by_category IF EXISTS;
+DROP IF EXISTS TABLE provider_by_category;
 CREATE TABLE provider_by_category (category text, provider_name text, merchant_address text,merchant_country text,merchant_id bigint,merchant_latitude text,merchant_locality text,merchant_longitude text,merchant_name text,merchant_phone_number text,merchant_region text,number_sold text, PRIMARY KEY (provider_name, category))
 
  QUERY 1: 
  create table trending_products_with_price  (id bigint, merchant_id bigint, provider text, title text, category text, sub_category text, description text, fine_print text, price float, percentage_disc float, number_sold int, created_at timestamp, expires_at timestamp, updated_at timestamp, url text, online boolean, unique_deals set<bigint>, PRIMARY KEY ((sub_category, price, percentage_disc),  number_sold, category, merchant_id, updated_at, created_at, expires_at, online)) with clustering order by (number_sold desc);
  
+ STREAMING
+ DROP TABLE deals_streaming.trending_categories_by_time;
+CREATE TABLE deals_streaming.trending_categories_by_time (category text, ts bigint, count bigint, PRIMARY KEY (count, ts)) WITH CLUSTERING ORDER BY (ts DESC) AND default_time_to_live = 120;
+ 
+ DROP TABLE deals_streaming.users_purchasing_pattern;
+ CREATE TABLE deals_streaming.users_purchasing_pattern (name text, purchased text, purchase_time bigint, PRIMARY KEY (name, purchase_time)) WITH CLUSTERING ORDER BY (purchase_time DESC) AND default_time_to_live = 30;
  
  SAMPLE DATA:
  {"id": 4464085, "category": "dining-nightlife", "sub_category": "restaurants", "title": "60% off at Shewaber Restaurant and Lounge", "description": "<p>The menu at Shewaber Restaurant and Lounge features a wide array of great selections, made from only the freshest and highest quality ingredients, with something sure to please every member of your group. Shewaber Restaurant and Lounge has established itself as one of the area's favorite culinary destinations and is sure to offer you a pleasant and unique dining experience every time you visit. Please stop in soon!</p>", "fine_print": "Minimum purchase amounts and other restrictions may apply. See the deal for additional information. Restaurant.com Terms and Conditions apply for all purchases; for Restaurant.com's terms and conditions please see here http://www.restaurant.com/about/terms.", "number_sold": 0, "url": "https://www.groupon.com/deals/shewaber-restaurant-and-lounge-1", "price": 4.0, "discount_percentage": 0.6, "provider_name": "Groupon", "online": false, "expires_at": "2039-06-24T23:59:59Z", "created_at": "2016-01-05T14:38:15Z", "updated_at": "2016-01-10T20:27:05Z", "merchant_id": 987569}
