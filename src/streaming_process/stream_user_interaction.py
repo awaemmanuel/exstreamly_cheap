@@ -45,6 +45,7 @@ def process_trends(time, rdd):
         
         # Convert RDD[String] to RDD[Row] to DataFrame
         rowRdd = rdd.map(lambda c: Row(category=c, ts=int(datetime.now().strftime('%Y%m%d%H%M%S'))))
+        #rowRdd = rdd.map(lambda c: Row(categories=c))
         categories_df = sqlContext.createDataFrame(rowRdd)
         #categories_df.show()
 
@@ -54,6 +55,10 @@ def process_trends(time, rdd):
         # Count category trending in time window
         category_counts_df = sqlContext.sql('select category, first(ts) as ts, count(*) as count from trending_categories_by_time group by category')
         
+        #category_counts_df = sqlContext.sql('select *  from trending_categories_by_time')
+        category_counts_df.show()
+        
+        new_df.show()
         category_counts_df.write.format("org.apache.spark.sql.cassandra").options(table="trending_categories_by_time",keyspace="deals_streaming").save(mode="append")
         print "Appended to table trending_categories_by_time: {}".format(datetime.now().strftime('%Y-%m-%d %H%M%S'))
     except:
