@@ -9,9 +9,9 @@ Table of Contents:
 2. [Motivation](README.md#2-motivation)
 3. [Sample Queries](README.md#3-sample-queries)
 4. [Engineering Solution](README.md#4-engineering-solution) 
-5. [Challenges](README.md#4-challenges)
-6. [Take Away](README.md#5-take-aways)
-7. [Demo and Slides](README.md#6-demo-and-slides)
+5. [Challenges](README.md#5-challenges)
+6. [Take Away](README.md#6-take-aways)
+7. [Demo and Slides](README.md#7-demo-and-slides)
 8. [Youtube video](README.md#8-direct-youtube-video)
 9. [Sample Query Results](README.md#9-sample-query-results)
 
@@ -50,7 +50,9 @@ At Ingestion, boostraping the data pipeline, an asynchronous distributed query e
 The Async Distributed Query Engine (ADQE) is a hybrid distributed querying engine, leveraging kafka's thread safeness and messaging queue, that was implemented to mitigate the pagination challenge of the Sqoot API. As ExStreamly Cheap is a service by category platform, a lot of dependency lies on the accuracy of the specified total number of deals at any given time. Sqoot's API was inconsistent, constantly changing total amounts with each millisecond page refresh.The Async DQE is split into three major components.
   1. [First Stage Producer](src/fetch_data/generate_all_categories.py) that utilizes [Sqoot Data Fetcher](src/fetch/fetch_sqoot_data.py) to interact with the API. Multiple producers - one for each category -  are spun in parallel on tmux sessions as the main interaction with the data source. As each category total is computed, the producers into the first kafka topic       
 ```all_deals_ url - a message with timestamp, url for consumer to fetch and page chunks to grab. ```
+
 This follows the leaky bucket approach. 
+
   2. Intermediate Hybrid Consumer-Producer that creates multiple consumers (2:1 producer) to enable a unique fetch of actual data. A consumer-producer becomes available, fetches from the first stage topic. For that instance of producer, multiple OS threads are spun to grab each individual page as fast as possible. At this point, order of deals isn't important. Aggregation will be handled in spark. The final order synchronization when writing out to file (or another subsequent kafka topic) is handled by a BoundedSemaphore. Output is then written to the final ```deals_data``` topic.
   3. Final Stage Consumer that fetches from the final kafka topic and persists the data to HDFS.
 ![alt text](figures/async_dqe_architecture.png "Async DQE.")
@@ -73,7 +75,7 @@ A lot challenges were meant a long the way. A few outstanding ones are completel
 The following are some of the lessons learned.
   1. There are ubiquitous engineering intricacies that go into designing a robust data pipeline. Careful consideration need to be given to release versions, bugs reported, features already supported by client libraries and documentation (most important in my opinion). A choice between your favorite programming language, which may not be the tool's native implementation, vs the native language implementation is very key. If a native language is chosen, then you may need to learn a new language like SCALA.
   
-  2. The best/optimal design architecture for the Asynchronous Distributed Querying Engine (Async DQE) was a bit challenging. Design tradeoffs had to made to ensure uniqueness of deals. Crawling the API synchronously led to duplicate and expired deals. 
+  2. The best/optimal design architecture for the Asynchronous Distributed Querying Engine (Async DQE) was a bit challenging. Tradeoffs had to made to ensure uniqueness of deals. Crawling the API synchronously led to duplicate and expired deals. 
   ![alt text](figures/pagination_issue.png "Sqoot Pagination challenge.")
 This reason led to implementing Async DQE to try and fetch unique deals asynchronously in parallel, utilizing PyKafka asynchronous producers and balanced consumer implementations. This path was choosen because of the 
 ```LEAKY BUCKET ALGORITHM,  kafka's thread safeness, message queuing and ability to multithread a balanced consumer.``` 
