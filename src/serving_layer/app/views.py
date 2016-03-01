@@ -7,8 +7,9 @@ from flask import request, jsonify, render_template
 from cassandra.cluster import Cluster
 
 # setting up connections to cassandra
-cluster = Cluster(['172.31.2.39']) 
+cluster = Cluster(['52.1.154.19']) 
 session = cluster.connect('deals')
+app.config["JSON_SORT_KEYS"] = False
 
 # setting up connections to realtime cluster
 cluster_rt = Cluster(['172.31.2.37', '172.31.2.36', '172.31.2.45', '172.31.2.46'])
@@ -45,7 +46,7 @@ def get_all_merchants(merchants, full=False):
         json_response = [{'merchant id': x.id, 'name': x.name, 'address': x.address,\
                          'postal code': x.postal_code, 'phone': x.phone_number, \
                           'country': x.country} for x in response_list]
-        return jsonify(merchants=json_response)
+        return jsonify(all_merchants=json_response)
 '''            
 @app.route('/category')
 def get_categories():
