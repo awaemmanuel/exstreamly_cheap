@@ -7,8 +7,8 @@ Table of Contents:
 
 1. [Introduction](README.md#1-introduction)
 2. [Motivation](README.md#2-motivation)
-3. [Engineering Solution](README.md#3-engineering-solution) 
-4. [Sample Queries](README.md#4-sample-queries)
+3. [Sample Queries](README.md#3-sample-queries)
+4. [Engineering Solution](README.md#4-engineering-solution) 
 5. [Challenges](README.md#4-challenges)
 6. [Take Away](README.md#5-take-aways)
 7. [Demo and Slides](README.md#6-demo-and-slides)
