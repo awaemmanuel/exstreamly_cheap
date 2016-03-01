@@ -55,6 +55,7 @@ The Async Distributed Query Engine (ADQE) is a hybrid distributed querying engin
 This follows the leaky bucket approach. 
   2. Intermediate Hybrid Consumer-Producer that creates multiple consumers (2:1 producer) to enable a unique fetch of actual data. A consumer-producer becomes available, fetches from the first stage topic. For that instance of producer, multiple OS threads are spun to grab each individual page as fast as possible. At this point, order of deals isn't important. Aggregation will be handled in spark. The final order synchronization when writing out to file (or another subsequent kafka topic) is handled by a BoundedSemaphore. Output is then written to the final ```deals_data``` topic.
   3. Final Stage Consumer that fetches from the final kafka topic and persists the data to HDFS.
+![alt text](figures/async_dqe_architecture.png "Async DQE.")
 
 ### Realtime Process
 The streaming process data source is a data from an engineered process flow.
