@@ -7,9 +7,11 @@ Table of Contents:
 
 1. [Introduction](README.md#1-introduction)
 2. [Motivation](README.md#2-motivation)
-3. [Engineering Solution](README.md#3-engineering) 
+3. [Engineering Solution](README.md#3-engineering-solution) 
 4. [Challenges](README.md#4-challenges)
-5. [Take Away](README.md#4-take-aways)
+5. [Take Away](README.md#5-take-aways)
+6. [Demo and Slides](README.md#6-demo-and-slides)
+7. [Youtube video](README.md#7-youtube-video)
 
 ## 1. Introduction
 ExStreamly Cheap is a real time scalable deals serving platform. It provides Insights and searching capabilities, maximizing time and profit for end users. 
