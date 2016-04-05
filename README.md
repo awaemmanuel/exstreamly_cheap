@@ -108,4 +108,6 @@ Similarly, a merchant search based on categories will yield a result like this.
 Observe that the first merchant returned is the highest selling merchant in that class. Also a result attributed to proper clustering and secondary indexes in cassandra
 
 ## 10. Slides
-Please find the project slides hosted on slideshare.
+Please find the [project slides](http://www.slideshare.net/EmmanuelAwa/exstreamlycheap-final-slides) here hosted on slideshare.
+
+For questions and concerns please email me at awaemmanuel1@gmail.com
