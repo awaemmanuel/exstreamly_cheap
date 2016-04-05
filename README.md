@@ -14,6 +14,7 @@ Table of Contents:
 7. [Demo and Slides](README.md#7-demo-and-slides)
 8. [Youtube video](README.md#8-direct-youtube-video)
 9. [Sample Query Results](README.md#9-sample-query-results)
+10. [Slides](README.md#10-slides)
 
 ## 1. Introduction
 ExStreamly Cheap is a real time scalable deals serving platform. It provides Insights and searching capabilities, maximizing time and profit for end users. 
@@ -105,3 +106,6 @@ A final product search would yield results like this. This is an example of a di
 Similarly, a merchant search based on categories will yield a result like this.
   ![alt text](figures/merchant_search_with_result.png "Deals search based on price and discount.")
 Observe that the first merchant returned is the highest selling merchant in that class. Also a result attributed to proper clustering and secondary indexes in cassandra
+
+## 10. Slides
+Please find the project slides hosted on slideshare.
